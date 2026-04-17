@@ -91,8 +91,8 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3">
-        {navItems.map((item) => (
-          <NavLink key={item.href} item={item} onClick={onNavClick} />
+        {navItems.map((item, index) => (
+          <NavLink key={index} item={item} onClick={onNavClick} />
         ))}
 
         {isAdmin && (
