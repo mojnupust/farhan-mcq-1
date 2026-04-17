@@ -1,13 +1,9 @@
 "use client";
 
 import { AppLayout } from "@/components/layout/app-layout";
-import { useAuth } from "@/features/auth";
+import { AuthProvider, useAuth } from "@/features/auth";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -29,5 +25,17 @@ export default function AdminLayout({
     >
       {children}
     </AppLayout>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </AuthProvider>
   );
 }

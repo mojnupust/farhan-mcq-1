@@ -1,4 +1,3 @@
-import { AuthProvider } from "@/features/auth";
 import type { Metadata } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import "./globals.css";
@@ -63,9 +62,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="bn">
       <body className={`${hindSiliguri.variable} font-hind antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );

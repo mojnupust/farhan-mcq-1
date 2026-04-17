@@ -1,9 +1,3 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,33 +16,34 @@ import {
   Users,
   Video,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { examCategoryService } from "@/features/exam-categories";
+export const dynamic = "force-static";
 
-const courses = [
-  {
-    id: "ai-augmented-engineering",
-    title: "AI-Augmented Software Engineering",
-    description:
-      "Using AI tools in real production workflows — not toy demos, but actual engineering practices.",
-    videoCount: 12,
+export const metadata: Metadata = {
+  title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ MCQ প্রস্তুতি প্ল্যাটফর্ম",
+  description:
+    "BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA সহ সকল সরকারি চাকরির MCQ প্রস্তুতি নিন। লাইভ পরীক্ষা, মডেল টেস্ট, বিগত বছরের প্রশ্ন সমাধান — সব এক জায়গায়। মাত্র ৳190/মাস।",
+  alternates: {
+    canonical: "https://farhanmcq.com",
   },
-  {
-    id: "deep-nodejs",
-    title: "Deep Node.js",
+  openGraph: {
+    title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ MCQ প্রস্তুতি",
     description:
-      "Internals, event loop, streams, and production debugging. The stuff that separates juniors from seniors.",
-    videoCount: 8,
+      "BCS, ব্যাংক ও প্রাইমারি শিক্ষক নিয়োগসহ সকল সরকারি চাকরির MCQ অনুশীলন, লাইভ পরীক্ষা ও মডেল টেস্ট। মাত্র ৳190/মাস।",
+    url: "https://farhanmcq.com",
+    type: "website",
+    locale: "bn_BD",
+    siteName: "Farhan MCQ",
   },
-  {
-    id: "software-architecture",
-    title: "Software Architecture Fundamentals",
-    description:
-      "Design patterns, system design, and understanding trade-offs in real systems.",
-    videoCount: 6,
-    inProgress: true,
-  },
+};
+
+const categories = [
+  { id: 1, name: "জব সলিউশন", slug: "job-solution" },
+  { id: 2, name: "শিক্ষক নিয়োগ ও নিবন্ধন", slug: "teacher-recruitment" },
+  { id: 3, name: "বিসিএস প্রস্তুতি", slug: "bcs-preparation" },
+  { id: 4, name: "ব্যাংক নিয়োগ ও প্রস্তুতি", slug: "bank-recruitment" },
 ];
 
 const benefits = [
@@ -105,37 +100,34 @@ const faqs = [
   },
 ];
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
-      <path
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-        fill="#4285F4"
-      />
-      <path
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-        fill="#34A853"
-      />
-      <path
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-        fill="#FBBC05"
-      />
-      <path
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-        fill="#EA4335"
-      />
-    </svg>
-  );
-}
+export default function LandingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Farhan MCQ",
+    url: "https://farhanmcq.com",
+    description:
+      "BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA সহ সকল সরকারি চাকরির MCQ প্রস্তুতি প্ল্যাটফর্ম।",
+    publisher: {
+      "@type": "Organization",
+      name: "Farhan Software",
+      founder: { "@type": "Person", name: "Mojnu Miah" },
+    },
+    offers: {
+      "@type": "Offer",
+      price: "190",
+      priceCurrency: "BDT",
+      url: "https://farhanmcq.com/dashboard",
+      availability: "https://schema.org/InStock",
+    },
+  };
 
-export const dynamic = "force-dynamic";
-
-export default async function LandingPage() {
-  const categories = await examCategoryService.getAll();
-
-  console.log("Fetched categories:", categories);
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
@@ -338,17 +330,21 @@ export default async function LandingPage() {
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               Frequently asked questions
             </h2>
-            <div className="mt-8 max-w-2xl">
-              <Accordion type="single" collapsible className="w-full">
-                {faqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger>{faq.question}</AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+            <div className="mt-8 max-w-2xl space-y-2">
+              {faqs.map((faq, index) => (
+                <details
+                  key={index}
+                  className="group border-b pb-4 [&[open]>summary>svg]:rotate-180"
+                >
+                  <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-medium transition-colors hover:underline [&::-webkit-details-marker]:hidden list-none">
+                    {faq.question}
+                    <ChevronRight className="size-4 shrink-0 rotate-90 text-muted-foreground transition-transform duration-200" />
+                  </summary>
+                  <p className="pb-2 text-sm text-muted-foreground">
+                    {faq.answer}
+                  </p>
+                </details>
+              ))}
             </div>
           </div>
         </section>

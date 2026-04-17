@@ -1,14 +1,10 @@
 "use client";
 
 import { AppLayout } from "@/components/layout/app-layout";
-import { useAuth } from "@/features/auth";
+import { AuthProvider, useAuth } from "@/features/auth";
 import { SubscriptionProvider } from "@/features/subscriptions";
 
-export default function MemberLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function MemberLayoutInner({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -30,5 +26,17 @@ export default function MemberLayout({
     >
       <SubscriptionProvider>{children}</SubscriptionProvider>
     </AppLayout>
+  );
+}
+
+export default function MemberLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthProvider>
+      <MemberLayoutInner>{children}</MemberLayoutInner>
+    </AuthProvider>
   );
 }

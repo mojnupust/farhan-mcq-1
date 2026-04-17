@@ -101,8 +101,8 @@ function SidebarContent({
             <p className="px-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Admin
             </p>
-            {adminNav.map((item) => (
-              <NavLink key={item.href} item={item} onClick={onNavClick} />
+            {adminNav.map((item, index) => (
+              <NavLink key={index} item={item} onClick={onNavClick} />
             ))}
           </>
         )}
