@@ -195,259 +195,267 @@ export default function AdminRoutinesPage() {
     }
   };
 
-  return (
-          <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              রুটিন ব্যবস্থাপনা
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {routines.length} টি রুটিন
-            </p>
-          </div>
+  const convertToBengali = (num) => {
+    const banglaDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    return num.toString().replace(/\d/g, (digit) => banglaDigits[digit]);
+  };
 
-          <Dialog
-            open={dialogOpen}
-            onOpenChange={(open) => {
-              setDialogOpen(open);
-              if (!open) resetForm();
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button size="sm" disabled={!selectedSub}>
-                <Plus className="size-4 mr-1" />
-                নতুন রুটিন
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingId ? "রুটিন সম্পাদনা" : "নতুন রুটিন"}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            রুটিন ব্যবস্থাপনা
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {routines.length} টি রুটিন
+          </p>
+        </div>
+
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) resetForm();
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button size="sm" disabled={!selectedSub}>
+              <Plus className="size-4 mr-1" />
+              নতুন রুটিন
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId ? "রুটিন সম্পাদনা" : "নতুন রুটিন"}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="title">শিরোনাম</Label>
+                <Input
+                  id="title"
+                  value={form.title}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, title: e.target.value }))
+                  }
+                  placeholder="বাংলা সাহিত্য মডেল টেস্ট"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title">শিরোনাম</Label>
+                  <Label htmlFor="date">তারিখ</Label>
                   <Input
-                    id="title"
-                    value={form.title}
+                    id="date"
+                    type="date"
+                    value={form.date}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, title: e.target.value }))
+                      setForm((f) => ({ ...f, date: e.target.value }))
                     }
-                    placeholder="বাংলা সাহিত্য মডেল টেস্ট"
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="date">তারিখ</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={form.date}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, date: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="subject">বিষয়</Label>
-                    <Input
-                      id="subject"
-                      value={form.subject}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, subject: e.target.value }))
-                      }
-                      placeholder="বাংলা"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="totalMarks">মোট নম্বর</Label>
-                    <Input
-                      id="totalMarks"
-                      type="number"
-                      value={form.totalMarks}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          totalMarks: parseInt(e.target.value) || 0,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="duration">সময় (মিনিট)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      value={form.duration}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          duration: parseInt(e.target.value) || 0,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                </div>
                 <div>
-                  <Label htmlFor="topics">টপিক (ঐচ্ছিক)</Label>
+                  <Label htmlFor="subject">বিষয়</Label>
                   <Input
-                    id="topics"
-                    value={form.topics}
+                    id="subject"
+                    value={form.subject}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, topics: e.target.value }))
+                      setForm((f) => ({ ...f, subject: e.target.value }))
                     }
-                    placeholder="কবিতা, গল্প, উপন্যাস"
+                    placeholder="বাংলা"
+                    required
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sourceMaterial">সোর্স (ঐচ্ছিক)</Label>
+                  <Label htmlFor="totalMarks">মোট নম্বর</Label>
                   <Input
-                    id="sourceMaterial"
-                    value={form.sourceMaterial}
+                    id="totalMarks"
+                    type="number"
+                    value={form.totalMarks}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
-                        sourceMaterial: e.target.value,
+                        totalMarks: parseInt(e.target.value) || 0,
                       }))
                     }
-                    placeholder="NCTB বোর্ড বই"
+                    required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="description">বিবরণ (ঐচ্ছিক)</Label>
-                  <Textarea
-                    id="description"
-                    value={form.description}
+                  <Label htmlFor="duration">সময় (মিনিট)</Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    value={form.duration}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, description: e.target.value }))
+                      setForm((f) => ({
+                        ...f,
+                        duration: parseInt(e.target.value) || 0,
+                      }))
                     }
-                    placeholder="বিস্তারিত বিবরণ..."
-                    rows={3}
+                    required
                   />
                 </div>
-                <Button type="submit" className="w-full">
-                  {editingId ? "আপডেট করুন" : "তৈরি করুন"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Filters */}
-        <div className="mt-4 flex gap-4">
-          <div className="flex-1 max-w-xs">
-            <Label>ক্যাটাগরি</Label>
-            <Select value={selectedCatId} onValueChange={setSelectedCatId}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="ক্যাটাগরি নির্বাচন" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.icon || "📝"} {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 max-w-xs">
-            <Label>সাব-ক্যাটাগরি</Label>
-            <Select value={selectedSubSlug} onValueChange={setSelectedSubSlug}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="সাব-ক্যাটাগরি নির্বাচন" />
-              </SelectTrigger>
-              <SelectContent>
-                {subCategories.map((sub) => (
-                  <SelectItem key={sub.id} value={sub.slug}>
-                    {sub.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">রুটিন তালিকা</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                লোড হচ্ছে...
-              </p>
-            ) : !selectedSubSlug ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                একটি সাব-ক্যাটাগরি নির্বাচন করুন
-              </p>
-            ) : routines.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                কোনো রুটিন নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>শিরোনাম</TableHead>
-                    <TableHead>তারিখ</TableHead>
-                    <TableHead>বিষয়</TableHead>
-                    <TableHead>নম্বর</TableHead>
-                    <TableHead>সময়</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {routines.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-medium max-w-50 truncate">
-                        {r.title}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {formatDate(r.date)}
-                      </TableCell>
-                      <TableCell>{r.subject}</TableCell>
-                      <TableCell>{r.totalMarks}</TableCell>
-                      <TableCell>{r.duration} মি.</TableCell>
-                      <TableCell>
-                        <Badge variant={r.isActive ? "default" : "secondary"}>
-                          {r.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(r)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(r.id)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+              </div>
+              <div>
+                <Label htmlFor="topics">টপিক (ঐচ্ছিক)</Label>
+                <Input
+                  id="topics"
+                  value={form.topics}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, topics: e.target.value }))
+                  }
+                  placeholder="কবিতা, গল্প, উপন্যাস"
+                />
+              </div>
+              <div>
+                <Label htmlFor="sourceMaterial">সোর্স (ঐচ্ছিক)</Label>
+                <Input
+                  id="sourceMaterial"
+                  value={form.sourceMaterial}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      sourceMaterial: e.target.value,
+                    }))
+                  }
+                  placeholder="NCTB বোর্ড বই"
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">বিবরণ (ঐচ্ছিক)</Label>
+                <Textarea
+                  id="description"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                  placeholder="বিস্তারিত বিবরণ..."
+                  rows={3}
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                {editingId ? "আপডেট করুন" : "তৈরি করুন"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
+
+      {/* Filters */}
+      <div className="mt-4 flex gap-4">
+        <div className="flex-1 max-w-xs">
+          <Label>ক্যাটাগরি</Label>
+          <Select value={selectedCatId} onValueChange={setSelectedCatId}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="ক্যাটাগরি নির্বাচন" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.icon || "📝"} {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex-1 max-w-xs">
+          <Label>সাব-ক্যাটাগরি</Label>
+          <Select value={selectedSubSlug} onValueChange={setSelectedSubSlug}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="সাব-ক্যাটাগরি নির্বাচন" />
+            </SelectTrigger>
+            <SelectContent>
+              {subCategories.map((sub) => (
+                <SelectItem key={sub.id} value={sub.slug}>
+                  {sub.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">রুটিন তালিকা</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              লোড হচ্ছে...
+            </p>
+          ) : !selectedSubSlug ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              একটি সাব-ক্যাটাগরি নির্বাচন করুন
+            </p>
+          ) : routines.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              কোনো রুটিন নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>প্রশ্নসেট</TableHead>
+                  <TableHead>টপিক</TableHead>
+                  <TableHead>তারিখ</TableHead>
+                  <TableHead>বিষয়</TableHead>
+                  <TableHead>নম্বর</TableHead>
+                  <TableHead>সময়</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {routines.map((r, index) => (
+                  <TableRow key={r.id}>
+                    <TableCell>{convertToBengali(index + 1)}</TableCell>
+                    <TableCell className="font-medium max-w-50 truncate">
+                      {r.topics || "বিষয়বস্তু নেই"}
+                    </TableCell>
+                    <TableCell>{r.subject}</TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(r.date)}
+                    </TableCell>
+                    <TableCell>{r.subject}</TableCell>
+                    <TableCell>{r.totalMarks}</TableCell>
+                    <TableCell>{r.duration} মি.</TableCell>
+                    <TableCell>
+                      <Badge variant={r.isActive ? "default" : "secondary"}>
+                        {r.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(r)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(r.id)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
