@@ -195,9 +195,11 @@ export default function AdminRoutinesPage() {
     }
   };
 
-  const convertToBengali = (num) => {
+  const convertToBengali = (num: number) => {
     const banglaDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-    return num.toString().replace(/\d/g, (digit) => banglaDigits[digit]);
+    return num
+      .toString()
+      .replace(/\d/g, (digit) => banglaDigits[parseInt(digit)]);
   };
 
   return (
