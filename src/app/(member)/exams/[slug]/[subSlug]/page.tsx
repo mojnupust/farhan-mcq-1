@@ -106,65 +106,91 @@ export default function SubExamDashboardPage({
 
   if (loading) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-muted-foreground py-12">
-            লোড হচ্ছে...
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+      </div>
     );
   }
 
   if (!subCategory) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-muted-foreground py-12">
-            সাব-ক্যাটাগরি পাওয়া যায়নি
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+        <p className="text-center text-muted-foreground py-12">
+          সাব-ক্যাটাগরি পাওয়া যায়নি
+        </p>
+      </div>
     );
   }
 
   return (
-          <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Back + Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.examCategory(slug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {subCategory.name}
-          </h1>
-        </div>
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Back + Header */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={ROUTES.examCategory(slug)}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {subCategory.name}
+        </h1>
+      </div>
 
-        {/* Live Question Set Card */}
-        {liveSet && (
-          <Card className="mt-6 border-green-200 bg-green-50/50">
-            <CardContent className="py-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Badge className="bg-green-600 text-white text-xs">
-                  <PlayCircle className="size-3 mr-1" />
-                  লাইভ পরীক্ষা
-                </Badge>
+      {/* Live Question Set Card */}
+      {liveSet ? (
+        <Card className="mt-6 overflow-hidden border border-green-200/60 bg-gradient-to-br from-green-50 via-emerald-50/40 to-white shadow-md shadow-green-100/50">
+          <CardContent className="py-0 px-0">
+            {/* Top accent bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-green-400 via-emerald-500 to-green-600" />
+
+            <div className="px-5 py-4">
+              {/* Live Badge with animated pulse */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  {/* Animated live pulse dot */}
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-600" />
+                  </span>
+                  <Badge className="bg-green-600/90 hover:bg-green-600 text-white text-xs font-semibold tracking-wide px-2.5 py-0.5 shadow-sm shadow-green-700/20">
+                    LIVE • লাইভ পরীক্ষা
+                  </Badge>
+                </div>
+                <span className="text-[10px] font-medium text-green-600/70 uppercase tracking-widest">
+                  এখন চলছে
+                </span>
               </div>
-              <h2 className="text-lg font-semibold">{liveSet.title}</h2>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="size-3.5" />
+
+              {/* Title */}
+              <h2 className="text-base font-bold text-gray-900 leading-snug">
+                {liveSet.title}
+              </h2>
+
+              {/* Meta info */}
+              <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 text-gray-500">
+                  <Calendar className="size-3.5 text-green-500" />
                   {new Date(liveSet.date).toLocaleDateString("bn-BD")}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="size-3.5" />
+                <span className="flex items-center gap-1.5 text-gray-500">
+                  <Clock className="size-3.5 text-green-500" />
                   {liveSet.duration} মিনিট
                 </span>
-                <span>মোট নম্বর: {liveSet.totalMarks}</span>
-                <span>বিষয়: {liveSet.subject}</span>
+                <span className="flex items-center gap-1 text-gray-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                  মোট নম্বর: {liveSet.totalMarks}
+                </span>
+                <span className="flex items-center gap-1 text-gray-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                  বিষয়: {liveSet.subject}
+                </span>
               </div>
-              <div className="mt-3">
+
+              {/* CTA */}
+              <div className="mt-4">
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 active:scale-95 transition-all duration-150 text-white shadow-sm shadow-green-700/30 font-semibold text-sm px-4"
                   asChild
                 >
                   <Link href={ROUTES.exam(liveSet.id)}>
@@ -173,29 +199,47 @@ export default function SubExamDashboardPage({
                   </Link>
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white">
+          {/* Subtle top strip */}
+          <div className="h-0.5 w-full bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200" />
 
-        {/* 6 Icon Cards Grid */}
-        <div className="mt-6 grid grid-cols-3 gap-3">
-          {cards.map((card) => (
-            <Link key={card.label} href={card.href}>
-              <Card className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/30">
-                <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
-                  <div
-                    className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-transform group-hover:scale-110`}
-                  >
-                    <card.icon className={`size-7 ${card.color}`} />
-                  </div>
-                  <span className="text-sm font-medium text-center">
-                    {card.label}
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-7 text-center">
+            {/* Text */}
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-slate-600">
+                আজ লাইভ পরীক্ষা নেই
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                পরবর্তী পরীক্ষার জন্য অপেক্ষা করুন
+              </p>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* 6 Icon Cards Grid */}
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        {cards.map((card) => (
+          <Link key={card.label} href={card.href}>
+            <Card className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/30">
+              <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
+                <div
+                  className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-transform group-hover:scale-110`}
+                >
+                  <card.icon className={`size-7 ${card.color}`} />
+                </div>
+                <span className="text-sm font-medium text-center">
+                  {card.label}
+                </span>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
+    </div>
   );
 }

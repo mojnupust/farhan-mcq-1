@@ -1,0 +1,18 @@
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.hide-scrollbar::-webkit-scrollbar-thumb {
+  background: #d3d3d3; /* lightgrey */
+  border-radius: 8px;
+}
+.hide-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d3d3d3 transparent;
+}

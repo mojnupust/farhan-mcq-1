@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
+import "./hide-scrollbar.css";
 
 const OPTION_LABELS = ["ক", "খ", "গ", "ঘ"] as const;
 const OPTION_KEYS = ["A", "B", "C", "D"] as const;
@@ -293,7 +294,7 @@ export default function AnswersPage({
         {/* Question Palette */}
         <Card className="mt-4">
           <CardContent className="py-4">
-            <div className="grid grid-cols-10 gap-1.5">
+            <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-1.5">
               {filteredQuestions.map((q, i) => {
                 const isCurrent = i === currentIndex;
                 return (
@@ -315,7 +316,7 @@ export default function AnswersPage({
       </div>
 
       <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto w-full sm:max-w-lg p-4 sm:p-6 hide-scrollbar">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="size-5" />
