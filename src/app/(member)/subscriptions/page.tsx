@@ -311,7 +311,7 @@ export default function SubscriptionsPage() {
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
                   নিচের যেকোনো একটি মাধ্যমে উক্ত পরিমাণ পাঠান, তারপর ট্রানজাকশন
-                  আইডি এখানে সাবমিট করুন।
+                  আইডি এখানে সাবমিট করুন। ৫ মিনিট পর রিফ্রেস দিন।
                   <br />- 01788262433 (Bkash/Nagad) - 01788262433 (Rocket)
                 </p>
               </div>
