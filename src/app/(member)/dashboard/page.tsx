@@ -3,36 +3,33 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth";
 import { StudySection } from "@/features/dashboard/components/study-section";
-import type { ExamCategory } from "@/features/exam-categories";
-import { examCategoryService } from "@/features/exam-categories";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
+const categories = [
+  {
+    id: 1,
+    icon: "💼",
+    slug: "job-solution",
+    name: "জব সল্যুশন",
+  },
+  {
+    id: 2,
+    icon: "📚",
+    slug: "teacher-recruitment",
+    name: "শিক্ষক নিয়োগ ও নিবন্ধন",
+  },
+];
 
 // TODO: replace with real auth session
 export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth();
-  const [categories, setCategories] = useState<ExamCategory[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
   const router = useRouter();
-
-  useEffect(() => {
-    examCategoryService.getAll().then(setCategories).catch(console.error);
-  }, []);
 
   if (!isLoading && !user) {
     router.push("/login");
     return null;
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <p className="text-muted-foreground">লোড হচ্ছে...</p>
-      </div>
-    );
   }
 
   return (
