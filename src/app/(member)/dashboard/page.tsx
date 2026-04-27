@@ -7,18 +7,26 @@ import { CategoryGrid } from "@/features/exam-categories/components/category-gri
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const categories = [
+import type { ExamCategory } from "@/features/exam-categories/types";
+
+const categories: ExamCategory[] = [
   {
-    id: 1,
+    id: "1",
     icon: "💼",
     slug: "job-solution",
     name: "জব সল্যুশন",
+    sortOrder: 1,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00.000Z",
   },
   {
-    id: 2,
+    id: "2",
     icon: "📚",
     slug: "teacher-recruitment",
     name: "শিক্ষক নিয়োগ ও নিবন্ধন",
+    sortOrder: 2,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00.000Z",
   },
 ];
 

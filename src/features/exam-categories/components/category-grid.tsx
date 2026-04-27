@@ -2,11 +2,9 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import type { ExamCategory } from "../types";
 
-interface CategoryGridProps {
-  categories: ExamCategory[];
-}
 
-export function CategoryGrid({ categories }: CategoryGridProps) {
+
+export function CategoryGrid({ categories }: { categories: ExamCategory[] }) {
   return (
     <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
       {categories.map((category) => (
