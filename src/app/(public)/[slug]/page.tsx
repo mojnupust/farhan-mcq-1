@@ -180,7 +180,7 @@ export default async function QuestionPage({ params }: Props) {
                 </Link>
               </li>
               <li aria-hidden>/</li>
-              <li className="truncate max-w-[200px]" aria-current="page">
+              <li className="truncate max-w-50" aria-current="page">
                 {question.questionText.slice(0, 50)}…
               </li>
             </ol>

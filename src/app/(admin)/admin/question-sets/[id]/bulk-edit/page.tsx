@@ -297,7 +297,7 @@ export default function BulkEditPage({
   }
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-400 px-4 py-6 sm:px-6">
       {/* Header */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
@@ -392,14 +392,14 @@ export default function BulkEditPage({
                 />
               </th>
               <th className="px-2 py-2.5 text-center w-12">#</th>
-              <th className="px-2 py-2.5 text-left min-w-[260px]">প্রশ্ন</th>
-              <th className="px-2 py-2.5 text-left min-w-[130px]">ক) A</th>
-              <th className="px-2 py-2.5 text-left min-w-[130px]">খ) B</th>
-              <th className="px-2 py-2.5 text-left min-w-[130px]">গ) C</th>
-              <th className="px-2 py-2.5 text-left min-w-[130px]">ঘ) D</th>
+              <th className="px-2 py-2.5 text-left min-w-65">প্রশ্ন</th>
+              <th className="px-2 py-2.5 text-left min-w-32.5">ক) A</th>
+              <th className="px-2 py-2.5 text-left min-w-32.5">খ) B</th>
+              <th className="px-2 py-2.5 text-left min-w-32.5">গ) C</th>
+              <th className="px-2 py-2.5 text-left min-w-32.5">ঘ) D</th>
               <th className="px-2 py-2.5 text-center w-20">উত্তর</th>
-              <th className="px-2 py-2.5 text-left min-w-[110px]">বিষয়</th>
-              <th className="px-2 py-2.5 text-left min-w-[110px]">টপিক</th>
+              <th className="px-2 py-2.5 text-left min-w-27.5">বিষয়</th>
+              <th className="px-2 py-2.5 text-left min-w-27.5">টপিক</th>
               <th className="px-2 py-2.5 text-center w-16">ব্যাখ্যা</th>
               <th className="px-2 py-2.5 w-10" />
             </tr>
@@ -521,7 +521,7 @@ function RowGroup({
             }
             rows={2}
             placeholder="প্রশ্নের বিষয়বস্তু..."
-            className="min-w-[240px] text-xs resize-none"
+            className="min-w-60 text-xs resize-none"
           />
         </td>
 
@@ -535,7 +535,7 @@ function RowGroup({
                   onUpdate(row._key, { [field]: e.target.value })
                 }
                 placeholder="—"
-                className="min-w-[120px] text-xs h-8"
+                className="min-w-30 text-xs h-8"
               />
             </td>
           ),
@@ -565,7 +565,7 @@ function RowGroup({
             value={row.subject}
             onChange={(e) => onUpdate(row._key, { subject: e.target.value })}
             placeholder="বিষয়"
-            className="min-w-[100px] text-xs h-8"
+            className="min-w-25 text-xs h-8"
           />
         </td>
 
@@ -575,7 +575,7 @@ function RowGroup({
             value={row.topic}
             onChange={(e) => onUpdate(row._key, { topic: e.target.value })}
             placeholder="টপিক"
-            className="min-w-[100px] text-xs h-8"
+            className="min-w-25 text-xs h-8"
           />
         </td>
 

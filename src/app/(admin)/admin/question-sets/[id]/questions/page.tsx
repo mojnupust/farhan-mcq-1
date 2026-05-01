@@ -33,6 +33,7 @@ import {
   GripVertical,
   Pencil,
   Plus,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -186,6 +187,12 @@ export default function AdminQuestionSetQuestionsPage({
             </p>
           )}
         </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/admin/question-sets/${questionSetId}/ai-import`}>
+            <Sparkles className="size-4 mr-1" />
+            AI আমদানি
+          </Link>
+        </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href={`/admin/question-sets/${questionSetId}/bulk-edit`}>
             বাল্ক এডিট
