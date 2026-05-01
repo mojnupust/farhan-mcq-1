@@ -88,6 +88,10 @@ export interface Question {
   correctAnswer: string;
   explanation: string | null;
   subject: string | null;
+  topic: string | null;
+  subTopic: string | null;
+  slug: string | null;
+  frequencyTag: string | null;
   sortOrder: number;
 }
 
@@ -125,6 +129,29 @@ export interface UpdateQuestionInput {
   correctAnswer?: string;
   explanation?: string;
   subject?: string;
+  topic?: string;
+  subTopic?: string;
+  slug?: string;
+  frequencyTag?: string;
+  sortOrder?: number;
+}
+
+export interface BulkUpsertQuestionItem {
+  /** Omit for new questions; include for updates. */
+  id?: string;
+  questionSetId: string;
+  questionText: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  correctAnswer: string;
+  explanation?: string;
+  subject?: string;
+  topic?: string;
+  subTopic?: string;
+  slug?: string;
+  frequencyTag?: string;
   sortOrder?: number;
 }
 

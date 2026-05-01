@@ -155,6 +155,10 @@ export const mockQuestionSetService: QuestionSetService = {
     return {} as Question;
   },
   async deleteQuestion() {},
+  async bulkUpsertQuestions() {
+    return [] as Question[];
+  },
+  async bulkDeleteQuestions() {},
 
   // Exam flow
   async getExamQuestions(): Promise<ExamQuestion[]> {

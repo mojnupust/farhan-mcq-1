@@ -1,6 +1,7 @@
 import type {
   AnswerQuestionInput,
   AppSettings,
+  BulkUpsertQuestionItem,
   CreateQuestionInput,
   CreateQuestionSetInput,
   ExamAttempt,
@@ -39,6 +40,8 @@ export interface QuestionSetService {
   createQuestion(input: CreateQuestionInput): Promise<Question>;
   updateQuestion(id: string, input: UpdateQuestionInput): Promise<Question>;
   deleteQuestion(id: string): Promise<void>;
+  bulkUpsertQuestions(questions: BulkUpsertQuestionItem[]): Promise<Question[]>;
+  bulkDeleteQuestions(ids: string[]): Promise<void>;
 
   // Exam flow
   getExamQuestions(questionSetId: string): Promise<ExamQuestion[]>;

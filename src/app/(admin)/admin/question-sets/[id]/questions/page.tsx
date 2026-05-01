@@ -186,6 +186,11 @@ export default function AdminQuestionSetQuestionsPage({
             </p>
           )}
         </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/admin/question-sets/${questionSetId}/bulk-edit`}>
+            বাল্ক এডিট
+          </Link>
+        </Button>
         <Dialog
           open={dialogOpen}
           onOpenChange={setDialogOpen} // Simplified: don't reset form here yet
@@ -202,7 +207,6 @@ export default function AdminQuestionSetQuestionsPage({
               প্রশ্ন যোগ করুন
             </Button>
           </DialogTrigger>
-
           <DialogContent
             className="max-w-2xl max-h-[90vh] overflow-y-auto"
             onCloseAutoFocus={(e) => {

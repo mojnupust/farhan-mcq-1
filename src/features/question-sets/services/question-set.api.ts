@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/api-client";
 import type {
   AnswerQuestionInput,
   AppSettings,
+  BulkUpsertQuestionItem,
   CreateQuestionInput,
   CreateQuestionSetInput,
   ExamAttempt,
@@ -110,6 +111,16 @@ export const apiQuestionSetService: QuestionSetService = {
   },
   async deleteQuestion(id: string) {
     await apiClient.delete(`/v1/question-sets/question/${id}`);
+  },
+  async bulkUpsertQuestions(questions: BulkUpsertQuestionItem[]) {
+    const res = await apiClient.post<{ data: Question[] }>(
+      "/v1/question-sets/questions/bulk-upsert",
+      { questions },
+    );
+    return res.data;
+  },
+  async bulkDeleteQuestions(ids: string[]) {
+    await apiClient.delete("/v1/question-sets/questions/bulk-delete", { ids });
   },
 
   // Exam flow
