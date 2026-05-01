@@ -40,6 +40,7 @@ export const ROUTES = {
   syllabus: "#",
   jobAlerts: "#",
   blogPosts: "#",
+  question: (slug: string) => `/${slug}` as const,
 
   // Admin
   admin: "/admin",
