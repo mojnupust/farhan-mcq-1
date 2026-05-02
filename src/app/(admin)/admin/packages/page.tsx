@@ -27,6 +27,7 @@ import type {
   PackageDto,
 } from "@/features/subscriptions/types";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const emptyForm: CreatePackageInput = {
@@ -129,17 +130,21 @@ export default function AdminPackagesPage() {
   };
 
   return (
-          <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              প্যাকেজ ব্যবস্থাপনা
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {packages.length} টি প্যাকেজ
-            </p>
-          </div>
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            প্যাকেজ ব্যবস্থাপনা
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {packages.length} টি প্যাকেজ
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/packages/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -285,7 +290,7 @@ export default function AdminPackagesPage() {
                       setForm((f) => ({ ...f, description: e.target.value }))
                     }
                     placeholder="প্যাকেজের বিবরণ..."
-                    className="min-h-[60px] resize-none"
+                    className="min-h-15 resize-none"
                   />
                 </div>
                 <Button type="submit" className="w-full">
@@ -295,86 +300,87 @@ export default function AdminPackagesPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">সকল প্যাকেজ</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="py-8 text-center text-muted-foreground">
-                লোড হচ্ছে...
-              </p>
-            ) : packages.length === 0 ? (
-              <p className="py-8 text-center text-muted-foreground">
-                কোনো প্যাকেজ নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>নাম</TableHead>
-                    <TableHead>মেয়াদ</TableHead>
-                    <TableHead>মূল্য</TableHead>
-                    <TableHead>ছাড়</TableHead>
-                    <TableHead>কোটা</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {packages.map((pkg) => (
-                    <TableRow key={pkg.id}>
-                      <TableCell className="font-medium">{pkg.name}</TableCell>
-                      <TableCell>{pkg.durationDays} দিন</TableCell>
-                      <TableCell>৳{pkg.price}</TableCell>
-                      <TableCell>৳{pkg.discount}</TableCell>
-                      <TableCell>
-                        {pkg.liveQuota || pkg.archiveQuota ? (
-                          <span className="text-xs">
-                            L:{pkg.liveQuota ?? "∞"} A:
-                            {pkg.archiveQuota ?? "∞"}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            সীমাহীন
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={pkg.isActive ? "default" : "secondary"}
-                          className="cursor-pointer"
-                          onClick={() => handleToggleActive(pkg)}
-                        >
-                          {pkg.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(pkg)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(pkg.id)}
-                          >
-                            <Trash2 className="size-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">সকল প্যাকেজ</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="py-8 text-center text-muted-foreground">
+              লোড হচ্ছে...
+            </p>
+          ) : packages.length === 0 ? (
+            <p className="py-8 text-center text-muted-foreground">
+              কোনো প্যাকেজ নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>নাম</TableHead>
+                  <TableHead>মেয়াদ</TableHead>
+                  <TableHead>মূল্য</TableHead>
+                  <TableHead>ছাড়</TableHead>
+                  <TableHead>কোটা</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {packages.map((pkg) => (
+                  <TableRow key={pkg.id}>
+                    <TableCell className="font-medium">{pkg.name}</TableCell>
+                    <TableCell>{pkg.durationDays} দিন</TableCell>
+                    <TableCell>৳{pkg.price}</TableCell>
+                    <TableCell>৳{pkg.discount}</TableCell>
+                    <TableCell>
+                      {pkg.liveQuota || pkg.archiveQuota ? (
+                        <span className="text-xs">
+                          L:{pkg.liveQuota ?? "∞"} A:
+                          {pkg.archiveQuota ?? "∞"}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          সীমাহীন
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={pkg.isActive ? "default" : "secondary"}
+                        className="cursor-pointer"
+                        onClick={() => handleToggleActive(pkg)}
+                      >
+                        {pkg.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(pkg)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(pkg.id)}
+                        >
+                          <Trash2 className="size-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

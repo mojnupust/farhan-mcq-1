@@ -35,6 +35,7 @@ import type {
 } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function slugify(text: string): string {
@@ -165,18 +166,22 @@ export default function AdminSubCategoriesPage() {
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
 
   return (
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              সাব-ক্যাটাগরি ব্যবস্থাপনা
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {subCategories.length} টি সাব-ক্যাটাগরি
-              {selectedCategory ? ` — ${selectedCategory.name}` : ""}
-            </p>
-          </div>
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            সাব-ক্যাটাগরি ব্যবস্থাপনা
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {subCategories.length} টি সাব-ক্যাটাগরি
+            {selectedCategory ? ` — ${selectedCategory.name}` : ""}
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/sub-categories/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -258,89 +263,90 @@ export default function AdminSubCategoriesPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        {/* Category Filter */}
-        <div className="mt-4">
-          <Label>প্যারেন্ট ক্যাটাগরি</Label>
-          <Select
-            value={selectedCategoryId}
-            onValueChange={setSelectedCategoryId}
-          >
-            <SelectTrigger className="mt-1 w-full max-w-xs">
-              <SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.icon || "📝"} {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">সাব-ক্যাটাগরি তালিকা</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                লোড হচ্ছে...
-              </p>
-            ) : subCategories.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                কোনো সাব-ক্যাটাগরি নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>নাম</TableHead>
-                    <TableHead>স্লাগ</TableHead>
-                    <TableHead>ক্রম</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {subCategories.map((sub) => (
-                    <TableRow key={sub.id}>
-                      <TableCell className="font-medium">{sub.name}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {sub.slug}
-                      </TableCell>
-                      <TableCell>{sub.sortOrder}</TableCell>
-                      <TableCell>
-                        <Badge variant={sub.isActive ? "default" : "secondary"}>
-                          {sub.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(sub)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(sub.id)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Category Filter */}
+      <div className="mt-4">
+        <Label>প্যারেন্ট ক্যাটাগরি</Label>
+        <Select
+          value={selectedCategoryId}
+          onValueChange={setSelectedCategoryId}
+        >
+          <SelectTrigger className="mt-1 w-full max-w-xs">
+            <SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {cat.icon || "📝"} {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">সাব-ক্যাটাগরি তালিকা</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              লোড হচ্ছে...
+            </p>
+          ) : subCategories.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              কোনো সাব-ক্যাটাগরি নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>নাম</TableHead>
+                  <TableHead>স্লাগ</TableHead>
+                  <TableHead>ক্রম</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {subCategories.map((sub) => (
+                  <TableRow key={sub.id}>
+                    <TableCell className="font-medium">{sub.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {sub.slug}
+                    </TableCell>
+                    <TableCell>{sub.sortOrder}</TableCell>
+                    <TableCell>
+                      <Badge variant={sub.isActive ? "default" : "secondary"}>
+                        {sub.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(sub)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(sub.id)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

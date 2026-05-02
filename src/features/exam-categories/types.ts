@@ -22,3 +22,12 @@ export interface UpdateExamCategoryInput {
   sortOrder?: number;
   isActive?: boolean;
 }
+
+export interface BulkUpsertExamCategoryItem {
+  id?: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}

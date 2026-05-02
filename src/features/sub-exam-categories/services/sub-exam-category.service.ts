@@ -1,4 +1,5 @@
 import type {
+  BulkUpsertSubExamCategoryItem,
   CreateSubExamCategoryInput,
   MeritListEntry,
   SubExamCategory,
@@ -16,4 +17,8 @@ export interface SubExamCategoryService {
     input: UpdateSubExamCategoryInput,
   ): Promise<SubExamCategory>;
   delete(id: string): Promise<void>;
+  bulkUpsert(
+    items: BulkUpsertSubExamCategoryItem[],
+  ): Promise<SubExamCategory[]>;
+  bulkDelete(ids: string[]): Promise<void>;
 }

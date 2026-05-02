@@ -35,6 +35,7 @@ import { routineService } from "@/features/routines";
 import type { SubExamCategory } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function formatDate(dateStr: string): string {
@@ -214,139 +215,145 @@ export default function AdminRoutinesPage() {
           </p>
         </div>
 
-        <Dialog
-          open={dialogOpen}
-          onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) resetForm();
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button size="sm" disabled={!selectedSub}>
-              <Plus className="size-4 mr-1" />
-              নতুন রুটিন
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingId ? "রুটিন সম্পাদনা" : "নতুন রুটিন"}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="title">শিরোনাম</Label>
-                <Input
-                  id="title"
-                  value={form.title}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, title: e.target.value }))
-                  }
-                  placeholder="বাংলা সাহিত্য মডেল টেস্ট"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="date">তারিখ</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={form.date}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, date: e.target.value }))
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="subject">বিষয়</Label>
-                  <Input
-                    id="subject"
-                    value={form.subject}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, subject: e.target.value }))
-                    }
-                    placeholder="বাংলা"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="totalMarks">মোট নম্বর</Label>
-                  <Input
-                    id="totalMarks"
-                    type="number"
-                    value={form.totalMarks}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        totalMarks: parseInt(e.target.value) || 0,
-                      }))
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="duration">সময় (মিনিট)</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    value={form.duration}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        duration: parseInt(e.target.value) || 0,
-                      }))
-                    }
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="topics">টপিক (ঐচ্ছিক)</Label>
-                <Input
-                  id="topics"
-                  value={form.topics}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, topics: e.target.value }))
-                  }
-                  placeholder="কবিতা, গল্প, উপন্যাস"
-                />
-              </div>
-              <div>
-                <Label htmlFor="sourceMaterial">সোর্স (ঐচ্ছিক)</Label>
-                <Input
-                  id="sourceMaterial"
-                  value={form.sourceMaterial}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      sourceMaterial: e.target.value,
-                    }))
-                  }
-                  placeholder="NCTB বোর্ড বই"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">বিবরণ (ঐচ্ছিক)</Label>
-                <Textarea
-                  id="description"
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                  placeholder="বিস্তারিত বিবরণ..."
-                  rows={3}
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                {editingId ? "আপডেট করুন" : "তৈরি করুন"}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/routines/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
+
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) resetForm();
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button size="sm" disabled={!selectedSub}>
+                <Plus className="size-4 mr-1" />
+                নতুন রুটিন
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingId ? "রুটিন সম্পাদনা" : "নতুন রুটিন"}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="title">শিরোনাম</Label>
+                  <Input
+                    id="title"
+                    value={form.title}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, title: e.target.value }))
+                    }
+                    placeholder="বাংলা সাহিত্য মডেল টেস্ট"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="date">তারিখ</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={form.date}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, date: e.target.value }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="subject">বিষয়</Label>
+                    <Input
+                      id="subject"
+                      value={form.subject}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, subject: e.target.value }))
+                      }
+                      placeholder="বাংলা"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="totalMarks">মোট নম্বর</Label>
+                    <Input
+                      id="totalMarks"
+                      type="number"
+                      value={form.totalMarks}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          totalMarks: parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="duration">সময় (মিনিট)</Label>
+                    <Input
+                      id="duration"
+                      type="number"
+                      value={form.duration}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          duration: parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="topics">টপিক (ঐচ্ছিক)</Label>
+                  <Input
+                    id="topics"
+                    value={form.topics}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, topics: e.target.value }))
+                    }
+                    placeholder="কবিতা, গল্প, উপন্যাস"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sourceMaterial">সোর্স (ঐচ্ছিক)</Label>
+                  <Input
+                    id="sourceMaterial"
+                    value={form.sourceMaterial}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        sourceMaterial: e.target.value,
+                      }))
+                    }
+                    placeholder="NCTB বোর্ড বই"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">বিবরণ (ঐচ্ছিক)</Label>
+                  <Textarea
+                    id="description"
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, description: e.target.value }))
+                    }
+                    placeholder="বিস্তারিত বিবরণ..."
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingId ? "আপডেট করুন" : "তৈরি করুন"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters */}

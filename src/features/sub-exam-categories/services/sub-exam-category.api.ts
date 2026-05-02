@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  BulkUpsertSubExamCategoryItem,
   CreateSubExamCategoryInput,
   MeritListEntry,
   SubExamCategory,
@@ -43,5 +44,15 @@ export const apiSubExamCategoryService: SubExamCategoryService = {
   },
   async delete(id: string) {
     await apiClient.delete(`/v1/sub-exam-categories/${id}`);
+  },
+  async bulkUpsert(items: BulkUpsertSubExamCategoryItem[]) {
+    const res = await apiClient.post<{ data: SubExamCategory[] }>(
+      "/v1/sub-exam-categories/bulk-upsert",
+      { items },
+    );
+    return res.data;
+  },
+  async bulkDelete(ids: string[]) {
+    await apiClient.delete("/v1/sub-exam-categories/bulk-delete", { ids });
   },
 };

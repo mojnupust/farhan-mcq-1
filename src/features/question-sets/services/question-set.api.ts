@@ -3,6 +3,7 @@ import type {
   AnswerQuestionInput,
   AppSettings,
   BulkUpsertQuestionItem,
+  BulkUpsertQuestionSetItem,
   CreateQuestionInput,
   CreateQuestionSetInput,
   ExamAttempt,
@@ -197,5 +198,15 @@ export const apiQuestionSetService: QuestionSetService = {
       {},
     );
     return res.data;
+  },
+  async bulkUpsertSets(items: BulkUpsertQuestionSetItem[]) {
+    const res = await apiClient.post<{ data: QuestionSet[] }>(
+      "/v1/question-sets/bulk-upsert-sets",
+      { items },
+    );
+    return res.data;
+  },
+  async bulkDeleteSets(ids: string[]) {
+    await apiClient.delete("/v1/question-sets/bulk-delete-sets", { ids });
   },
 };

@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  BulkUpsertExamCategoryItem,
   CreateExamCategoryInput,
   ExamCategory,
   UpdateExamCategoryInput,
@@ -35,5 +36,15 @@ export const apiExamCategoryService: ExamCategoryService = {
   },
   async delete(id: string) {
     await apiClient.delete(`/v1/exam-categories/${id}`);
+  },
+  async bulkUpsert(items: BulkUpsertExamCategoryItem[]) {
+    const res = await apiClient.post<{ data: ExamCategory[] }>(
+      "/v1/exam-categories/bulk-upsert",
+      { items },
+    );
+    return res.data;
+  },
+  async bulkDelete(ids: string[]) {
+    await apiClient.delete("/v1/exam-categories/bulk-delete", { ids });
   },
 };

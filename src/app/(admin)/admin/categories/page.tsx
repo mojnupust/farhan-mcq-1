@@ -26,6 +26,7 @@ import type {
 } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 function slugify(text: string): string {
@@ -106,17 +107,21 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              পরীক্ষার ক্যাটাগরি
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {categories.length} টি ক্যাটাগরি
-            </p>
-          </div>
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            পরীক্ষার ক্যাটাগরি
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {categories.length} টি ক্যাটাগরি
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/categories/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -200,73 +205,74 @@ export default function AdminCategoriesPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">সকল ক্যাটাগরি</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                লোড হচ্ছে...
-              </p>
-            ) : categories.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                কোনো ক্যাটাগরি নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>আইকন</TableHead>
-                    <TableHead>নাম</TableHead>
-                    <TableHead>স্লাগ</TableHead>
-                    <TableHead>ক্রম</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories.map((cat) => (
-                    <TableRow key={cat.id}>
-                      <TableCell className="text-2xl">
-                        {cat.icon || "📝"}
-                      </TableCell>
-                      <TableCell className="font-medium">{cat.name}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {cat.slug}
-                      </TableCell>
-                      <TableCell>{cat.sortOrder}</TableCell>
-                      <TableCell>
-                        <Badge variant={cat.isActive ? "default" : "secondary"}>
-                          {cat.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(cat)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(cat.id)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">সকল ক্যাটাগরি</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              লোড হচ্ছে...
+            </p>
+          ) : categories.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              কোনো ক্যাটাগরি নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>আইকন</TableHead>
+                  <TableHead>নাম</TableHead>
+                  <TableHead>স্লাগ</TableHead>
+                  <TableHead>ক্রম</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((cat) => (
+                  <TableRow key={cat.id}>
+                    <TableCell className="text-2xl">
+                      {cat.icon || "📝"}
+                    </TableCell>
+                    <TableCell className="font-medium">{cat.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {cat.slug}
+                    </TableCell>
+                    <TableCell>{cat.sortOrder}</TableCell>
+                    <TableCell>
+                      <Badge variant={cat.isActive ? "default" : "secondary"}>
+                        {cat.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(cat)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(cat.id)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

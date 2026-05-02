@@ -25,6 +25,16 @@ export interface UpdateSubExamCategoryInput {
   isActive?: boolean;
 }
 
+export interface BulkUpsertSubExamCategoryItem {
+  id?: string;
+  examCategoryId: string;
+  name: string;
+  slug: string;
+  description?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
 export interface UserCategorySummary {
   totalQuestionsFaced: number;
   totalCorrect: number;

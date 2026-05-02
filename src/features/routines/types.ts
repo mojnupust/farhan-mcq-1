@@ -36,3 +36,18 @@ export interface UpdateRoutineInput {
   description?: string;
   isActive?: boolean;
 }
+
+export interface BulkUpsertRoutineItem {
+  /** Omit for new routines; include for updates. */
+  id?: string;
+  subExamCategoryId: string;
+  date: string;
+  title: string;
+  totalMarks: number;
+  duration: number;
+  subject: string;
+  topics?: string;
+  sourceMaterial?: string;
+  description?: string;
+  isActive?: boolean;
+}

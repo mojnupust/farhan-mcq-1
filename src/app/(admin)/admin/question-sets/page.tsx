@@ -237,17 +237,21 @@ export default function AdminQuestionSetsPage() {
   };
 
   return (
-          <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              প্রশ্নসেট ব্যবস্থাপনা
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {sets.length} টি প্রশ্নসেট
-            </p>
-          </div>
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            প্রশ্নসেট ব্যবস্থাপনা
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {sets.length} টি প্রশ্নসেট
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/question-sets/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -402,158 +406,159 @@ export default function AdminQuestionSetsPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        {/* Filters */}
-        <div className="mt-4 flex gap-4">
-          <div className="flex-1 max-w-xs">
-            <Label>ক্যাটাগরি</Label>
-            <Select value={selectedCatId} onValueChange={setSelectedCatId}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="ক্যাটাগরি নির্বাচন" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.icon || "📝"} {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1 max-w-xs">
-            <Label>সাব-ক্যাটাগরি</Label>
-            <Select value={selectedSubSlug} onValueChange={setSelectedSubSlug}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="সাব-ক্যাটাগরি নির্বাচন" />
-              </SelectTrigger>
-              <SelectContent>
-                {subCategories.map((sub) => (
-                  <SelectItem key={sub.id} value={sub.slug}>
-                    {sub.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">প্রশ্নসেট তালিকা</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                লোড হচ্ছে...
-              </p>
-            ) : !selectedSubSlug ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                একটি সাব-ক্যাটাগরি নির্বাচন করুন
-              </p>
-            ) : sets.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                কোনো প্রশ্নসেট নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>শিরোনাম</TableHead>
-                    <TableHead>তারিখ</TableHead>
-                    <TableHead>বিষয়</TableHead>
-                    <TableHead>নম্বর</TableHead>
-                    <TableHead>সময়</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sets.map((qs) => (
-                    <TableRow key={qs.id}>
-                      <TableCell className="font-medium max-w-50 truncate">
-                        {qs.title}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {formatDate(qs.date)}
-                      </TableCell>
-                      <TableCell>{qs.subject}</TableCell>
-                      <TableCell>{qs.totalMarks}</TableCell>
-                      <TableCell>{qs.duration} মি.</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Badge
-                            variant={qs.isLive ? "default" : "secondary"}
-                            className={qs.isLive ? "bg-green-600" : ""}
-                          >
-                            {qs.isLive ? "লাইভ" : "আর্কাইভ"}
-                          </Badge>
-                          {qs.isFree && (
-                            <Badge
-                              variant="outline"
-                              className="text-blue-600 border-blue-300"
-                            >
-                              ফ্রি
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="প্রশ্ন"
-                            asChild
-                          >
-                            <Link
-                              href={`/admin/question-sets/${qs.id}/questions`}
-                            >
-                              <FileText className="size-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title={qs.isFree ? "পেইড করুন" : "ফ্রি করুন"}
-                            onClick={() => handleToggleFree(qs.id)}
-                          >
-                            {qs.isFree ? (
-                              <Unlock className="size-4 text-blue-500" />
-                            ) : (
-                              <Lock className="size-4 text-gray-400" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title={qs.isLive ? "আর্কাইভ করুন" : "লাইভ করুন"}
-                            onClick={() => handleToggleStatus(qs.id)}
-                          >
-                            <ArrowUpDown className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(qs)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(qs.id)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Filters */}
+      <div className="mt-4 flex gap-4">
+        <div className="flex-1 max-w-xs">
+          <Label>ক্যাটাগরি</Label>
+          <Select value={selectedCatId} onValueChange={setSelectedCatId}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="ক্যাটাগরি নির্বাচন" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.icon || "📝"} {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex-1 max-w-xs">
+          <Label>সাব-ক্যাটাগরি</Label>
+          <Select value={selectedSubSlug} onValueChange={setSelectedSubSlug}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="সাব-ক্যাটাগরি নির্বাচন" />
+            </SelectTrigger>
+            <SelectContent>
+              {subCategories.map((sub) => (
+                <SelectItem key={sub.id} value={sub.slug}>
+                  {sub.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">প্রশ্নসেট তালিকা</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              লোড হচ্ছে...
+            </p>
+          ) : !selectedSubSlug ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              একটি সাব-ক্যাটাগরি নির্বাচন করুন
+            </p>
+          ) : sets.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              কোনো প্রশ্নসেট নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>শিরোনাম</TableHead>
+                  <TableHead>তারিখ</TableHead>
+                  <TableHead>বিষয়</TableHead>
+                  <TableHead>নম্বর</TableHead>
+                  <TableHead>সময়</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sets.map((qs) => (
+                  <TableRow key={qs.id}>
+                    <TableCell className="font-medium max-w-50 truncate">
+                      {qs.title}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(qs.date)}
+                    </TableCell>
+                    <TableCell>{qs.subject}</TableCell>
+                    <TableCell>{qs.totalMarks}</TableCell>
+                    <TableCell>{qs.duration} মি.</TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Badge
+                          variant={qs.isLive ? "default" : "secondary"}
+                          className={qs.isLive ? "bg-green-600" : ""}
+                        >
+                          {qs.isLive ? "লাইভ" : "আর্কাইভ"}
+                        </Badge>
+                        {qs.isFree && (
+                          <Badge
+                            variant="outline"
+                            className="text-blue-600 border-blue-300"
+                          >
+                            ফ্রি
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="প্রশ্ন"
+                          asChild
+                        >
+                          <Link
+                            href={`/admin/question-sets/${qs.id}/questions`}
+                          >
+                            <FileText className="size-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={qs.isFree ? "পেইড করুন" : "ফ্রি করুন"}
+                          onClick={() => handleToggleFree(qs.id)}
+                        >
+                          {qs.isFree ? (
+                            <Unlock className="size-4 text-blue-500" />
+                          ) : (
+                            <Lock className="size-4 text-gray-400" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={qs.isLive ? "আর্কাইভ করুন" : "লাইভ করুন"}
+                          onClick={() => handleToggleStatus(qs.id)}
+                        >
+                          <ArrowUpDown className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(qs)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(qs.id)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

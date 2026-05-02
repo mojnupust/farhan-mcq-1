@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  BulkUpsertNotificationItem,
   CreateNotificationInput,
   Notification,
   UpdateNotificationInput,
@@ -44,5 +45,15 @@ export const apiNotificationService: NotificationService = {
   },
   async delete(id: string) {
     await apiClient.delete(`/v1/notifications/admin/${id}`);
+  },
+  async bulkUpsert(items: BulkUpsertNotificationItem[]) {
+    const res = await apiClient.post<{ data: Notification[] }>(
+      "/v1/notifications/admin/bulk-upsert",
+      { items },
+    );
+    return res.data;
+  },
+  async bulkDelete(ids: string[]) {
+    await apiClient.delete("/v1/notifications/admin/bulk-delete", { ids });
   },
 };

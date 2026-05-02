@@ -68,4 +68,18 @@ export const mockExamCategoryService: ExamCategoryService = {
   async delete() {
     // no-op
   },
+  async bulkUpsert(items) {
+    return items.map((item, i) => ({
+      id: item.id ?? String(Date.now() + i),
+      name: item.name,
+      slug: item.slug,
+      icon: item.icon ?? null,
+      sortOrder: item.sortOrder ?? 0,
+      isActive: item.isActive ?? true,
+      createdAt: new Date().toISOString(),
+    }));
+  },
+  async bulkDelete() {
+    // no-op
+  },
 };

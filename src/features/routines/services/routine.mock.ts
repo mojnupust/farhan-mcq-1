@@ -53,4 +53,8 @@ export const mockRoutineService: RoutineService = {
     return { ...r, ...input } as Routine;
   },
   async delete() {},
+  async bulkUpsert() {
+    return [] as Routine[];
+  },
+  async bulkDelete() {},
 };

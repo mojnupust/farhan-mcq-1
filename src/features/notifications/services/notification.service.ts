@@ -1,4 +1,5 @@
 import type {
+  BulkUpsertNotificationItem,
   CreateNotificationInput,
   Notification,
   UpdateNotificationInput,
@@ -13,4 +14,6 @@ export interface NotificationService {
   create(input: CreateNotificationInput): Promise<Notification>;
   update(id: string, input: UpdateNotificationInput): Promise<Notification>;
   delete(id: string): Promise<void>;
+  bulkUpsert(items: BulkUpsertNotificationItem[]): Promise<Notification[]>;
+  bulkDelete(ids: string[]): Promise<void>;
 }

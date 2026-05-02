@@ -1,5 +1,10 @@
 import { apiClient } from "@/lib/api-client";
-import type { CreateRoutineInput, Routine, UpdateRoutineInput } from "../types";
+import type {
+  BulkUpsertRoutineItem,
+  CreateRoutineInput,
+  Routine,
+  UpdateRoutineInput,
+} from "../types";
 import type { RoutineService } from "./routine.service";
 
 export const apiRoutineService: RoutineService = {
@@ -22,5 +27,15 @@ export const apiRoutineService: RoutineService = {
   },
   async delete(id: string) {
     await apiClient.delete(`/v1/routines/${id}`);
+  },
+  async bulkUpsert(items: BulkUpsertRoutineItem[]) {
+    const res = await apiClient.post<{ data: Routine[] }>(
+      "/v1/routines/bulk-upsert",
+      { routines: items },
+    );
+    return res.data;
+  },
+  async bulkDelete(ids: string[]) {
+    await apiClient.delete("/v1/routines/bulk-delete", { ids });
   },
 };

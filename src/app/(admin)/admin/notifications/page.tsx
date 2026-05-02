@@ -34,6 +34,7 @@ import type {
 } from "@/features/notifications";
 import { notificationService } from "@/features/notifications";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AdminNotificationsPage() {
@@ -112,17 +113,21 @@ export default function AdminNotificationsPage() {
   };
 
   return (
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              নোটিফিকেশন ব্যবস্থাপনা
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {notifications.length} টি নোটিফিকেশন
-            </p>
-          </div>
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            নোটিফিকেশন ব্যবস্থাপনা
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {notifications.length} টি নোটিফিকেশন
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/notifications/bulk-edit">বাল্ক এডিট</Link>
+          </Button>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -197,80 +202,81 @@ export default function AdminNotificationsPage() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">সকল নোটিফিকেশন</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                লোড হচ্ছে...
-              </p>
-            ) : notifications.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                কোনো নোটিফিকেশন নেই
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>শিরোনাম</TableHead>
-                    <TableHead>ধরন</TableHead>
-                    <TableHead>তারিখ</TableHead>
-                    <TableHead>স্ট্যাটাস</TableHead>
-                    <TableHead className="text-right">অ্যাকশন</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {notifications.map((n) => (
-                    <TableRow key={n.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{n.title}</p>
-                          <p className="text-xs text-muted-foreground line-clamp-1">
-                            {n.content}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {n.type === "PUBLIC" ? "সবার জন্য" : "নির্দিষ্ট"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(n.createdAt)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={n.isActive ? "default" : "secondary"}>
-                          {n.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(n)}
-                          >
-                            <Pencil className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(n.id)}
-                          >
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">সকল নোটিফিকেশন</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              লোড হচ্ছে...
+            </p>
+          ) : notifications.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              কোনো নোটিফিকেশন নেই
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>শিরোনাম</TableHead>
+                  <TableHead>ধরন</TableHead>
+                  <TableHead>তারিখ</TableHead>
+                  <TableHead>স্ট্যাটাস</TableHead>
+                  <TableHead className="text-right">অ্যাকশন</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {notifications.map((n) => (
+                  <TableRow key={n.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{n.title}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {n.content}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {n.type === "PUBLIC" ? "সবার জন্য" : "নির্দিষ্ট"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(n.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={n.isActive ? "default" : "secondary"}>
+                        {n.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(n)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(n.id)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

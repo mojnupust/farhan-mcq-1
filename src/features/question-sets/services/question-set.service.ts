@@ -2,6 +2,7 @@ import type {
   AnswerQuestionInput,
   AppSettings,
   BulkUpsertQuestionItem,
+  BulkUpsertQuestionSetItem,
   CreateQuestionInput,
   CreateQuestionSetInput,
   ExamAttempt,
@@ -61,4 +62,8 @@ export interface QuestionSetService {
   getAppSettings(): Promise<AppSettings>;
   updateAppSettings(input: UpdateAppSettingsInput): Promise<AppSettings>;
   toggleFree(id: string): Promise<QuestionSet>;
+
+  // Bulk question sets
+  bulkUpsertSets(items: BulkUpsertQuestionSetItem[]): Promise<QuestionSet[]>;
+  bulkDeleteSets(ids: string[]): Promise<void>;
 }

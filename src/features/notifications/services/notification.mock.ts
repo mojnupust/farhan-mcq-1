@@ -66,4 +66,18 @@ export const mockNotificationService: NotificationService = {
   async delete() {
     // no-op
   },
+  async bulkUpsert(items) {
+    return items.map((item, i) => ({
+      id: item.id ?? String(Date.now() + i),
+      title: item.title,
+      content: item.content,
+      type: item.type,
+      targetUserId: item.targetUserId ?? null,
+      isActive: item.isActive ?? true,
+      createdAt: new Date().toISOString(),
+    }));
+  },
+  async bulkDelete() {
+    // no-op
+  },
 };

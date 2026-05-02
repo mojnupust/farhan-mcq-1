@@ -1,4 +1,5 @@
 import type {
+  BulkUpsertQuestionSetItem,
   ExamAttempt,
   ExamQuestion,
   Marksheet,
@@ -230,5 +231,27 @@ export const mockQuestionSetService: QuestionSetService = {
   },
   async toggleFree(id) {
     return { ...mockLiveSet, id, isFree: true };
+  },
+  async bulkUpsertSets(items: BulkUpsertQuestionSetItem[]) {
+    return items.map((item, i) => ({
+      id: item.id ?? String(Date.now() + i),
+      subExamCategoryId: item.subExamCategoryId,
+      title: item.title,
+      date: item.date,
+      totalMarks: item.totalMarks,
+      duration: item.duration,
+      subject: item.subject,
+      topics: item.topics ?? null,
+      sourceMaterial: item.sourceMaterial ?? null,
+      markPerQuestion: item.markPerQuestion ?? 1,
+      negativeMark: item.negativeMark ?? 0,
+      isFree: item.isFree ?? false,
+      isLive: item.isLive ?? false,
+      isActive: item.isActive ?? true,
+      createdAt: new Date().toISOString(),
+    }));
+  },
+  async bulkDeleteSets() {
+    // no-op
   },
 };

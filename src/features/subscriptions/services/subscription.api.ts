@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  BulkUpsertPackageItem,
   PackageDto,
   PaymentTransactionDto,
   UserPackageDto,
@@ -99,5 +100,15 @@ export const apiSubscriptionService: SubscriptionService = {
       data,
     );
     return res.data;
+  },
+  async bulkUpsertPackages(items: BulkUpsertPackageItem[]) {
+    const res = await apiClient.post<{ data: PackageDto[] }>(
+      "/v1/packages/admin/bulk-upsert",
+      { items },
+    );
+    return res.data;
+  },
+  async bulkDeletePackages(ids: string[]) {
+    await apiClient.delete("/v1/packages/admin/bulk-delete", { ids });
   },
 };

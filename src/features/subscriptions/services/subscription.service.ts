@@ -1,4 +1,5 @@
 import type {
+  BulkUpsertPackageItem,
   CreatePackageInput,
   PackageDto,
   PaymentTransactionDto,
@@ -29,6 +30,8 @@ export interface SubscriptionService {
   createPackage(data: CreatePackageInput): Promise<PackageDto>;
   updatePackage(id: string, data: UpdatePackageInput): Promise<PackageDto>;
   deletePackage(id: string): Promise<void>;
+  bulkUpsertPackages(items: BulkUpsertPackageItem[]): Promise<PackageDto[]>;
+  bulkDeletePackages(ids: string[]): Promise<void>;
 
   // Admin: Transactions
   getAllTransactions(status?: string): Promise<PaymentTransactionDto[]>;

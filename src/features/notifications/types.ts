@@ -23,3 +23,12 @@ export interface UpdateNotificationInput {
   targetUserId?: string;
   isActive?: boolean;
 }
+
+export interface BulkUpsertNotificationItem {
+  id?: string;
+  title: string;
+  content: string;
+  type: "PUBLIC" | "SPECIFIC";
+  targetUserId?: string;
+  isActive?: boolean;
+}

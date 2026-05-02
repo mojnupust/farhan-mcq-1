@@ -124,4 +124,22 @@ export const mockSubscriptionService: SubscriptionService = {
     if (data.adminNote) txn.adminNote = data.adminNote;
     return txn;
   },
+  async bulkUpsertPackages(items) {
+    return items.map((item, i) => ({
+      id: item.id ?? String(Date.now() + i),
+      name: item.name,
+      durationDays: item.durationDays,
+      price: item.price,
+      discount: item.discount ?? 0,
+      description: item.description ?? null,
+      liveQuota: item.liveQuota ?? null,
+      archiveQuota: item.archiveQuota ?? null,
+      sortOrder: item.sortOrder ?? 0,
+      isActive: item.isActive ?? true,
+      createdAt: new Date().toISOString(),
+    }));
+  },
+  async bulkDeletePackages() {
+    // no-op
+  },
 };

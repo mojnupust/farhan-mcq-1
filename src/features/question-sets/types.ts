@@ -46,6 +46,23 @@ export interface UpdateQuestionSetInput {
   isActive?: boolean;
 }
 
+export interface BulkUpsertQuestionSetItem {
+  id?: string;
+  subExamCategoryId: string;
+  title: string;
+  date: string;
+  totalMarks: number;
+  duration: number;
+  subject: string;
+  topics?: string;
+  sourceMaterial?: string;
+  markPerQuestion?: number;
+  negativeMark?: number;
+  isFree?: boolean;
+  isLive?: boolean;
+  isActive?: boolean;
+}
+
 export interface SubjectWiseMark {
   subject: string;
   correct: number;
