@@ -3,11 +3,18 @@ import type {
   BulkUpsertRoutineItem,
   CreateRoutineInput,
   Routine,
+  RoutineWithCategory,
   UpdateRoutineInput,
 } from "../types";
 import type { RoutineService } from "./routine.service";
 
 export const apiRoutineService: RoutineService = {
+  async getAll() {
+    const res = await apiClient.get<{ data: RoutineWithCategory[] }>(
+      `/v1/routines`,
+    );
+    return res.data;
+  },
   async getBySubCategorySlug(subCategorySlug: string) {
     const res = await apiClient.get<{ data: Routine[] }>(
       `/v1/routines/by-sub-category/${subCategorySlug}`,

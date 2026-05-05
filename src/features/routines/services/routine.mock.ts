@@ -1,4 +1,4 @@
-import type { Routine } from "../types";
+import type { Routine, RoutineWithCategory } from "../types";
 import type { RoutineService } from "./routine.service";
 
 const mockRoutines: Routine[] = [
@@ -34,6 +34,14 @@ const mockRoutines: Routine[] = [
 ];
 
 export const mockRoutineService: RoutineService = {
+  async getAll() {
+    return mockRoutines.map((r) => ({
+      ...r,
+      subExamCategoryName: "প্রাইমারি শিক্ষক নিয়োগ",
+      subExamCategorySlug: "primary-teacher",
+      examCategorySlug: "primary",
+    })) as RoutineWithCategory[];
+  },
   async getBySubCategorySlug() {
     return mockRoutines;
   },

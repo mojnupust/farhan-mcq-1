@@ -56,6 +56,7 @@ export interface QuestionSetService {
   getQuestionStats(questionId: string): Promise<QuestionStats>;
 
   // Favorites
+  getFavoriteQuestions(): Promise<ReviewQuestion[]>;
   toggleFavorite(questionId: string): Promise<boolean>;
 
   // App settings

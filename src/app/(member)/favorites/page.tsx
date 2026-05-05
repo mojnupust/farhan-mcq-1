@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ROUTES } from "@/config/routes";
 import type { QuestionStats, ReviewQuestion } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import {
@@ -19,18 +18,14 @@ import {
   CheckCircle2,
   Heart,
 } from "lucide-react";
-import Link from "next/link";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const OPTION_LABELS = ["ক", "খ", "গ", "ঘ"] as const;
 const OPTION_KEYS = ["A", "B", "C", "D"] as const;
 
-export default function FavoritesPage({
-  params,
-}: {
-  params: Promise<{ slug: string; subSlug: string }>;
-}) {
-  const { slug, subSlug } = use(params);
+export default function FavoritesPage() {
+  const router = useRouter();
 
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +33,6 @@ export default function FavoritesPage({
   const [stats, setStats] = useState<QuestionStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [activeExplanation, setActiveExplanation] = useState<string | null>(
     null,
   );
@@ -48,7 +42,6 @@ export default function FavoritesPage({
       try {
         const data = await questionSetService.getFavoriteQuestions();
         setQuestions(data);
-        setFavorites(new Set(data.map((q) => q.id)));
       } catch (err) {
         console.error(err);
       } finally {
@@ -85,16 +78,8 @@ export default function FavoritesPage({
 
   const handleToggleFavorite = useCallback(async (questionId: string) => {
     try {
-      const isFav = await questionSetService.toggleFavorite(questionId);
-      setFavorites((prev) => {
-        const next = new Set(prev);
-        if (isFav) next.add(questionId);
-        else next.delete(questionId);
-        return next;
-      });
-      if (!isFav) {
-        setQuestions((prev) => prev.filter((q) => q.id !== questionId));
-      }
+      await questionSetService.toggleFavorite(questionId);
+      setQuestions((prev) => prev.filter((q) => q.id !== questionId));
     } catch {
       // ignore
     }
@@ -112,10 +97,8 @@ export default function FavoritesPage({
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex items-center gap-3 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="size-5" />
           </Button>
           <h1 className="text-xl font-semibold tracking-tight">ফেভারিট</h1>
         </div>
@@ -134,10 +117,8 @@ export default function FavoritesPage({
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="size-5" />
           </Button>
           <h1 className="text-xl font-semibold tracking-tight">ফেভারিট</h1>
           <span className="ml-auto text-sm text-muted-foreground">
@@ -253,18 +234,10 @@ export default function FavoritesPage({
                   size="sm"
                   variant="outline"
                   onClick={() => handleToggleFavorite(question.id)}
-                  className={
-                    favorites.has(question.id)
-                      ? "text-rose-500 border-rose-200 bg-rose-50"
-                      : ""
-                  }
+                  className="text-rose-500 border-rose-200 bg-rose-50"
                 >
-                  <Heart
-                    className={`size-4 mr-1 ${
-                      favorites.has(question.id) ? "fill-rose-500" : ""
-                    }`}
-                  />
-                  {favorites.has(question.id) ? "সরিয়ে দিন" : "ফেভারিট"}
+                  <Heart className="size-4 mr-1 fill-rose-500" />
+                  সরিয়ে দিন
                 </Button>
               </div>
             </div>

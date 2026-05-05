@@ -215,6 +215,9 @@ export const mockQuestionSetService: QuestionSetService = {
   },
 
   // Favorites
+  async getFavoriteQuestions() {
+    return [];
+  },
   async toggleFavorite() {
     return true;
   },

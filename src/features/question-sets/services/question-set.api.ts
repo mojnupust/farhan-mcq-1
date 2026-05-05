@@ -170,6 +170,12 @@ export const apiQuestionSetService: QuestionSetService = {
   },
 
   // Favorites
+  async getFavoriteQuestions() {
+    const res = await apiClient.get<{ data: ReviewQuestion[] }>(
+      `/v1/question-sets/favorites`,
+    );
+    return res.data;
+  },
   async toggleFavorite(questionId: string) {
     const res = await apiClient.post<{ data: { isFavorite: boolean } }>(
       `/v1/question-sets/favorite/${questionId}`,

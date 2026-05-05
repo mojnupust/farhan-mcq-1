@@ -1,4 +1,4 @@
-import type { Syllabus } from "../types";
+import type { Syllabus, SyllabusWithCategory } from "../types";
 import type { SyllabusService } from "./syllabus.service";
 
 const mockSyllabuses: Syllabus[] = [
@@ -27,6 +27,14 @@ const mockSyllabuses: Syllabus[] = [
 ];
 
 export const mockSyllabusService: SyllabusService = {
+  async getAll() {
+    return mockSyllabuses.map((s) => ({
+      ...s,
+      subExamCategoryName: "প্রাইমারি শিক্ষক নিয়োগ",
+      subExamCategorySlug: "primary-teacher",
+      examCategorySlug: "primary",
+    })) as SyllabusWithCategory[];
+  },
   async getBySubCategorySlug() {
     return mockSyllabuses;
   },

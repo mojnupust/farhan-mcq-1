@@ -2,11 +2,18 @@ import { apiClient } from "@/lib/api-client";
 import type {
   CreateSyllabusInput,
   Syllabus,
+  SyllabusWithCategory,
   UpdateSyllabusInput,
 } from "../types";
 import type { SyllabusService } from "./syllabus.service";
 
 export const apiSyllabusService: SyllabusService = {
+  async getAll() {
+    const res = await apiClient.get<{ data: SyllabusWithCategory[] }>(
+      `/v1/syllabuses`,
+    );
+    return res.data;
+  },
   async getBySubCategorySlug(subCategorySlug: string) {
     const res = await apiClient.get<{ data: Syllabus[] }>(
       `/v1/syllabuses/by-sub-category/${subCategorySlug}`,

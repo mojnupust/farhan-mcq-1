@@ -16,8 +16,6 @@ import {
   BarChart3,
   BookOpen,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   Heart,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -37,13 +35,14 @@ export default function AnswersPage({
 
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showExplanation, setShowExplanation] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [stats, setStats] = useState<QuestionStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [activeExplanation, setActiveExplanation] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -74,8 +73,6 @@ export default function AnswersPage({
     if (!subjectFilter) return questions;
     return questions.filter((q) => q.subject === subjectFilter);
   }, [questions, subjectFilter]);
-
-  const currentQuestion = filteredQuestions[currentIndex];
 
   const handleShowStats = useCallback(async (questionId: string) => {
     setShowStats(true);
@@ -112,7 +109,7 @@ export default function AnswersPage({
     );
   }
 
-  if (!currentQuestion) {
+  if (!filteredQuestions.length) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
@@ -143,10 +140,7 @@ export default function AnswersPage({
             <Button
               size="sm"
               variant={subjectFilter === null ? "default" : "outline"}
-              onClick={() => {
-                setSubjectFilter(null);
-                setCurrentIndex(0);
-              }}
+              onClick={() => setSubjectFilter(null)}
             >
               সকল ({questions.length})
             </Button>
@@ -157,10 +151,7 @@ export default function AnswersPage({
                   key={s}
                   size="sm"
                   variant={subjectFilter === s ? "default" : "outline"}
-                  onClick={() => {
-                    setSubjectFilter(s);
-                    setCurrentIndex(0);
-                  }}
+                  onClick={() => setSubjectFilter(s)}
                 >
                   {s} ({count})
                 </Button>
@@ -169,153 +160,114 @@ export default function AnswersPage({
           </div>
         )}
 
-        {/* Question Card */}
-        <Card>
-          <CardContent className="py-5">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                {currentQuestion.sortOrder}
-              </span>
-              {currentQuestion.subject && (
-                <Badge variant="secondary" className="text-xs">
-                  {currentQuestion.subject}
-                </Badge>
-              )}
-            </div>
-            <p className="text-lg leading-relaxed whitespace-pre-wrap">
-              {currentQuestion.questionText}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Questions - Flat View */}
+        <div className="space-y-6">
+          {filteredQuestions.map((question) => (
+            <div key={question.id}>
+              {/* Question Card */}
+              <Card>
+                <CardContent className="py-5">
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                      {question.sortOrder}
+                    </span>
+                    {question.subject && (
+                      <Badge variant="secondary" className="text-xs">
+                        {question.subject}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap">
+                    {question.questionText}
+                  </p>
+                </CardContent>
+              </Card>
 
-        {/* Options - always show correct answer */}
-        <div className="mt-3 space-y-2">
-          {OPTION_KEYS.map((key, i) => {
-            const optionText = currentQuestion[
-              `option${key}` as keyof ReviewQuestion
-            ] as string;
-            const isCorrectAnswer = currentQuestion.correctAnswer === key;
+              {/* Options */}
+              <div className="mt-3 space-y-2">
+                {OPTION_KEYS.map((key, i) => {
+                  const optionText = question[
+                    `option${key}` as keyof ReviewQuestion
+                  ] as string;
+                  const isCorrectAnswer = question.correctAnswer === key;
 
-            return (
-              <div
-                key={key}
-                className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 ${
-                  isCorrectAnswer
-                    ? "border-green-400 bg-green-50"
-                    : "border-gray-200"
-                }`}
-              >
-                <span
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
-                    isCorrectAnswer
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {OPTION_LABELS[i]}
-                </span>
-                <span className="text-base flex-1">{optionText}</span>
-                {isCorrectAnswer && (
-                  <CheckCircle2 className="size-5 text-green-500" />
-                )}
+                  return (
+                    <div
+                      key={key}
+                      className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 ${
+                        isCorrectAnswer
+                          ? "border-green-400 bg-green-50"
+                          : "border-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                          isCorrectAnswer
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {OPTION_LABELS[i]}
+                      </span>
+                      <span className="text-base flex-1">{optionText}</span>
+                      {isCorrectAnswer && (
+                        <CheckCircle2 className="size-5 text-green-500" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
 
-        {/* Action Buttons */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleShowStats(currentQuestion.id)}
-          >
-            <BarChart3 className="size-4 mr-1" />
-            বিশ্লেষণ
-          </Button>
-          {currentQuestion.explanation && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowExplanation(true)}
-            >
-              <BookOpen className="size-4 mr-1" />
-              ব্যাখ্যা
-            </Button>
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleToggleFavorite(currentQuestion.id)}
-            className={
-              favorites.has(currentQuestion.id)
-                ? "text-rose-500 border-rose-200 bg-rose-50"
-                : ""
-            }
-          >
-            <Heart
-              className={`size-4 mr-1 ${
-                favorites.has(currentQuestion.id) ? "fill-rose-500" : ""
-              }`}
-            />
-            ফেভারিট
-          </Button>
-        </div>
-
-        {/* Navigation */}
-        <div className="mt-4 flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentIndex === 0}
-            onClick={() => setCurrentIndex((p) => Math.max(0, p - 1))}
-          >
-            <ChevronLeft className="size-4 mr-1" />
-            আগের
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {filteredQuestions.length}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentIndex >= filteredQuestions.length - 1}
-            onClick={() =>
-              setCurrentIndex((p) =>
-                Math.min(filteredQuestions.length - 1, p + 1),
-              )
-            }
-          >
-            পরের
-            <ChevronRight className="size-4 ml-1" />
-          </Button>
-        </div>
-
-        {/* Question Palette */}
-        <Card className="mt-4">
-          <CardContent className="py-4">
-            <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-1.5">
-              {filteredQuestions.map((q, i) => {
-                const isCurrent = i === currentIndex;
-                return (
-                  <button
-                    type="button"
-                    key={q.id}
-                    onClick={() => setCurrentIndex(i)}
-                    className={`flex size-8 items-center justify-center rounded text-xs font-bold transition-all bg-green-100 text-green-700 ${
-                      isCurrent ? "ring-2 ring-primary/50 ring-offset-1" : ""
-                    }`}
+              {/* Action Buttons */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleShowStats(question.id)}
+                >
+                  <BarChart3 className="size-4 mr-1" />
+                  বিশ্লেষণ
+                </Button>
+                {question.explanation && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setActiveExplanation(question.explanation!)}
                   >
-                    {q.sortOrder}
-                  </button>
-                );
-              })}
+                    <BookOpen className="size-4 mr-1" />
+                    ব্যাখ্যা
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleToggleFavorite(question.id)}
+                  className={
+                    favorites.has(question.id)
+                      ? "text-rose-500 border-rose-200 bg-rose-50"
+                      : ""
+                  }
+                >
+                  <Heart
+                    className={`size-4 mr-1 ${
+                      favorites.has(question.id) ? "fill-rose-500" : ""
+                    }`}
+                  />
+                  ফেভারিট
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       </div>
 
-      <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
+      {/* Explanation Dialog */}
+      <Dialog
+        open={activeExplanation !== null}
+        onOpenChange={(open) => {
+          if (!open) setActiveExplanation(null);
+        }}
+      >
         <DialogContent className="max-h-[80vh] overflow-y-auto w-full sm:max-w-lg p-4 sm:p-6 hide-scrollbar">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -324,7 +276,7 @@ export default function AnswersPage({
             </DialogTitle>
           </DialogHeader>
           <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-            {currentQuestion.explanation}
+            {activeExplanation}
           </div>
         </DialogContent>
       </Dialog>

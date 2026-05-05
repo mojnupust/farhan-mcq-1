@@ -9,6 +9,12 @@ export interface Syllabus {
   createdAt: string;
 }
 
+export interface SyllabusWithCategory extends Syllabus {
+  subExamCategoryName: string;
+  subExamCategorySlug: string;
+  examCategorySlug: string;
+}
+
 export interface CreateSyllabusInput {
   subExamCategoryId: string;
   title: string;

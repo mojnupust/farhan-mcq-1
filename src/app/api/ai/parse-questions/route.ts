@@ -4,48 +4,135 @@ import { type NextRequest, NextResponse } from "next/server";
 const GEMINI_MODEL = "gemini-flash-latest";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-function buildPrompt(
-  rawText: string,
-  subjectHint: string,
-  startSortOrder: number,
-): string {
-  return `You are an expert at parsing Bangladesh public exam MCQ questions (BCS, NTRCA, Primary, etc.) from messy OCR or raw text.
+// ============================================================
+// MCQ Question Factory — buildPrompt()
+// Single source of truth for all exam question generation
+// Supports: BCS, NTRCA, Primary, Bank, Custom/Topic-wise
+// ============================================================
 
-Your task: Extract ALL MCQ questions from the input text and return them as a JSON array.
+export type ExamType = "BCS" | "NTRCA" | "Primary" | "Bank" | "Custom";
 
-PARSING RULES:
-1. Each MCQ has question text + exactly 4 options + correct answer
-2. Detect the correct answer from:
-   - "উ. ক" or "উঃ ক" → A | "উ. খ" → B | "উ. গ" → C | "উ. ঘ" → D
-   - "উত্তর: (ক)" → A, etc.
-   - Option order in text = A, B, C, D regardless of bullet symbol
-3. Strip option bullet symbols: @, ©, ®, ¬, •, ○, ●, (ক), (খ), (গ), (ঘ), ক., খ.
-4. Strip question number prefixes: "১.", "০১.", "1.", "(১)", "Q1." etc. from questionText
-5. Explanation:
-   - If "ব্যাখ্যা:" section exists → use it AND elaborate it
-   - If absent → generate a comprehensive explanation
-   - Always start explanation with: "সঠিক উত্তর: (X) [answer text]\\n\\n"
-     where X is ক/খ/গ/ঘ matching the correctAnswer
-   - Then write 5-8 lines: context, key facts, why wrong options are wrong, sources
-6. Subject: "${subjectHint || "auto-detect (বাংলা ভাষা ও সাহিত্য / ইংরেজি / গণিত / সাধারণ জ্ঞান / বাংলাদেশ ও বিশ্বপরিচয়)"}"
-7. Auto-detect topic and subTopic from the question content
-8. sortOrder starts from ${startSortOrder} and increments by 1
-9. SKIP non-question content: page headers, decorative lines, grammar tables (not part of a question), QR codes, app ads
+export interface BuildPromptOptions {
+  rawText: string;
+  subjectHint: string;
+  startSortOrder: number;
+  expectedCount?: number;
+  examType?: ExamType;
+}
 
-OUTPUT: A JSON array ONLY — no markdown, no code fences, no explanation outside the array.
+const SUBJECT_LISTS: Record<ExamType, string> = {
+  BCS: "বাংলা ভাষা ও সাহিত্য, ইংরেজি ভাষা ও সাহিত্য, বাংলাদেশ বিষয়াবলি, আন্তর্জাতিক বিষয়াবলি, ভূগোল ও পরিবেশ ও দুর্যোগ ব্যবস্থাপনা, সাধারণ বিজ্ঞান, কম্পিউটার ও তথ্যপ্রযুক্তি, গাণিতিক যুক্তি, মানসিক দক্ষতা, নৈতিকতা মূল্যবোধ ও সুশাসন",
+  NTRCA: "বাংলা ভাষা ও সাহিত্য, ইংরেজি ভাষা ও সাহিত্য, গণিত, সাধারণ জ্ঞান",
+  Primary: "বাংলা, ইংরেজি, গণিত, সাধারণ জ্ঞান",
+  Bank: "বাংলা, ইংরেজি, গণিত, সাধারণ জ্ঞান, কম্পিউটার ও তথ্যপ্রযুক্তি",
+  Custom: "auto-detect from content",
+};
+
+function buildPrompt({
+  rawText,
+  subjectHint,
+  startSortOrder,
+  expectedCount = 25,
+  examType = "NTRCA",
+}: BuildPromptOptions): string {
+  const subjectScope = SUBJECT_LISTS[examType];
+  const forceSubject =
+    subjectHint && subjectHint !== "auto-detect"
+      ? `"${subjectHint}"`
+      : "auto-detect based on question content";
+
+  return `You are an expert MCQ question processor for Bangladesh public job exam preparation (${examType}).
+
+Your dual ability:
+A) EXTRACT: Parse structured MCQ questions from messy OCR, raw text, or unformatted question banks.
+B) GENERATE: If the input is a topic name, paragraph, or raw knowledge text — CREATE high-quality MCQ questions from it.
+
+DETECT MODE automatically:
+— Input contains question marks (?) or option markers (ক/খ/গ/ঘ or A/B/C/D) → MODE A (Extract)
+— Otherwise → MODE B (Generate from content)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MODE A — EXTRACTION RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Strip question number prefixes — remove "১.", "০১.", "1.", "(১)", "Q1.", "প্রশ্ন ১:" etc. from questionText
+2. Map option letters correctly: ক→A, খ→B, গ→C, ঘ→D (or keep A/B/C/D directly)
+3. Detect correct answer from any of these markers:
+   — "উত্তর:", "সঠিক উত্তর:", "Ans:", "Answer:", "উঃ"
+   — Bold or underlined option in original text
+   — Trailing marker like "— উত্তর: খ" at end of question
+4. If a "ব্যাখ্যা:" section exists → use it as the explanation base AND elaborate it significantly
+5. SKIP non-question content: page headers, decorative separator lines, QR codes, app advertisements, grammar tables that are not part of a question
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MODE B — GENERATION RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Analyze the topic/paragraph deeply using your training knowledge
+2. Create EXACTLY ${expectedCount} questions that are:
+   — The most frequently asked questions on this topic in past ${examType} exams
+   — Covering all sub-aspects and important details of the topic
+   — Having 4 plausible, well-crafted distractors (no obviously wrong options)
+   — Ranging from basic recall to application-level difficulty
+3. Prioritize questions that appeared in:
+   — NTRCA: 10th through 18th registration exams
+   — BCS: 43rd through 48th BCS preliminaries
+   — Primary: recent 2018–2023 primary recruitment exams
+4. Add question number prefix in Bengali format: "০১.", "০২." etc. inside questionText
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXPLANATION FORMAT — MANDATORY STRUCTURE (every question)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Write the explanation using this exact multi-line structure.
+Use \\n in JSON output for each new line break.
+
+Line 1:   সঠিক উত্তর: (ক/খ/গ/ঘ) [exact answer text]
+Line 2:   [blank]
+Line 3:   [1 sentence: why this topic/question matters in ${examType} exams]
+Line 4:   [blank]
+Line 5:   [Section heading — main concept name]:
+Lines 6+: — [key fact 1 with specific detail]
+          — [key fact 2 with specific detail]
+          — [key fact 3 — historical/numerical/comparative detail]
+          — [key fact 4 — additional context or exception]
+Line N:   [blank]
+Line N+1: [Why wrong options are wrong — heading or inline]:
+          ✗ [optionX text]: [specific reason it is wrong]
+          ✗ [optionY text]: [specific reason it is wrong]
+          ✗ [optionZ text]: [specific reason it is wrong]
+Last:     [blank]
+          উৎস: [Book name — ড. Author / NTRCA প্রশ্নব্যাংক / NCTB নবম-দশম শ্রেণি / BCS প্রশ্নব্যাংক]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUBJECT CLASSIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Exam type    : ${examType}
+Valid subjects: ${subjectScope}
+Subject to use: ${forceSubject}
+topic        : auto-detect from question content (be specific, e.g., "সমাস", "ক্রিয়ার কাল")
+subTopic     : auto-detect and be even more specific (e.g., "বহুব্রীহি সমাস", "Simple Present Tense")
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT SPECIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+— Output a JSON array ONLY — no markdown, no code fences, no explanation text outside the array
+— sortOrder starts at ${startSortOrder} and increments by 1 for each question
+— correctAnswer must be exactly one character: "A", "B", "C", or "D"
+— explanation: use \\n for newlines (valid JSON string — not literal line breaks)
+— All text fields in Bengali except for English-language questions/options
+— questionText for Mode B: include prefix like "০১." at the start
+
 [
   {
-    "questionText": "string — clean, no number prefix",
+    "questionText": "string — clean, no stray number prefix for Mode A; with ০১. prefix for Mode B",
     "optionA": "string",
     "optionB": "string",
     "optionC": "string",
     "optionD": "string",
     "correctAnswer": "A" | "B" | "C" | "D",
-    "explanation": "string — elaborate Bengali explanation",
-    "subject": "string — Bengali",
-    "topic": "string — Bengali",
-    "subTopic": "string — Bengali",
-    "sortOrder": number
+    "explanation": "string — multi-line Bengali explanation using \\n",
+    "subject": "string — Bengali subject name from valid list above",
+    "topic": "string — specific Bengali topic",
+    "subTopic": "string — even more specific Bengali sub-topic",
+    "sortOrder": ${startSortOrder}
   }
 ]
 
@@ -67,7 +154,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { rawText?: string; subjectHint?: string; startSortOrder?: number };
+  let body: {
+    rawText?: string;
+    subjectHint?: string;
+    startSortOrder?: number;
+    expectedCount?: number;
+    examType?: ExamType;
+  };
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -77,12 +170,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { rawText, subjectHint = "", startSortOrder = 1 } = body;
+  const {
+    rawText,
+    subjectHint = "",
+    startSortOrder = 1,
+    expectedCount = 25,
+    examType = "NTRCA",
+  } = body;
   if (!rawText?.trim()) {
     return NextResponse.json({ error: "rawText is required" }, { status: 400 });
   }
 
-  const prompt = buildPrompt(rawText.trim(), subjectHint, startSortOrder);
+  const prompt = buildPrompt({
+    rawText: rawText.trim(),
+    subjectHint,
+    startSortOrder,
+    expectedCount,
+    examType,
+  });
 
   let geminiRes: Response;
   try {

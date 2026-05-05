@@ -13,6 +13,12 @@ export interface Routine {
   createdAt: string;
 }
 
+export interface RoutineWithCategory extends Routine {
+  subExamCategoryName: string;
+  subExamCategorySlug: string;
+  examCategorySlug: string;
+}
+
 export interface CreateRoutineInput {
   subExamCategoryId: string;
   date: string;
