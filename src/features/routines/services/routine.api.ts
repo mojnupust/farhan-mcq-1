@@ -1,3 +1,4 @@
+import type { QuestionSet } from "@/features/question-sets";
 import { apiClient } from "@/lib/api-client";
 import type {
   BulkUpsertRoutineItem,
@@ -44,5 +45,13 @@ export const apiRoutineService: RoutineService = {
   },
   async bulkDelete(ids: string[]) {
     await apiClient.delete("/v1/routines/bulk-delete", { ids });
+  },
+  async autoCreateQuestionSetsForDate(date?: string) {
+    const payload = date ? { date } : {};
+    const res = await apiClient.post<{ data: QuestionSet[] }>(
+      "/v1/routines/auto-create-question-sets",
+      payload,
+    );
+    return res.data;
   },
 };

@@ -42,7 +42,12 @@ export default function SyllabusPage() {
   const groups = useMemo(() => {
     const map = new Map<
       string,
-      { name: string; examSlug: string; subSlug: string; items: SyllabusWithCategory[] }
+      {
+        name: string;
+        examSlug: string;
+        subSlug: string;
+        items: SyllabusWithCategory[];
+      }
     >();
     for (const s of filtered) {
       if (!map.has(s.subExamCategorySlug)) {
@@ -122,10 +127,7 @@ export default function SyllabusPage() {
                             <p className="font-medium text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2">
                               {s.title}
                             </p>
-                            <Badge
-                              variant="secondary"
-                              className="mt-2 text-xs"
-                            >
+                            <Badge variant="secondary" className="mt-2 text-xs">
                               {group.name}
                             </Badge>
                           </div>
@@ -143,4 +145,3 @@ export default function SyllabusPage() {
     </div>
   );
 }
-

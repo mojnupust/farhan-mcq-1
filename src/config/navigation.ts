@@ -45,6 +45,11 @@ export const adminNav: NavItem[] = [
   { label: "রুটিন", href: ROUTES.adminRoutines, icon: Calendar },
   { label: "সিলেবাস", href: ROUTES.adminSyllabus, icon: FileText },
   { label: "প্রশ্নসেট", href: ROUTES.adminQuestionSets, icon: ClipboardList },
+  {
+    label: "প্রশ্নসেট অটোমোশন",
+    href: ROUTES.adminQuestionSetsAutomotion,
+    icon: ClipboardList,
+  },
   { label: "নোটিফিকেশন", href: ROUTES.adminNotifications, icon: Megaphone },
   { label: "প্রশ্ন ব্যাংক", href: ROUTES.adminQuestions, icon: HelpCircle },
   { label: "প্যাকেজ", href: ROUTES.adminPackages, icon: Package },

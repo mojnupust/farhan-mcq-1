@@ -1,3 +1,4 @@
+import type { QuestionSet } from "@/features/question-sets";
 import type { Routine, RoutineWithCategory } from "../types";
 import type { RoutineService } from "./routine.service";
 
@@ -65,4 +66,7 @@ export const mockRoutineService: RoutineService = {
     return [] as Routine[];
   },
   async bulkDelete() {},
+  async autoCreateQuestionSetsForDate() {
+    return [] as QuestionSet[];
+  },
 };

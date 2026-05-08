@@ -1,3 +1,4 @@
+import type { QuestionSet } from "@/features/question-sets";
 import type {
   BulkUpsertRoutineItem,
   CreateRoutineInput,
@@ -14,4 +15,5 @@ export interface RoutineService {
   delete(id: string): Promise<void>;
   bulkUpsert(items: BulkUpsertRoutineItem[]): Promise<Routine[]>;
   bulkDelete(ids: string[]): Promise<void>;
+  autoCreateQuestionSetsForDate(date?: string): Promise<QuestionSet[]>;
 }

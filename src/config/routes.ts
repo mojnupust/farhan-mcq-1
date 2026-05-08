@@ -51,6 +51,7 @@ export const ROUTES = {
   adminNotifications: "/admin/notifications",
   adminQuestions: "/admin/questions",
   adminQuestionSets: "/admin/question-sets",
+  adminQuestionSetsAutomotion: "/admin/question-sets-automotion",
   adminSubscriptions: "/admin/subscriptions",
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",
