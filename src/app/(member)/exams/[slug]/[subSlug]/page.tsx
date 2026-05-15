@@ -68,7 +68,14 @@ export default function SubExamDashboardPage({
       bg: "bg-blue-50",
     },
     {
-      label: "রেজাল্ট",
+      label: "বিষয়ভিত্তিক MCQ",
+      icon: Trophy,
+      href: ROUTES.subExamResults(slug, subSlug),
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+    },
+    {
+      label: "টপিকভিত্তিক MCQ",
       icon: Trophy,
       href: ROUTES.subExamResults(slug, subSlug),
       color: "text-amber-600",
