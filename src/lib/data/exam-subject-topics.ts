@@ -385,3 +385,25 @@ export function getTopicsBySubjectName(subjectName: string): TopicOption[] {
   if (!subject) return [];
   return topics.filter((t) => t.subject_id === subject.id);
 }
+
+/** Resolve exam display name from a stored subject string (for loaded questions). */
+export function getExamNameForSubject(subjectName: string): string {
+  if (!subjectName.trim()) return "";
+  const subject = subjects.find((s) => s.name === subjectName);
+  if (!subject) return "";
+  return exams.find((e) => e.id === subject.exam_id)?.name ?? "";
+}
+
+/** True if subject string exists in catalog (may still need exam picked if ambiguous). */
+export function isKnownSubjectName(subjectName: string): boolean {
+  return subjects.some((s) => s.name === subjectName);
+}
+
+/** True if topic string exists under the given subject in catalog. */
+export function isKnownTopicForSubject(
+  subjectName: string,
+  topicName: string,
+): boolean {
+  if (!topicName.trim()) return false;
+  return getTopicsBySubjectName(subjectName).some((t) => t.name === topicName);
+}

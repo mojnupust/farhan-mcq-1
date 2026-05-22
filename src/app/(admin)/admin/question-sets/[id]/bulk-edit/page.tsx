@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  RowClassificationSelects,
+  SharedExamSelect,
+} from "@/components/admin/exam-subject-topic-selects";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +21,12 @@ import type {
 } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import {
+  getExamNameForSubject,
+  getSubjectsByExamName,
+  getTopicsBySubjectName,
+  type SubjectOption,
+} from "@/lib/data/exam-subject-topics";
+import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
@@ -26,14 +36,21 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import {
+  memo,
+  startTransition,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 // ─── Row state ─────────────────────────────────────────────────────────────
 
 interface RowData {
-  /** Temporary client-side key (never sent to server) */
   _key: string;
-  /** Undefined → new (not yet saved) */
   id: string | undefined;
   questionSetId: string;
   questionText: string;
@@ -49,9 +66,7 @@ interface RowData {
   frequencyTag: string;
   slug: string;
   sortOrder: number;
-  /** true if modified since last save */
   dirty: boolean;
-  /** expand explanation row */
   expanded: boolean;
   selected: boolean;
 }
@@ -59,6 +74,14 @@ interface RowData {
 let _keyCounter = 0;
 function nextKey() {
   return `row-${++_keyCounter}`;
+}
+
+function inferSharedExamName(questions: Question[]): string {
+  for (const q of questions) {
+    const exam = getExamNameForSubject(q.subject ?? "");
+    if (exam) return exam;
+  }
+  return "";
 }
 
 function questionToRow(q: Question, questionSetId: string): RowData {
@@ -109,7 +132,31 @@ function emptyRow(questionSetId: string, sortOrder: number): RowData {
   };
 }
 
-// ─── Component ─────────────────────────────────────────────────────────────
+function patchRowForExamChange(
+  row: RowData,
+  nextExam: string,
+): RowData {
+  if (!nextExam) {
+    if (!row.subject && !row.topic) return row;
+    return { ...row, subject: "", topic: "", dirty: true };
+  }
+  const validSubjects = getSubjectsByExamName(nextExam);
+  const subjectOk =
+    row.subject && validSubjects.some((s) => s.name === row.subject);
+  if (!subjectOk) {
+    if (!row.subject && !row.topic) return row;
+    return { ...row, subject: "", topic: "", dirty: true };
+  }
+  if (row.topic) {
+    const topics = getTopicsBySubjectName(row.subject);
+    if (!topics.some((t) => t.name === row.topic)) {
+      return { ...row, topic: "", dirty: true };
+    }
+  }
+  return row;
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────
 
 export default function BulkEditPage({
   params,
@@ -120,57 +167,107 @@ export default function BulkEditPage({
 
   const [questionSet, setQuestionSet] = useState<QuestionSet | null>(null);
   const [rows, setRows] = useState<RowData[]>([]);
+  const [sharedExamName, setSharedExamName] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [savedCount, setSavedCount] = useState<number | null>(null);
 
-  // Track original IDs for detecting truly removed rows
   const originalIds = useRef<Set<string>>(new Set());
 
-  // ── Load ────────────────────────────────────────────────────────────────
+  const subjectOptions = useMemo(
+    () => (sharedExamName ? getSubjectsByExamName(sharedExamName) : []),
+    [sharedExamName],
+  );
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
         const [qs, questions] = await Promise.all([
           questionSetService.getById(questionSetId),
           questionSetService.getQuestions(questionSetId),
         ]);
+        if (cancelled) return;
+
         setQuestionSet(qs);
-        const loaded = questions.map((q) => questionToRow(q, questionSetId));
-        setRows(loaded);
+        setRows(questions.map((q) => questionToRow(q, questionSetId)));
+        setSharedExamName(inferSharedExamName(questions));
         originalIds.current = new Set(questions.map((q) => q.id));
       } catch (err) {
-        console.error(err);
+        if (!cancelled) console.error(err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [questionSetId]);
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
-
   const updateRow = useCallback((key: string, patch: Partial<RowData>) => {
-    setRows((prev) =>
-      prev.map((r) => (r._key === key ? { ...r, ...patch, dirty: true } : r)),
-    );
+    setRows((prev) => {
+      const i = prev.findIndex((r) => r._key === key);
+      if (i === -1) return prev;
+      const current = prev[i]!;
+      const next = [...prev];
+      next[i] = { ...current, ...patch, dirty: true };
+      return next;
+    });
   }, []);
 
+  /** One exam for the whole set — updates every row (clears invalid subject/topic). */
+  const handleSharedExamChange = useCallback((nextExam: string) => {
+    setSharedExamName(nextExam);
+    startTransition(() => {
+      setRows((prev) => {
+        let changed = false;
+        const next = prev.map((r) => {
+          const patched = patchRowForExamChange(r, nextExam);
+          if (patched !== r) changed = true;
+          return patched;
+        });
+        return changed ? next : prev;
+      });
+    });
+  }, []);
+
+  const updateRowClassification = useCallback(
+    (key: string, patch: { subject?: string; topic?: string }) => {
+      updateRow(key, patch);
+    },
+    [updateRow],
+  );
+
   const toggleExpand = useCallback((key: string) => {
-    setRows((prev) =>
-      prev.map((r) => (r._key === key ? { ...r, expanded: !r.expanded } : r)),
-    );
+    setRows((prev) => {
+      const i = prev.findIndex((r) => r._key === key);
+      if (i === -1) return prev;
+      const current = prev[i]!;
+      const next = [...prev];
+      next[i] = { ...current, expanded: !current.expanded };
+      return next;
+    });
   }, []);
 
   const toggleSelect = useCallback((key: string) => {
-    setRows((prev) =>
-      prev.map((r) => (r._key === key ? { ...r, selected: !r.selected } : r)),
-    );
+    setRows((prev) => {
+      const i = prev.findIndex((r) => r._key === key);
+      if (i === -1) return prev;
+      const current = prev[i]!;
+      const next = [...prev];
+      next[i] = { ...current, selected: !current.selected };
+      return next;
+    });
   }, []);
 
   const toggleSelectAll = useCallback((checked: boolean) => {
-    setRows((prev) => prev.map((r) => ({ ...r, selected: checked })));
+    setRows((prev) => {
+      if (prev.every((r) => r.selected === checked)) return prev;
+      return prev.map((r) => ({ ...r, selected: checked }));
+    });
   }, []);
 
   const addRow = useCallback(() => {
@@ -181,13 +278,10 @@ export default function BulkEditPage({
     setRows((prev) => prev.filter((r) => r._key !== key));
   }, []);
 
-  // ── Save all dirty rows ─────────────────────────────────────────────────
-
   const handleSave = async () => {
     const dirtyRows = rows.filter((r) => r.dirty);
     if (dirtyRows.length === 0) return;
 
-    // Validate required fields
     for (const r of dirtyRows) {
       if (
         !r.questionText.trim() ||
@@ -223,16 +317,16 @@ export default function BulkEditPage({
       }));
 
       const saved = await questionSetService.bulkUpsertQuestions(payload);
-
-      // Merge saved IDs back into rows
       const savedMap = new Map(saved.map((q, i) => [dirtyRows[i]!._key, q]));
 
-      setRows((prev) =>
-        prev.map((r) => {
-          const s = savedMap.get(r._key);
-          return s ? { ...r, id: s.id, dirty: false } : r;
-        }),
-      );
+      setRows((prev) => {
+        const next = [...prev];
+        for (let i = 0; i < next.length; i += 1) {
+          const s = savedMap.get(next[i]!._key);
+          if (s) next[i] = { ...next[i]!, id: s.id, dirty: false };
+        }
+        return next;
+      });
 
       setSavedCount(saved.length);
     } catch (err) {
@@ -243,16 +337,12 @@ export default function BulkEditPage({
     }
   };
 
-  // ── Bulk delete selected rows ───────────────────────────────────────────
-
   const handleBulkDelete = async () => {
     const selected = rows.filter((r) => r.selected);
     if (selected.length === 0) return;
 
-    const confirmMsg = `${selected.length} টি প্রশ্ন মুছে ফেলতে চান?`;
-    if (!confirm(confirmMsg)) return;
+    if (!confirm(`${selected.length} টি প্রশ্ন মুছে ফেলতে চান?`)) return;
 
-    // Split into persisted (need API call) vs local-only (new, unsaved)
     const persistedIds = selected
       .filter((r) => r.id !== undefined)
       .map((r) => r.id as string);
@@ -265,7 +355,6 @@ export default function BulkEditPage({
       if (persistedIds.length > 0) {
         await questionSetService.bulkDeleteQuestions(persistedIds);
       }
-      // Remove from UI
       const deletedIdSet = new Set(persistedIds);
       setRows((prev) =>
         prev.filter(
@@ -280,13 +369,19 @@ export default function BulkEditPage({
     }
   };
 
-  // ── Derived state ──────────────────────────────────────────────────────
-
-  const dirtyCount = rows.filter((r) => r.dirty).length;
-  const selectedCount = rows.filter((r) => r.selected).length;
-  const allSelected = rows.length > 0 && rows.every((r) => r.selected);
-
-  // ── Render ─────────────────────────────────────────────────────────────
+  const { dirtyCount, selectedCount, allSelected } = useMemo(() => {
+    let dirty = 0;
+    let selected = 0;
+    for (const r of rows) {
+      if (r.dirty) dirty += 1;
+      if (r.selected) selected += 1;
+    }
+    return {
+      dirtyCount: dirty,
+      selectedCount: selected,
+      allSelected: rows.length > 0 && selected === rows.length,
+    };
+  }, [rows]);
 
   if (loading) {
     return (
@@ -298,7 +393,6 @@ export default function BulkEditPage({
 
   return (
     <div className="mx-auto max-w-400 px-4 py-6 sm:px-6">
-      {/* Header */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
           <Link href={`/admin/question-sets/${questionSetId}/questions`}>
@@ -306,7 +400,7 @@ export default function BulkEditPage({
           </Link>
         </Button>
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h1 className="text-xl font-semibold tracking-tight">
             বাল্ক প্রশ্ন ব্যবস্থাপনা
           </h1>
@@ -314,8 +408,8 @@ export default function BulkEditPage({
             <p className="text-sm text-muted-foreground">
               {questionSet.title} — {rows.length} টি প্রশ্ন
               {dirtyCount > 0 && (
-                <span className="ml-2 text-amber-600 font-medium">
-                  ({dirtyCount} টি অপরিবর্তিত)
+                <span className="ml-2 font-medium text-amber-600">
+                  ({dirtyCount} টি অসংরক্ষিত)
                 </span>
               )}
             </p>
@@ -331,16 +425,16 @@ export default function BulkEditPage({
               disabled={deleting}
             >
               {deleting ? (
-                <Loader2 className="size-4 mr-1 animate-spin" />
+                <Loader2 className="mr-1 size-4 animate-spin" />
               ) : (
-                <Trash2 className="size-4 mr-1" />
+                <Trash2 className="mr-1 size-4" />
               )}
               {selectedCount} টি মুছুন
             </Button>
           )}
 
           <Button variant="outline" size="sm" onClick={addRow}>
-            <Plus className="size-4 mr-1" />
+            <Plus className="mr-1 size-4" />
             নতুন সারি
           </Button>
 
@@ -350,9 +444,9 @@ export default function BulkEditPage({
             disabled={saving || dirtyCount === 0}
           >
             {saving ? (
-              <Loader2 className="size-4 mr-1 animate-spin" />
+              <Loader2 className="mr-1 size-4 animate-spin" />
             ) : (
-              <Save className="size-4 mr-1" />
+              <Save className="mr-1 size-4" />
             )}
             সংরক্ষণ করুন
             {dirtyCount > 0 && (
@@ -364,11 +458,30 @@ export default function BulkEditPage({
         </div>
       </div>
 
-      {/* Success banner */}
+      {/* Shared exam — applies to all rows */}
+      <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3">
+        <div>
+          <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+            সকল প্রশ্নের পরীক্ষা — এখানে বা যেকোনো সারিতে পরিবর্তন করলে সব সারিতে
+            একই পরীক্ষা সেট হবে
+          </p>
+          <SharedExamSelect
+            examName={sharedExamName}
+            onExamChange={handleSharedExamChange}
+          />
+        </div>
+        {!sharedExamName && (
+          <p className="pb-1 text-xs text-amber-700 dark:text-amber-400">
+            প্রথমে পরীক্ষা নির্বাচন করুন, তারপর প্রতিটি সারিতে বিষয় ও টপিক।
+          </p>
+        )}
+      </div>
+
       {savedCount !== null && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5 text-sm text-green-800 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
           ✓ {savedCount} টি প্রশ্ন সফলভাবে সংরক্ষিত হয়েছে।
           <button
+            type="button"
             className="ml-auto text-green-600 hover:text-green-800"
             onClick={() => setSavedCount(null)}
           >
@@ -377,12 +490,11 @@ export default function BulkEditPage({
         </div>
       )}
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-muted/60 text-muted-foreground border-b border-border">
-              <th className="px-3 py-2.5 text-left w-10">
+            <tr className="border-b border-border bg-muted/60 text-muted-foreground">
+              <th className="w-10 px-3 py-2.5 text-left">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -391,28 +503,33 @@ export default function BulkEditPage({
                   className="h-4 w-4 cursor-pointer accent-primary"
                 />
               </th>
-              <th className="px-2 py-2.5 text-center w-12">#</th>
-              <th className="px-2 py-2.5 text-left min-w-65">প্রশ্ন</th>
-              <th className="px-2 py-2.5 text-left min-w-32.5">ক) A</th>
-              <th className="px-2 py-2.5 text-left min-w-32.5">খ) B</th>
-              <th className="px-2 py-2.5 text-left min-w-32.5">গ) C</th>
-              <th className="px-2 py-2.5 text-left min-w-32.5">ঘ) D</th>
-              <th className="px-2 py-2.5 text-center w-20">উত্তর</th>
-              <th className="px-2 py-2.5 text-left min-w-27.5">বিষয়</th>
-              <th className="px-2 py-2.5 text-left min-w-27.5">টপিক</th>
-              <th className="px-2 py-2.5 text-center w-16">ব্যাখ্যা</th>
-              <th className="px-2 py-2.5 w-10" />
+              <th className="w-12 px-2 py-2.5 text-center">#</th>
+              <th className="min-w-65 px-2 py-2.5 text-left">প্রশ্ন</th>
+              <th className="min-w-32.5 px-2 py-2.5 text-left">ক) A</th>
+              <th className="min-w-32.5 px-2 py-2.5 text-left">খ) B</th>
+              <th className="min-w-32.5 px-2 py-2.5 text-left">গ) C</th>
+              <th className="min-w-32.5 px-2 py-2.5 text-left">ঘ) D</th>
+              <th className="w-20 px-2 py-2.5 text-center">উত্তর</th>
+              <th className="min-w-45 px-2 py-2.5 text-left">
+                পরীক্ষা / বিষয় / টপিক
+              </th>
+              <th className="w-16 px-2 py-2.5 text-center">ব্যাখ্যা</th>
+              <th className="w-10 px-2 py-2.5" />
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={12}
+                  colSpan={11}
                   className="py-12 text-center text-muted-foreground"
                 >
                   কোনো প্রশ্ন নেই।{" "}
-                  <button className="text-primary underline" onClick={addRow}>
+                  <button
+                    type="button"
+                    className="text-primary underline"
+                    onClick={addRow}
+                  >
                     প্রথম প্রশ্ন যোগ করুন
                   </button>
                 </td>
@@ -422,7 +539,11 @@ export default function BulkEditPage({
                 <RowGroup
                   key={row._key}
                   row={row}
+                  sharedExamName={sharedExamName}
+                  subjectOptions={subjectOptions}
+                  onSharedExamChange={handleSharedExamChange}
                   onUpdate={updateRow}
+                  onUpdateClassification={updateRowClassification}
                   onToggleExpand={toggleExpand}
                   onToggleSelect={toggleSelect}
                   onRemoveLocally={removeRowLocally}
@@ -433,15 +554,13 @@ export default function BulkEditPage({
         </table>
       </div>
 
-      {/* Bottom add button */}
       <div className="mt-4 flex justify-center">
         <Button variant="outline" size="sm" onClick={addRow}>
-          <Plus className="size-4 mr-1" />
+          <Plus className="mr-1 size-4" />
           নতুন সারি যোগ করুন
         </Button>
       </div>
 
-      {/* Legend */}
       <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-sm border-2 border-dashed border-green-400 bg-green-50" />
@@ -456,23 +575,43 @@ export default function BulkEditPage({
   );
 }
 
-// ─── Row Group ──────────────────────────────────────────────────────────────
+// ─── Row (memo: re-render only when this row or shared subject list changes) ─
 
 interface RowGroupProps {
   row: RowData;
+  sharedExamName: string;
+  subjectOptions: SubjectOption[];
+  onSharedExamChange: (examName: string) => void;
   onUpdate: (key: string, patch: Partial<RowData>) => void;
+  onUpdateClassification: (
+    key: string,
+    patch: { subject?: string; topic?: string },
+  ) => void;
   onToggleExpand: (key: string) => void;
   onToggleSelect: (key: string) => void;
   onRemoveLocally: (key: string) => void;
 }
 
-function RowGroup({
+function rowGroupPropsAreEqual(prev: RowGroupProps, next: RowGroupProps): boolean {
+  return (
+    prev.row === next.row &&
+    prev.sharedExamName === next.sharedExamName &&
+    prev.subjectOptions === next.subjectOptions
+  );
+}
+
+const RowGroup = memo(function RowGroup({
   row,
+  sharedExamName,
+  subjectOptions,
+  onSharedExamChange,
   onUpdate,
+  onUpdateClassification,
   onToggleExpand,
   onToggleSelect,
   onRemoveLocally,
 }: RowGroupProps) {
+  const rowKey = row._key;
   const isNew = row.id === undefined;
 
   const rowClass = isNew
@@ -481,71 +620,73 @@ function RowGroup({
       ? "border-l-4 border-l-amber-400 bg-amber-50/30 dark:bg-amber-900/10"
       : "border-l-4 border-l-transparent";
 
+  const handleClassificationChange = useCallback(
+    (patch: { subject?: string; topic?: string }) => {
+      onUpdateClassification(rowKey, patch);
+    },
+    [rowKey, onUpdateClassification],
+  );
+
   return (
     <>
       <tr
-        className={`border-b border-border transition-colors hover:bg-muted/30 ${rowClass}`}
+        className={`border-b border-border hover:bg-muted/30 ${rowClass}`}
       >
-        {/* Checkbox */}
         <td className="px-3 py-2">
           <input
             type="checkbox"
             checked={row.selected}
-            onChange={() => onToggleSelect(row._key)}
+            onChange={() => onToggleSelect(rowKey)}
             aria-label="নির্বাচন করুন"
             className="h-4 w-4 cursor-pointer accent-primary"
           />
         </td>
 
-        {/* Sort order */}
         <td className="px-2 py-2 text-center">
           <Input
             type="number"
             min={0}
             value={row.sortOrder}
             onChange={(e) =>
-              onUpdate(row._key, {
-                sortOrder: parseInt(e.target.value) || 0,
+              onUpdate(rowKey, {
+                sortOrder: parseInt(e.target.value, 10) || 0,
               })
             }
-            className="h-7 w-14 text-center text-xs p-1"
+            className="h-7 w-14 p-1 text-center text-xs"
           />
         </td>
 
-        {/* Question text */}
         <td className="px-2 py-2">
           <Textarea
             value={row.questionText}
             onChange={(e) =>
-              onUpdate(row._key, { questionText: e.target.value })
+              onUpdate(rowKey, { questionText: e.target.value })
             }
             rows={2}
             placeholder="প্রশ্নের বিষয়বস্তু..."
-            className="min-w-60 text-xs resize-none"
+            className="min-w-60 resize-none text-xs"
           />
         </td>
 
-        {/* Options A–D */}
         {(["optionA", "optionB", "optionC", "optionD"] as const).map(
           (field) => (
             <td key={field} className="px-2 py-2">
               <Input
                 value={row[field]}
                 onChange={(e) =>
-                  onUpdate(row._key, { [field]: e.target.value })
+                  onUpdate(rowKey, { [field]: e.target.value })
                 }
                 placeholder="—"
-                className="min-w-30 text-xs h-8"
+                className="h-8 min-w-30 text-xs"
               />
             </td>
           ),
         )}
 
-        {/* Correct answer */}
         <td className="px-2 py-2 text-center">
           <Select
             value={row.correctAnswer}
-            onValueChange={(v) => onUpdate(row._key, { correctAnswer: v })}
+            onValueChange={(v) => onUpdate(rowKey, { correctAnswer: v })}
           >
             <SelectTrigger className="h-8 w-16 text-xs">
               <SelectValue />
@@ -559,36 +700,26 @@ function RowGroup({
           </Select>
         </td>
 
-        {/* Subject */}
-        <td className="px-2 py-2">
-          <Input
-            value={row.subject}
-            onChange={(e) => onUpdate(row._key, { subject: e.target.value })}
-            placeholder="বিষয়"
-            className="min-w-25 text-xs h-8"
+        <td className="px-2 py-2 align-top">
+          <RowClassificationSelects
+            examName={sharedExamName}
+            subject={row.subject}
+            topic={row.topic}
+            subjectOptions={subjectOptions}
+            onExamChange={onSharedExamChange}
+            onSubjectTopicChange={handleClassificationChange}
           />
         </td>
 
-        {/* Topic */}
-        <td className="px-2 py-2">
-          <Input
-            value={row.topic}
-            onChange={(e) => onUpdate(row._key, { topic: e.target.value })}
-            placeholder="টপিক"
-            className="min-w-25 text-xs h-8"
-          />
-        </td>
-
-        {/* Explanation toggle */}
         <td className="px-2 py-2 text-center">
           <button
             type="button"
-            onClick={() => onToggleExpand(row._key)}
-            className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            onClick={() => onToggleExpand(rowKey)}
+            className="inline-flex items-center gap-0.5 rounded px-1.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             title={row.expanded ? "লুকান" : "ব্যাখ্যা দেখুন"}
           >
             {row.explanation.trim() ? (
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mr-0.5" />
+              <span className="mr-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
             ) : null}
             {row.expanded ? (
               <ChevronUp className="size-3.5" />
@@ -598,18 +729,14 @@ function RowGroup({
           </button>
         </td>
 
-        {/* Delete row */}
         <td className="px-2 py-2 text-center">
           <button
             type="button"
             onClick={() => {
-              if (row.id) {
-                onToggleSelect(row._key);
-              } else {
-                onRemoveLocally(row._key);
-              }
+              if (row.id) onToggleSelect(rowKey);
+              else onRemoveLocally(rowKey);
             }}
-            className="inline-flex size-7 items-center justify-center rounded text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors dark:hover:bg-red-900/20"
+            className="inline-flex size-7 items-center justify-center rounded text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
             title={row.id ? "নির্বাচন করুন" : "সারি সরান"}
           >
             <Trash2 className="size-3.5" />
@@ -617,12 +744,11 @@ function RowGroup({
         </td>
       </tr>
 
-      {/* Expanded explanation / extra fields */}
       {row.expanded && (
         <tr
           className={`border-b border-border ${isNew ? "bg-green-50/30 dark:bg-green-900/5" : row.dirty ? "bg-amber-50/20 dark:bg-amber-900/5" : "bg-muted/20"}`}
         >
-          <td colSpan={12} className="px-4 pb-3 pt-1">
+          <td colSpan={11} className="px-4 pb-3 pt-1">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="sm:col-span-3">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
@@ -631,11 +757,11 @@ function RowGroup({
                 <Textarea
                   value={row.explanation}
                   onChange={(e) =>
-                    onUpdate(row._key, { explanation: e.target.value })
+                    onUpdate(rowKey, { explanation: e.target.value })
                   }
                   rows={3}
                   placeholder="উত্তরের বিস্তারিত ব্যাখ্যা..."
-                  className="text-xs resize-y"
+                  className="resize-y text-xs"
                 />
               </div>
               <div>
@@ -645,10 +771,10 @@ function RowGroup({
                 <Input
                   value={row.subTopic}
                   onChange={(e) =>
-                    onUpdate(row._key, { subTopic: e.target.value })
+                    onUpdate(rowKey, { subTopic: e.target.value })
                   }
                   placeholder="সাব-টপিক"
-                  className="text-xs h-8"
+                  className="h-8 text-xs"
                 />
               </div>
               <div>
@@ -658,10 +784,10 @@ function RowGroup({
                 <Input
                   value={row.frequencyTag}
                   onChange={(e) =>
-                    onUpdate(row._key, { frequencyTag: e.target.value })
+                    onUpdate(rowKey, { frequencyTag: e.target.value })
                   }
                   placeholder="যেমন: বিগত ৫ বছর"
-                  className="text-xs h-8"
+                  className="h-8 text-xs"
                 />
               </div>
               <div>
@@ -670,9 +796,9 @@ function RowGroup({
                 </label>
                 <Input
                   value={row.slug}
-                  onChange={(e) => onUpdate(row._key, { slug: e.target.value })}
+                  onChange={(e) => onUpdate(rowKey, { slug: e.target.value })}
                   placeholder="যেমন: বালক-পত্রিকা-প্রতিষ্ঠা"
-                  className="text-xs h-8 font-mono"
+                  className="h-8 font-mono text-xs"
                 />
               </div>
             </div>
@@ -681,4 +807,4 @@ function RowGroup({
       )}
     </>
   );
-}
+}, rowGroupPropsAreEqual);

@@ -16,6 +16,8 @@ import {
   BarChart3,
   BookOpen,
   CheckCircle2,
+  Eye,
+  EyeOff,
   Heart,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -43,6 +45,8 @@ export default function AnswersPage({
   const [activeExplanation, setActiveExplanation] = useState<string | null>(
     null,
   );
+  const [globalShowAnswers, setGlobalShowAnswers] = useState(true);
+  const [hiddenAnswers, setHiddenAnswers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const load = async () => {
@@ -101,6 +105,33 @@ export default function AnswersPage({
     }
   }, []);
 
+  const handleGlobalToggle = useCallback(() => {
+    setGlobalShowAnswers((prev) => {
+      const next = !prev;
+      // Reset all individual overrides when toggling globally
+      setHiddenAnswers(new Set());
+      return next;
+    });
+  }, []);
+
+  const handleToggleIndividual = useCallback((questionId: string) => {
+    setHiddenAnswers((prev) => {
+      const next = new Set(prev);
+      if (next.has(questionId)) next.delete(questionId);
+      else next.add(questionId);
+      return next;
+    });
+  }, []);
+
+  const isAnswerVisible = useCallback(
+    (questionId: string) => {
+      const isIndividuallyToggled = hiddenAnswers.has(questionId);
+      // If globally showing, individual toggle hides; if globally hiding, individual toggle shows
+      return globalShowAnswers ? !isIndividuallyToggled : isIndividuallyToggled;
+    },
+    [globalShowAnswers, hiddenAnswers],
+  );
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
@@ -132,6 +163,26 @@ export default function AnswersPage({
             <ArrowLeft className="size-5" />
           </Button>
           <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
+          <div className="ml-auto">
+            <Button
+              size="sm"
+              variant={globalShowAnswers ? "outline" : "default"}
+              onClick={handleGlobalToggle}
+              className="gap-1.5"
+            >
+              {globalShowAnswers ? (
+                <>
+                  <EyeOff className="size-4" />
+                  উত্তর লুকান
+                </>
+              ) : (
+                <>
+                  <Eye className="size-4" />
+                  উত্তর দেখুন
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Subject Filter */}
@@ -185,41 +236,77 @@ export default function AnswersPage({
 
               {/* Options */}
               <div className="mt-3 space-y-2">
-                {OPTION_KEYS.map((key, i) => {
-                  const optionText = question[
-                    `option${key}` as keyof ReviewQuestion
-                  ] as string;
-                  const isCorrectAnswer = question.correctAnswer === key;
+                {isAnswerVisible(question.id)
+                  ? OPTION_KEYS.map((key, i) => {
+                      const optionText = question[
+                        `option${key}` as keyof ReviewQuestion
+                      ] as string;
+                      const isCorrectAnswer = question.correctAnswer === key;
 
-                  return (
-                    <div
-                      key={key}
-                      className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 ${
-                        isCorrectAnswer
-                          ? "border-green-400 bg-green-50"
-                          : "border-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
-                          isCorrectAnswer
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {OPTION_LABELS[i]}
-                      </span>
-                      <span className="text-base flex-1">{optionText}</span>
-                      {isCorrectAnswer && (
-                        <CheckCircle2 className="size-5 text-green-500" />
-                      )}
-                    </div>
-                  );
-                })}
+                      return (
+                        <div
+                          key={key}
+                          className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 ${
+                            isCorrectAnswer
+                              ? "border-green-400 bg-green-50"
+                              : "border-gray-200"
+                          }`}
+                        >
+                          <span
+                            className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                              isCorrectAnswer
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {OPTION_LABELS[i]}
+                          </span>
+                          <span className="text-base flex-1">{optionText}</span>
+                          {isCorrectAnswer && (
+                            <CheckCircle2 className="size-5 text-green-500" />
+                          )}
+                        </div>
+                      );
+                    })
+                  : OPTION_KEYS.map((key, i) => {
+                      const optionText = question[
+                        `option${key}` as keyof ReviewQuestion
+                      ] as string;
+
+                      return (
+                        <div
+                          key={key}
+                          className="flex w-full items-center gap-3 rounded-lg border-2 border-gray-200 p-3.5"
+                        >
+                          <span className="flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold bg-gray-100 text-gray-600">
+                            {OPTION_LABELS[i]}
+                          </span>
+                          <span className="text-base flex-1">{optionText}</span>
+                        </div>
+                      );
+                    })}
               </div>
 
               {/* Action Buttons */}
               <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant={isAnswerVisible(question.id) ? "outline" : "default"}
+                  onClick={() => handleToggleIndividual(question.id)}
+                  className="gap-1.5"
+                >
+                  {isAnswerVisible(question.id) ? (
+                    <>
+                      <EyeOff className="size-4" />
+                      উত্তর লুকান
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="size-4" />
+                      উত্তর দেখুন
+                    </>
+                  )}
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"
