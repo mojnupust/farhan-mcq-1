@@ -24,7 +24,6 @@ import {
   getExamNameForSubject,
   getSubjectsByExamName,
   getTopicsBySubjectName,
-  type SubjectOption,
 } from "@/lib/data/exam-subject-topics";
 import {
   ArrowLeft,
@@ -60,6 +59,7 @@ interface RowData {
   optionD: string;
   correctAnswer: string;
   explanation: string;
+  examName: string; // ✅ NEW
   subject: string;
   topic: string;
   subTopic: string;
@@ -78,6 +78,8 @@ function nextKey() {
 
 function inferSharedExamName(questions: Question[]): string {
   for (const q of questions) {
+    // ✅ CHANGED: prefer stored examName, fall back to inferring from subject
+    if (q.examName) return q.examName;
     const exam = getExamNameForSubject(q.subject ?? "");
     if (exam) return exam;
   }
@@ -96,6 +98,8 @@ function questionToRow(q: Question, questionSetId: string): RowData {
     optionD: q.optionD,
     correctAnswer: q.correctAnswer,
     explanation: q.explanation ?? "",
+    // ✅ CHANGED: use stored examName first, fall back to inferring from subject (for old data)
+    examName: q.examName ?? getExamNameForSubject(q.subject ?? ""),
     subject: q.subject ?? "",
     topic: q.topic ?? "",
     subTopic: q.subTopic ?? "",
@@ -108,7 +112,12 @@ function questionToRow(q: Question, questionSetId: string): RowData {
   };
 }
 
-function emptyRow(questionSetId: string, sortOrder: number): RowData {
+// ✅ CHANGED: emptyRow now accepts examName param for new rows
+function emptyRow(
+  questionSetId: string,
+  sortOrder: number,
+  examName = "",
+): RowData {
   return {
     _key: nextKey(),
     id: undefined,
@@ -120,6 +129,7 @@ function emptyRow(questionSetId: string, sortOrder: number): RowData {
     optionD: "",
     correctAnswer: "A",
     explanation: "",
+    examName, // ✅ NEW
     subject: "",
     topic: "",
     subTopic: "",
@@ -132,28 +142,27 @@ function emptyRow(questionSetId: string, sortOrder: number): RowData {
   };
 }
 
-function patchRowForExamChange(
-  row: RowData,
-  nextExam: string,
-): RowData {
+// ✅ CHANGED: now also patches row.examName so per-row exam state is correct
+function patchRowForExamChange(row: RowData, nextExam: string): RowData {
   if (!nextExam) {
-    if (!row.subject && !row.topic) return row;
-    return { ...row, subject: "", topic: "", dirty: true };
+    if (!row.subject && !row.topic && row.examName === nextExam) return row;
+    return { ...row, examName: nextExam, subject: "", topic: "", dirty: true };
   }
   const validSubjects = getSubjectsByExamName(nextExam);
   const subjectOk =
     row.subject && validSubjects.some((s) => s.name === row.subject);
   if (!subjectOk) {
-    if (!row.subject && !row.topic) return row;
-    return { ...row, subject: "", topic: "", dirty: true };
+    if (!row.subject && !row.topic && row.examName === nextExam) return row;
+    return { ...row, examName: nextExam, subject: "", topic: "", dirty: true };
   }
   if (row.topic) {
     const topics = getTopicsBySubjectName(row.subject);
     if (!topics.some((t) => t.name === row.topic)) {
-      return { ...row, topic: "", dirty: true };
+      return { ...row, examName: nextExam, topic: "", dirty: true };
     }
   }
-  return row;
+  if (row.examName === nextExam) return row;
+  return { ...row, examName: nextExam, dirty: true };
 }
 
 // ─── Page ──────────────────────────────────────────────────────────────────
@@ -175,10 +184,7 @@ export default function BulkEditPage({
 
   const originalIds = useRef<Set<string>>(new Set());
 
-  const subjectOptions = useMemo(
-    () => (sharedExamName ? getSubjectsByExamName(sharedExamName) : []),
-    [sharedExamName],
-  );
+  // ✅ CHANGED: removed shared subjectOptions — each row now derives its own from row.examName
 
   useEffect(() => {
     let cancelled = false;
@@ -218,7 +224,7 @@ export default function BulkEditPage({
     });
   }, []);
 
-  /** One exam for the whole set — updates every row (clears invalid subject/topic). */
+  /** Top-panel: one exam for the whole set — updates every row (clears invalid subject/topic). */
   const handleSharedExamChange = useCallback((nextExam: string) => {
     setSharedExamName(nextExam);
     startTransition(() => {
@@ -231,6 +237,19 @@ export default function BulkEditPage({
         });
         return changed ? next : prev;
       });
+    });
+  }, []);
+
+  // ✅ NEW: per-row exam change — only affects that single row
+  const handleRowExamChange = useCallback((key: string, nextExam: string) => {
+    setRows((prev) => {
+      const i = prev.findIndex((r) => r._key === key);
+      if (i === -1) return prev;
+      const patched = patchRowForExamChange(prev[i]!, nextExam);
+      if (patched === prev[i]) return prev;
+      const next = [...prev];
+      next[i] = patched;
+      return next;
     });
   }, []);
 
@@ -270,9 +289,13 @@ export default function BulkEditPage({
     });
   }, []);
 
+  // ✅ CHANGED: passes sharedExamName as default examName for new rows
   const addRow = useCallback(() => {
-    setRows((prev) => [...prev, emptyRow(questionSetId, prev.length + 1)]);
-  }, [questionSetId]);
+    setRows((prev) => [
+      ...prev,
+      emptyRow(questionSetId, prev.length + 1, sharedExamName),
+    ]);
+  }, [questionSetId, sharedExamName]);
 
   const removeRowLocally = useCallback((key: string) => {
     setRows((prev) => prev.filter((r) => r._key !== key));
@@ -308,6 +331,7 @@ export default function BulkEditPage({
         optionD: r.optionD.trim(),
         correctAnswer: r.correctAnswer,
         explanation: r.explanation.trim() || undefined,
+        examName: r.examName.trim() || undefined, // ✅ NEW
         subject: r.subject.trim() || undefined,
         topic: r.topic.trim() || undefined,
         subTopic: r.subTopic.trim() || undefined,
@@ -462,8 +486,8 @@ export default function BulkEditPage({
       <div className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3">
         <div>
           <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-            সকল প্রশ্নের পরীক্ষা — এখানে বা যেকোনো সারিতে পরিবর্তন করলে সব সারিতে
-            একই পরীক্ষা সেট হবে
+            সকল প্রশ্নের পরীক্ষা — এখানে পরিবর্তন করলে সব সারিতে একই পরীক্ষা সেট
+            (examName) হবে
           </p>
           <SharedExamSelect
             examName={sharedExamName}
@@ -512,6 +536,10 @@ export default function BulkEditPage({
               <th className="w-20 px-2 py-2.5 text-center">উত্তর</th>
               <th className="min-w-45 px-2 py-2.5 text-left">
                 পরীক্ষা / বিষয় / টপিক
+                {/* ✅ NEW: label clarifies per-row ownership */}
+                <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                  (প্রতি সারির নিজস্ব)
+                </span>
               </th>
               <th className="w-16 px-2 py-2.5 text-center">ব্যাখ্যা</th>
               <th className="w-10 px-2 py-2.5" />
@@ -536,12 +564,12 @@ export default function BulkEditPage({
               </tr>
             ) : (
               rows.map((row) => (
+                // ✅ CHANGED: removed sharedExamName/subjectOptions/onSharedExamChange props,
+                //             added onRowExamChange for per-row independent exam selection
                 <RowGroup
                   key={row._key}
                   row={row}
-                  sharedExamName={sharedExamName}
-                  subjectOptions={subjectOptions}
-                  onSharedExamChange={handleSharedExamChange}
+                  onRowExamChange={handleRowExamChange}
                   onUpdate={updateRow}
                   onUpdateClassification={updateRowClassification}
                   onToggleExpand={toggleExpand}
@@ -575,13 +603,13 @@ export default function BulkEditPage({
   );
 }
 
-// ─── Row (memo: re-render only when this row or shared subject list changes) ─
+// ─── Row ───────────────────────────────────────────────────────────────────
 
+// ✅ CHANGED: removed sharedExamName, subjectOptions, onSharedExamChange props;
+//             added onRowExamChange for per-row independent exam control
 interface RowGroupProps {
   row: RowData;
-  sharedExamName: string;
-  subjectOptions: SubjectOption[];
-  onSharedExamChange: (examName: string) => void;
+  onRowExamChange: (key: string, examName: string) => void;
   onUpdate: (key: string, patch: Partial<RowData>) => void;
   onUpdateClassification: (
     key: string,
@@ -592,19 +620,17 @@ interface RowGroupProps {
   onRemoveLocally: (key: string) => void;
 }
 
-function rowGroupPropsAreEqual(prev: RowGroupProps, next: RowGroupProps): boolean {
-  return (
-    prev.row === next.row &&
-    prev.sharedExamName === next.sharedExamName &&
-    prev.subjectOptions === next.subjectOptions
-  );
+// ✅ CHANGED: equality check simplified — only row identity matters now
+function rowGroupPropsAreEqual(
+  prev: RowGroupProps,
+  next: RowGroupProps,
+): boolean {
+  return prev.row === next.row;
 }
 
 const RowGroup = memo(function RowGroup({
   row,
-  sharedExamName,
-  subjectOptions,
-  onSharedExamChange,
+  onRowExamChange, // ✅ NEW
   onUpdate,
   onUpdateClassification,
   onToggleExpand,
@@ -613,6 +639,12 @@ const RowGroup = memo(function RowGroup({
 }: RowGroupProps) {
   const rowKey = row._key;
   const isNew = row.id === undefined;
+
+  // ✅ NEW: each row derives its own subject options from its own examName
+  const rowSubjectOptions = useMemo(
+    () => (row.examName ? getSubjectsByExamName(row.examName) : []),
+    [row.examName],
+  );
 
   const rowClass = isNew
     ? "border-l-4 border-dashed border-l-green-400 bg-green-50/40 dark:bg-green-900/10"
@@ -627,11 +659,17 @@ const RowGroup = memo(function RowGroup({
     [rowKey, onUpdateClassification],
   );
 
+  // ✅ NEW: local handler that calls the per-row exam change callback
+  const handleRowExamChangeLocal = useCallback(
+    (nextExam: string) => {
+      onRowExamChange(rowKey, nextExam);
+    },
+    [rowKey, onRowExamChange],
+  );
+
   return (
     <>
-      <tr
-        className={`border-b border-border hover:bg-muted/30 ${rowClass}`}
-      >
+      <tr className={`border-b border-border hover:bg-muted/30 ${rowClass}`}>
         <td className="px-3 py-2">
           <input
             type="checkbox"
@@ -659,9 +697,7 @@ const RowGroup = memo(function RowGroup({
         <td className="px-2 py-2">
           <Textarea
             value={row.questionText}
-            onChange={(e) =>
-              onUpdate(rowKey, { questionText: e.target.value })
-            }
+            onChange={(e) => onUpdate(rowKey, { questionText: e.target.value })}
             rows={2}
             placeholder="প্রশ্নের বিষয়বস্তু..."
             className="min-w-60 resize-none text-xs"
@@ -673,9 +709,7 @@ const RowGroup = memo(function RowGroup({
             <td key={field} className="px-2 py-2">
               <Input
                 value={row[field]}
-                onChange={(e) =>
-                  onUpdate(rowKey, { [field]: e.target.value })
-                }
+                onChange={(e) => onUpdate(rowKey, { [field]: e.target.value })}
                 placeholder="—"
                 className="h-8 min-w-30 text-xs"
               />
@@ -700,13 +734,15 @@ const RowGroup = memo(function RowGroup({
           </Select>
         </td>
 
+        {/* ✅ CHANGED: now passes row.examName and rowSubjectOptions (per-row),
+                        and handleRowExamChangeLocal instead of shared onSharedExamChange */}
         <td className="px-2 py-2 align-top">
           <RowClassificationSelects
-            examName={sharedExamName}
+            examName={row.examName}
             subject={row.subject}
             topic={row.topic}
-            subjectOptions={subjectOptions}
-            onExamChange={onSharedExamChange}
+            subjectOptions={rowSubjectOptions}
+            onExamChange={handleRowExamChangeLocal}
             onSubjectTopicChange={handleClassificationChange}
           />
         </td>

@@ -31,6 +31,7 @@ interface ParsedQuestion {
   optionD: string;
   correctAnswer: string;
   explanation: string;
+  examName: string; // ✅ NEW
   subject: string;
   topic: string;
   subTopic: string;
@@ -125,6 +126,7 @@ export default function AiImportPage({
         optionD: q.optionD,
         correctAnswer: q.correctAnswer,
         explanation: q.explanation || undefined,
+        examName: q.examName || undefined, // ✅ NEW
         subject: q.subject || undefined,
         topic: q.topic || undefined,
         subTopic: q.subTopic || undefined,
@@ -203,7 +205,6 @@ export default function AiImportPage({
       {/* ── Input Phase ── */}
       {!inPreview && (
         <div className="space-y-4">
-          {/* Raw text area */}
           <div>
             <Label htmlFor="raw-text" className="mb-1.5 block font-medium">
               অগোছালো প্রশ্নের টেক্সট
@@ -217,11 +218,10 @@ export default function AiImportPage({
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
               className="resize-y font-mono text-xs"
-              placeholder={`যেকোনো ফরম্যাটে প্রশ্ন পেস্ট করুন। উদাহরণ:\n\n১. 'বনস্পতি' শব্দটির সন্ধি বিচ্ছেদ কোনটি?\n@ বনস + পতি\n@ বনঃ + পতি\n@ বন + পতি\n® বনো + পতি\nউ. খ\nব্যাখ্যা: নিপাতনে সিদ্ধ সন্ধি...\n\n২. 'চতুষ্পদ' শব্দটির সন্ধি বিচ্ছেদ কোনটি?\n© চতুর + পদ\n¬ চতু + পদ\n@ চতুষ + পদ\n® চতুঃ + পদ\nউ. ঘ`}
+              placeholder={`যেকোনো ফরম্যাটে প্রশ্ন পেস্ট করুন।`}
             />
           </div>
 
-          {/* Hints row */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="subject-hint" className="mb-1.5 block">
@@ -253,7 +253,6 @@ export default function AiImportPage({
             </div>
           </div>
 
-          {/* Parse button */}
           <div className="flex items-center gap-3">
             <Button
               onClick={handleParse}
@@ -274,7 +273,6 @@ export default function AiImportPage({
             )}
           </div>
 
-          {/* Tips panel */}
           <div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground space-y-1.5">
             <p className="text-sm font-medium text-foreground">💡 টিপস</p>
             <p>
@@ -295,7 +293,6 @@ export default function AiImportPage({
       {/* ── Preview Phase ── */}
       {inPreview && questions && (
         <div>
-          {/* Toolbar */}
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <CheckCircle className="size-4 text-green-500" />
@@ -334,27 +331,22 @@ export default function AiImportPage({
             </div>
           </div>
 
-          {/* Question cards */}
           <div className="space-y-2">
             {questions.map((q, idx) => (
               <div
                 key={idx}
                 className="overflow-hidden rounded-xl border border-border bg-card"
               >
-                {/* Card header */}
                 <div className="flex items-start gap-3 px-4 py-3">
-                  {/* Sort order badge */}
                   <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     {q.sortOrder}
                   </span>
 
-                  {/* Content */}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium leading-snug">
                       {q.questionText}
                     </p>
 
-                    {/* Options 2×2 */}
                     <div className="mt-2 grid grid-cols-2 gap-1">
                       {(["A", "B", "C", "D"] as const).map((key) => {
                         const optKey = `option${key}` as keyof ParsedQuestion;
@@ -384,9 +376,12 @@ export default function AiImportPage({
                       })}
                     </div>
 
-                    {/* Subject / topic tags */}
-                    {(q.subject || q.topic) && (
+                    {/* ✅ CHANGED: also show examName badge if present */}
+                    {(q.examName || q.subject || q.topic) && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
+                        {q.examName && (
+                          <Badge className="text-xs">{q.examName}</Badge>
+                        )}
                         {q.subject && (
                           <Badge variant="secondary" className="text-xs">
                             {q.subject}
@@ -401,7 +396,6 @@ export default function AiImportPage({
                     )}
                   </div>
 
-                  {/* Action buttons */}
                   <div className="flex shrink-0 items-center gap-0.5">
                     <button
                       onClick={() => toggleExpand(idx)}
@@ -428,7 +422,6 @@ export default function AiImportPage({
                   </div>
                 </div>
 
-                {/* Expandable explanation */}
                 {expandedSet.has(idx) && (
                   <div className="border-t border-border bg-muted/20 px-4 py-3">
                     <p className="mb-1.5 text-xs font-medium text-muted-foreground">
@@ -449,7 +442,6 @@ export default function AiImportPage({
             ))}
           </div>
 
-          {/* Sticky save bar at bottom */}
           {questions.length > 0 && (
             <div className="sticky bottom-4 mt-6 flex justify-end">
               <div className="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 shadow-lg">

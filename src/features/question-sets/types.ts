@@ -104,6 +104,7 @@ export interface Question {
   optionD: string;
   correctAnswer: string;
   explanation: string | null;
+  examName: string | null;
   subject: string | null;
   topic: string | null;
   subTopic: string | null;
@@ -133,7 +134,12 @@ export interface CreateQuestionInput {
   optionD: string;
   correctAnswer: string;
   explanation?: string;
+  examName?: string;
   subject?: string;
+  topic?: string;
+  subTopic?: string;
+  slug?: string;
+  frequencyTag?: string;
   sortOrder?: number;
 }
 
@@ -145,6 +151,7 @@ export interface UpdateQuestionInput {
   optionD?: string;
   correctAnswer?: string;
   explanation?: string;
+  examName?: string;
   subject?: string;
   topic?: string;
   subTopic?: string;
@@ -164,6 +171,7 @@ export interface BulkUpsertQuestionItem {
   optionD: string;
   correctAnswer: string;
   explanation?: string;
+  examName?: string;
   subject?: string;
   topic?: string;
   subTopic?: string;
