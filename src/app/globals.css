@@ -258,7 +258,6 @@
     top: var(--ui-shell-blob-top);
     left: var(--ui-shell-blob-left);
     animation: gradient-drift 8s ease-in-out infinite;
-    will-change: transform;
   }
 
   .ui-shell::after {
@@ -268,7 +267,6 @@
     right: var(--ui-shell-blob-right);
     animation: gradient-drift 8s ease-in-out infinite;
     animation-delay: 900ms;
-    will-change: transform;
   }
 
   .ui-content {
@@ -281,7 +279,7 @@
 
   .loading-shimmer::after {
     content: "";
-    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent;
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-foreground/20 to-transparent;
     animation: shimmer 1.5s linear infinite;
   }
 }
