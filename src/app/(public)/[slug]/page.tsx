@@ -225,7 +225,7 @@ export default async function QuestionPage({ params }: Props) {
                   className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm transition-colors ${
                     isCorrect
                       ? "border-green-400 bg-green-50 font-semibold text-green-900 dark:border-green-600 dark:bg-green-900/20 dark:text-green-200"
-                     : "glass-card"
+                     : "border-border bg-card text-card-foreground backdrop-blur-sm"
                   }`}
                 >
                   <span
