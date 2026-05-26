@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth";
 import { StudySection } from "@/features/dashboard/components/study-section";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
+import type { ExamCategory } from "@/features/exam-categories/types";
+import { Award, BarChart3, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-import type { ExamCategory } from "@/features/exam-categories/types";
 
 const categories: ExamCategory[] = [
   {
@@ -30,7 +30,6 @@ const categories: ExamCategory[] = [
   },
 ];
 
-// TODO: replace with real auth session
 export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth();
   const router = useRouter();
@@ -41,37 +40,61 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">হোম</h1>
-          <p className="text-sm text-muted-foreground">স্বাগতম, {user?.name}</p>
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="rounded-2xl bg-gradient-to-r from-violet-600 to-blue-500 p-6 text-white">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">স্বাগতম, {user?.name}</h1>
+            <p className="mt-2 text-sm text-violet-100">
+              নিয়মিত প্র্যাক্টিস চালিয়ে যান, আপনার সফলতা খুব কাছেই ✨
+            </p>
+          </div>
+          <span className="text-3xl">🚀</span>
         </div>
-        {isAdmin && (
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/admin">অ্যাডমিন প্যানেল</Link>
-          </Button>
-        )}
       </div>
 
-      {/* Notification Banner Future Display Latest Notifications Here */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          { title: "মোট পরীক্ষা", value: "১২", icon: BarChart3, color: "text-violet-500" },
+          { title: "স্কোর", value: "৮৮%", icon: Trophy, color: "text-blue-500" },
+          { title: "র্যাংক", value: "#০৭", icon: Award, color: "text-emerald-500" },
+        ].map((item) => (
+          <div key={item.title} className="glass-card rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">{item.title}</p>
+              <item.icon className={`size-4 ${item.color}`} />
+            </div>
+            <p className="mt-2 text-2xl font-bold tracking-tight">{item.value}</p>
+          </div>
+        ))}
+      </div>
 
-      {/* Exam Categories */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight mb-4">
-          পরীক্ষার ক্যাটাগরি
-        </h2>
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight gradient-text">
+            পরীক্ষার ক্যাটাগরি
+          </h2>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/exams">সব দেখুন</Link>
+          </Button>
+        </div>
         <CategoryGrid categories={categories} />
       </div>
 
-      {/* Study Section */}
-      <div className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight mb-4">
-          প্র্যাক্টিস ও প্রস্তুতি
-        </h2>
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight gradient-text">
+            প্র্যাক্টিস ও প্রস্তুতি
+          </h2>
+        </div>
         <StudySection />
       </div>
+
+      {isAdmin && (
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin">অ্যাডমিন প্যানেল</Link>
+        </Button>
+      )}
     </div>
   );
 }

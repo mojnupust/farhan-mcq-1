@@ -24,7 +24,9 @@ export function AppLayout({
         user={user}
         unreadNotifications={unreadMessages}
       />
-      <main className="flex-1 overflow-x-hidden">{children}</main>
+      <main className="flex-1 overflow-x-hidden bg-gradient-to-br from-background to-muted/20">
+        {children}
+      </main>
     </div>
   );
 }
