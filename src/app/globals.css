@@ -204,7 +204,6 @@
       radial-gradient(circle at 12% 18%, rgb(99 102 241 / 0.12), transparent 34%),
       radial-gradient(circle at 88% 12%, rgb(59 130 246 / 0.1), transparent 30%),
       radial-gradient(circle at 48% 92%, rgb(16 185 129 / 0.08), transparent 30%);
-    background-attachment: fixed;
   }
 }
 
@@ -257,6 +256,7 @@
     content: "";
     @apply pointer-events-none absolute -left-14 top-16 size-64 rounded-full bg-violet-500/15 blur-3xl;
     animation: gradient-drift 8s ease-in-out infinite;
+    will-change: transform;
   }
 
   .ui-shell::after {
@@ -264,6 +264,7 @@
     @apply pointer-events-none absolute -right-12 top-0 size-72 rounded-full bg-blue-500/15 blur-3xl;
     animation: gradient-drift 8s ease-in-out infinite;
     animation-delay: 900ms;
+    will-change: transform;
   }
 
   .ui-content {
