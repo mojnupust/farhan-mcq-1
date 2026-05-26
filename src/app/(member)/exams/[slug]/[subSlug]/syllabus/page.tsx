@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { Syllabus } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
@@ -52,9 +53,7 @@ export default function SyllabusListPage({
         {/* Syllabus List */}
         <div className="mt-6 space-y-2">
           {loading ? (
-            <p className="text-center text-muted-foreground py-12">
-              লোড হচ্ছে...
-            </p>
+            <ListSkeleton count={4} />
           ) : syllabuses.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">

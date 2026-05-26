@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ProfileSkeleton } from "@/components/ui/loading-skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { subscriptionService, useSubscription } from "@/features/subscriptions";
@@ -64,7 +65,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">লোড হচ্ছে...</p>
+        <ProfileSkeleton />
       </div>
     );
   }

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Select,
   SelectContent,
@@ -451,7 +452,7 @@ export default function AdminQuestionSetQuestionsPage({
 
       {/* Question List */}
       {loading ? (
-        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+        <ListSkeleton count={5} />
       ) : questions.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">

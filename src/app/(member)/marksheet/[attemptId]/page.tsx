@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { Marksheet } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
@@ -42,9 +43,7 @@ export default function MarksheetPage({
   if (loading) {
     return (
               <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-muted-foreground py-12">
-            লোড হচ্ছে...
-          </p>
+          <ContentSkeleton />
         </div>
     );
   }
