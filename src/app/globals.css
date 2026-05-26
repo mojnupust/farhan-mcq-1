@@ -211,6 +211,10 @@
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
+  .animate-shimmer {
+    animation: shimmer 1.4s infinite;
+  }
+
   .gradient-text {
     background-image: var(--gradient-hero);
     -webkit-background-clip: text;

@@ -62,6 +62,13 @@ const categories = [
   },
 ];
 
+const categoryStrips = [
+  "from-violet-500 to-purple-500",
+  "from-blue-500 to-cyan-500",
+  "from-emerald-500 to-green-500",
+  "from-orange-500 to-amber-500",
+];
+
 const benefits = [
   {
     icon: Radio,
@@ -296,15 +303,7 @@ export default function LandingPage() {
                 <Link key={category.id} href={`/exams/${category.slug}`} className="group">
                   <Card className="relative h-full overflow-hidden border border-border/70 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-violet-400/50 group-hover:shadow-lg group-hover:shadow-primary/10">
                     <div
-                      className={`h-1.5 w-full bg-gradient-to-r ${
-                        index % 4 === 0
-                          ? "from-violet-500 to-purple-500"
-                          : index % 4 === 1
-                            ? "from-blue-500 to-cyan-500"
-                            : index % 4 === 2
-                              ? "from-emerald-500 to-green-500"
-                              : "from-orange-500 to-amber-500"
-                      }`}
+                      className={`h-1.5 w-full bg-gradient-to-r ${categoryStrips[index % categoryStrips.length]}`}
                     />
                     <CardHeader>
                       <div className="text-2xl">{category.emoji}</div>

@@ -81,10 +81,15 @@ function SidebarContent({
       <div className="px-4 py-5">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-xl font-black tracking-tight"
+          className="inline-flex flex-col items-start gap-1 text-xl font-black tracking-tight"
         >
-          <Sparkles className="size-4 text-violet-500" />
-          <span className="gradient-text">Farhan MCQ</span>
+          <span className="inline-flex items-center gap-2">
+            <Sparkles className="size-4 text-violet-500" />
+            <span className="gradient-text">Farhan MCQ</span>
+          </span>
+          <span className="text-xs font-medium text-muted-foreground">
+            MCQ প্ল্যাটফর্ম
+          </span>
         </Link>
       </div>
 
