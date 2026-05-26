@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
@@ -59,7 +60,7 @@ export function FreeTierSettings() {
     return (
       <Card className="mt-6">
         <CardContent className="py-6 text-center text-muted-foreground">
-          লোড হচ্ছে...
+          <ContentSkeleton />
         </CardContent>
       </Card>
     );

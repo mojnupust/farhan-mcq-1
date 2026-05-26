@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { MeritListEntry } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
@@ -76,9 +77,7 @@ export default function MeritListPage({
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-center text-muted-foreground py-8">
-                লোড হচ্ছে...
-              </p>
+              <TableSkeleton rows={5} />
             ) : entries.length === 0 ? (
               <div className="py-8 text-center">
                 <Medal className="mx-auto size-10 text-muted-foreground/50 mb-2" />

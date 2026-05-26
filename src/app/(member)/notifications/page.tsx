@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import type { Notification } from "@/features/notifications";
 import { notificationService } from "@/features/notifications";
 import { Bell, Check } from "lucide-react";
@@ -64,9 +65,7 @@ export default function NotificationsPage() {
 
         <div className="mt-6 space-y-3">
           {loading ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">
-              লোড হচ্ছে...
-            </p>
+            <ListSkeleton count={4} />
           ) : notifications.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">

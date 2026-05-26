@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Table,
   TableBody,
@@ -30,7 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { subscriptionService } from "@/features/subscriptions";
 import type { PaymentTransactionDto } from "@/features/subscriptions/types";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("bn-BD", {
@@ -82,11 +83,7 @@ export default function AdminTransactionsPage() {
   const [adminNote, setAdminNote] = useState("");
   const [reviewing, setReviewing] = useState(false);
 
-  useEffect(() => {
-    loadTransactions();
-  }, [filterStatus]);
-
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     try {
       const statusParam = filterStatus === "all" ? undefined : filterStatus;
       const data = await subscriptionService.getAllTransactions(statusParam);
@@ -96,7 +93,11 @@ export default function AdminTransactionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus]);
+
+  useEffect(() => {
+    loadTransactions();
+  }, [loadTransactions]);
 
   const openReview = (
     txn: PaymentTransactionDto,
@@ -183,9 +184,7 @@ export default function AdminTransactionsPage() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="py-8 text-center text-muted-foreground">
-                লোড হচ্ছে...
-              </p>
+              <TableSkeleton rows={5} />
             ) : filtered.length === 0 ? (
               <p className="py-8 text-center text-muted-foreground">
                 কোনো ট্রানজাকশন নেই

@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { QuestionSet } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
@@ -46,9 +47,7 @@ export default function ArchivePage({
         </div>
 
         {loading ? (
-          <p className="text-center text-muted-foreground py-12">
-            লোড হচ্ছে...
-          </p>
+          <ListSkeleton count={4} />
         ) : sets.length === 0 ? (
           <Card className="mt-6">
             <CardContent className="py-12 text-center">

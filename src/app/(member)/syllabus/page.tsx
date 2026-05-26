@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { SyllabusWithCategory } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
@@ -86,7 +87,7 @@ export default function SyllabusPage() {
       </div>
 
       {loading ? (
-        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+        <ListSkeleton count={4} />
       ) : groups.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">

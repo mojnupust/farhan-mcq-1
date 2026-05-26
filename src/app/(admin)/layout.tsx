@@ -1,17 +1,14 @@
 "use client";
 
 import { AppLayout } from "@/components/layout/app-layout";
+import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { AuthProvider, useAuth } from "@/features/auth";
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <p className="text-muted-foreground">লোড হচ্ছে...</p>
-      </div>
-    );
+    return <PageLoadingSkeleton />;
   }
 
   return (

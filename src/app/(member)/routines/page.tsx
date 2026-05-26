@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { RoutineWithCategory } from "@/features/routines";
 import { routineService } from "@/features/routines";
@@ -70,7 +71,7 @@ export default function RoutinesPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
-        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+        <ListSkeleton count={4} />
       </div>
     );
   }

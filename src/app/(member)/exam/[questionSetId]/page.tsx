@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ExamSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/features/auth";
 import type {
@@ -253,9 +254,8 @@ export default function ExamPage({
   if (loading || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="mx-auto size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="mt-3 text-muted-foreground">পরীক্ষা লোড হচ্ছে...</p>
+        <div className="w-full max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+          <ExamSkeleton />
         </div>
       </div>
     );

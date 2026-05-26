@@ -1,7 +1,9 @@
+import { ContentSkeleton } from "@/components/ui/loading-skeleton";
+
 export default function MemberLoading() {
   return (
-    <div className="flex min-h-dvh items-center justify-center">
-      <div className="size-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <ContentSkeleton />
     </div>
   );
 }
