@@ -48,6 +48,8 @@
 }
 
 :root {
+  --ui-shell-blob-left: -3.5rem;
+  --ui-shell-blob-right: -3rem;
   --gradient-hero: linear-gradient(135deg, oklch(0.55 0.25 260), oklch(0.65 0.20 290), oklch(0.60 0.22 220));
   --gradient-card: linear-gradient(135deg, oklch(0.97 0.01 260), oklch(0.99 0.005 290));
   --gradient-accent: linear-gradient(90deg, oklch(0.55 0.25 260), oklch(0.65 0.22 300));
@@ -254,14 +256,16 @@
 
   .ui-shell::before {
     content: "";
-    @apply pointer-events-none absolute -left-14 top-16 size-64 rounded-full bg-violet-500/15 blur-3xl;
+    @apply pointer-events-none absolute top-16 size-64 rounded-full bg-violet-500/15 blur-3xl;
+    left: var(--ui-shell-blob-left);
     animation: gradient-drift 8s ease-in-out infinite;
     will-change: transform;
   }
 
   .ui-shell::after {
     content: "";
-    @apply pointer-events-none absolute -right-12 top-0 size-72 rounded-full bg-blue-500/15 blur-3xl;
+    @apply pointer-events-none absolute top-0 size-72 rounded-full bg-blue-500/15 blur-3xl;
+    right: var(--ui-shell-blob-right);
     animation: gradient-drift 8s ease-in-out infinite;
     animation-delay: 900ms;
     will-change: transform;
