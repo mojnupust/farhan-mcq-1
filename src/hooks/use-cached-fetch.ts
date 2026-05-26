@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseCachedFetchOptions {
   /** Cache key for this data */
@@ -27,6 +27,8 @@ export function useCachedFetch<T>(
 ): UseCachedFetchResult<T> {
   const { key, skip = false } = options;
   const { getCached, setCache } = useAppStore();
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
 
   const cachedData = getCached<T>(key);
   const [data, setData] = useState<T | null>(cachedData);
@@ -36,8 +38,8 @@ export function useCachedFetch<T>(
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      if (!data) setIsLoading(true);
-      const result = await fetcher();
+      setIsLoading((prev) => (data === null ? true : prev));
+      const result = await fetcherRef.current();
       setData(result);
       setCache(key, result);
     } catch (err) {
@@ -45,23 +47,13 @@ export function useCachedFetch<T>(
     } finally {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, skip]);
+  }, [key, setCache, data]);
 
   useEffect(() => {
     if (skip) return;
-
-    // If we have cached data, show it immediately but still refresh
-    if (cachedData) {
-      setData(cachedData);
-      setIsLoading(false);
-      // Background refresh
-      fetchData();
-    } else {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, skip]);
+    fetchData();
+  }, [key, skip, fetchData]);
 
   return { data, isLoading, error, refetch: fetchData };
 }
+
