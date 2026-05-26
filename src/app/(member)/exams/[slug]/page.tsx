@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import type {
@@ -55,7 +56,7 @@ export default function ExamCategoryPage({
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+        <ContentSkeleton />
       </div>
     );
   }

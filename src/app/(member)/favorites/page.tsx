@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ContentSkeleton, ListSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Dialog,
   DialogContent,
@@ -88,7 +89,7 @@ export default function FavoritesPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
-        <p className="text-center text-muted-foreground py-12">লোড হচ্ছে...</p>
+        <ContentSkeleton />
       </div>
     );
   }
@@ -275,9 +276,7 @@ export default function FavoritesPage() {
             </DialogTitle>
           </DialogHeader>
           {statsLoading ? (
-            <p className="text-center text-muted-foreground py-4">
-              লোড হচ্ছে...
-            </p>
+            <ListSkeleton count={3} />
           ) : stats ? (
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50">

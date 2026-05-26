@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ListSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { Routine } from "@/features/routines";
 import { routineService } from "@/features/routines";
@@ -152,9 +153,7 @@ export default function RoutinePage({
         {/* Routine List */}
         <div className="mt-6 space-y-3">
           {loading ? (
-            <p className="text-center text-muted-foreground py-12">
-              লোড হচ্ছে...
-            </p>
+            <ListSkeleton count={3} />
           ) : routines.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">

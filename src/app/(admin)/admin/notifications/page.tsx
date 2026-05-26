@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Select,
   SelectContent,
@@ -210,9 +211,7 @@ export default function AdminNotificationsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">
-              লোড হচ্ছে...
-            </p>
+            <TableSkeleton rows={4} />
           ) : notifications.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">
               কোনো নোটিফিকেশন নেই

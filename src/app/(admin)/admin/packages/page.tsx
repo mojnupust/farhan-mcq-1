@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Table,
   TableBody,
@@ -308,9 +309,7 @@ export default function AdminPackagesPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="py-8 text-center text-muted-foreground">
-              লোড হচ্ছে...
-            </p>
+            <TableSkeleton rows={4} />
           ) : packages.length === 0 ? (
             <p className="py-8 text-center text-muted-foreground">
               কোনো প্যাকেজ নেই
