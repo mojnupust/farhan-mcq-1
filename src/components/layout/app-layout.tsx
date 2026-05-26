@@ -18,13 +18,13 @@ export function AppLayout({
   unreadMessages,
 }: AppLayoutProps) {
   return (
-    <div className="flex min-h-dvh flex-col lg:flex-row">
+    <div className="ui-shell flex min-h-dvh flex-col lg:flex-row">
       <AppSidebar
         isAdmin={isAdmin}
         user={user}
         unreadNotifications={unreadMessages}
       />
-      <main className="flex-1 overflow-x-hidden bg-gradient-to-br from-background to-muted/20">
+      <main className="ui-content flex-1 overflow-x-hidden bg-gradient-to-br from-background/40 via-background/70 to-muted/30">
         {children}
       </main>
     </div>

@@ -145,8 +145,8 @@ export default async function QuestionPage({ params }: Props) {
         />
       ))}
 
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <div className="ui-shell">
+        <div className="ui-content mx-auto max-w-3xl px-4 py-8 sm:px-6">
           {/* ── Breadcrumb ── */}
           <nav
             aria-label="Breadcrumb"
@@ -211,7 +211,7 @@ export default async function QuestionPage({ params }: Props) {
           </div>
 
           {/* ── Question text ── */}
-          <h1 className="mb-6 text-xl font-bold leading-snug text-foreground sm:text-2xl">
+          <h1 className="mb-6 animate-fade-in-up text-xl font-bold leading-snug text-foreground sm:text-2xl">
             {question.questionText}
           </h1>
 
@@ -225,7 +225,7 @@ export default async function QuestionPage({ params }: Props) {
                   className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm transition-colors ${
                     isCorrect
                       ? "border-green-400 bg-green-50 font-semibold text-green-900 dark:border-green-600 dark:bg-green-900/20 dark:text-green-200"
-                      : "border-border bg-card text-card-foreground"
+                     : "glass-card"
                   }`}
                 >
                   <span
@@ -261,7 +261,7 @@ export default async function QuestionPage({ params }: Props) {
                 ব্যাখ্যা
               </h2>
               <div
-                className="prose prose-sm max-w-none rounded-xl border border-border bg-card px-5 py-4 text-card-foreground dark:prose-invert [&_.ex-badge.correct]:rounded-full [&_.ex-badge.correct]:bg-green-100 [&_.ex-badge.correct]:px-3 [&_.ex-badge.correct]:py-1 [&_.ex-badge.correct]:text-green-800 [&_.ex-table]:w-full [&_.ex-table]:border-collapse [&_.ex-table_td]:border [&_.ex-table_td]:border-border [&_.ex-table_td]:px-3 [&_.ex-table_td]:py-2 [&_.ex-table_th]:border [&_.ex-table_th]:border-border [&_.ex-table_th]:bg-muted [&_.ex-table_th]:px-3 [&_.ex-table_th]:py-2 [&_.ex-table_th]:text-left"
+                className="glass-card prose prose-sm max-w-none rounded-xl px-5 py-4 text-card-foreground dark:prose-invert [&_.ex-badge.correct]:rounded-full [&_.ex-badge.correct]:bg-green-100 [&_.ex-badge.correct]:px-3 [&_.ex-badge.correct]:py-1 [&_.ex-badge.correct]:text-green-800 [&_.ex-table]:w-full [&_.ex-table]:border-collapse [&_.ex-table_td]:border [&_.ex-table_td]:border-border [&_.ex-table_td]:px-3 [&_.ex-table_td]:py-2 [&_.ex-table_th]:border [&_.ex-table_th]:border-border [&_.ex-table_th]:bg-muted [&_.ex-table_th]:px-3 [&_.ex-table_th]:py-2 [&_.ex-table_th]:text-left"
                 // explanation is admin-authored HTML — safe to render directly
 
                 dangerouslySetInnerHTML={{ __html: question.explanation }}
@@ -270,7 +270,7 @@ export default async function QuestionPage({ params }: Props) {
           )}
 
           {/* ── Exam source ── */}
-          <section className="mb-10 rounded-xl border border-border bg-muted/40 px-5 py-4 text-sm text-muted-foreground">
+          <section className="glass-card mb-10 rounded-xl px-5 py-4 text-sm text-muted-foreground">
             <p>
               <span className="font-medium text-foreground">পরীক্ষা:</span>{" "}
               <Link
@@ -299,7 +299,7 @@ export default async function QuestionPage({ params }: Props) {
                   <li key={rq.id}>
                     <Link
                       href={ROUTES.question(rq.slug)}
-                      className="flex items-start gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-card-foreground transition-colors hover:bg-muted"
+                      className="glass-card flex items-start gap-2 rounded-lg px-4 py-3 text-sm text-card-foreground transition-colors hover:bg-muted/70"
                     >
                       <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                       <span className="line-clamp-2">{rq.questionText}</span>
@@ -311,7 +311,7 @@ export default async function QuestionPage({ params }: Props) {
           )}
 
           {/* ── CTA ── */}
-          <div className="mt-12 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
+          <div className="glass-card mt-12 rounded-2xl border-primary/20 bg-primary/5 p-6 text-center">
             <p className="mb-3 text-sm font-medium text-foreground">
               এই বিষয়ের আরও প্রশ্ন অনুশীলন করতে চান?
             </p>

@@ -108,12 +108,12 @@ export default function LoginPage() {
   const steps = ["mobile", "otp", "password"] as const;
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-br from-violet-900 via-blue-900 to-slate-900 px-4 py-10">
+    <div className="ui-shell flex items-center justify-center bg-gradient-to-br from-violet-900 via-blue-900 to-slate-900 px-4 py-10">
       <div className="absolute -left-8 top-20 size-72 rounded-full bg-purple-500/20 blur-3xl animate-float" />
       <div className="absolute right-0 top-0 size-80 rounded-full bg-blue-500/15 blur-3xl animate-float [animation-delay:500ms]" />
       <div className="absolute bottom-0 left-1/2 size-72 -translate-x-1/2 rounded-full bg-green-400/10 blur-3xl animate-float [animation-delay:900ms]" />
 
-      <div className="glass relative mx-auto w-full max-w-sm rounded-2xl p-8 shadow-2xl">
+      <div className="glass-strong ui-content relative mx-auto w-full max-w-sm rounded-2xl p-8 shadow-2xl">
         <div className="text-center text-white">
           <p className="inline-flex items-center gap-2 text-lg font-black">
             <Sparkles className="size-4 text-violet-300" />
@@ -202,7 +202,7 @@ export default function LoginPage() {
 
       {showResetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="glass w-full max-w-sm rounded-2xl p-6 shadow-2xl">
+          <div className="glass-strong w-full max-w-sm rounded-2xl p-6 shadow-2xl">
             <h2 className="text-lg font-semibold text-white">পাসওয়ার্ড রিসেট</h2>
 
             <div className="mt-4 flex items-center justify-center gap-2">

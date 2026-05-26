@@ -63,7 +63,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn">
-      <body className={`${hindSiliguri.variable} font-hind antialiased`}>
+      <body
+        className={`${hindSiliguri.variable} font-hind antialiased selection:bg-violet-500/20 selection:text-foreground`}
+      >
         {children}
       </body>
     </html>

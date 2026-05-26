@@ -25,8 +25,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
-      <div className="mx-auto w-full max-w-md">
+    <div className="ui-shell flex items-center justify-center px-4 py-12">
+      <div className="ui-content mx-auto w-full max-w-md animate-fade-in-up">
         <div className="text-center">
           <Link
             href="/dashboard"
@@ -39,7 +39,7 @@ export default function OnboardingPage() {
           </p>
         </div>
 
-        <Card className="mt-8">
+        <Card className="glass-card mt-8">
           <CardHeader>
             <CardTitle className="text-lg">Complete your profile</CardTitle>
             <CardDescription>
