@@ -109,10 +109,6 @@ export default function LoginPage() {
 
   return (
     <div className="ui-shell flex items-center justify-center bg-gradient-to-br from-violet-900 via-blue-900 to-slate-900 px-4 py-10">
-      <div className="absolute -left-8 top-20 size-72 rounded-full bg-purple-500/20 blur-3xl animate-float" />
-      <div className="absolute right-0 top-0 size-80 rounded-full bg-blue-500/15 blur-3xl animate-float [animation-delay:500ms]" />
-      <div className="absolute bottom-0 left-1/2 size-72 -translate-x-1/2 rounded-full bg-green-400/10 blur-3xl animate-float [animation-delay:900ms]" />
-
       <div className="glass-strong ui-content relative mx-auto w-full max-w-sm rounded-2xl p-8 shadow-2xl">
         <div className="text-center text-white">
           <p className="inline-flex items-center gap-2 text-lg font-black">
