@@ -7,7 +7,7 @@ export default function MemberLoading() {
             key={i}
             className="relative h-24 overflow-hidden rounded-xl border bg-card/60"
           >
-          <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-foreground/10 to-transparent dark:via-white/20" />
           </div>
         ))}
       </div>
