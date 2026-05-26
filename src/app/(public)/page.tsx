@@ -62,7 +62,8 @@ const categories = [
   },
 ];
 
-const STUDENT_COUNT = "৪৫+";
+const STUDENT_COUNT_LABEL = "৪৫+";
+const DEFAULT_CATEGORY_STRIP = "from-violet-500 to-blue-500";
 
 const categoryStripById: Record<number, string> = {
   1: "from-violet-500 to-purple-500",
@@ -195,7 +196,7 @@ export default function LandingPage() {
           <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <div className="max-w-4xl animate-fade-in-up">
               <div className="inline-flex animate-pulse-glow items-center gap-2 rounded-full border border-violet-400/40 bg-gradient-to-r from-violet-500/20 to-blue-500/20 px-4 py-2 text-sm font-medium">
-                🔥 {STUDENT_COUNT} শিক্ষার্থী ইতিমধ্যে যোগ দিয়েছে
+                🔥 {STUDENT_COUNT_LABEL} শিক্ষার্থী ইতিমধ্যে যোগ দিয়েছে
               </div>
 
               <h1 className="mt-6 text-4xl font-black tracking-tight sm:text-5xl lg:text-7xl">
@@ -235,7 +236,7 @@ export default function LandingPage() {
 
               <div className="mt-10 grid gap-4 rounded-2xl border bg-background/80 p-5 backdrop-blur-sm sm:grid-cols-3">
                 {[
-                  { icon: Users, text: `${STUDENT_COUNT} শিক্ষার্থী`, color: "text-violet-500" },
+                  { icon: Users, text: `${STUDENT_COUNT_LABEL} শিক্ষার্থী`, color: "text-violet-500" },
                   { icon: Wallet, text: "৪ ক্যাটাগরি", color: "text-blue-500" },
                   { icon: PlayCircle, text: "লাইভ পরীক্ষা", color: "text-emerald-500" },
                 ].map((item, index) => (
@@ -301,11 +302,11 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {categories.map((category, index) => (
+              {categories.map((category) => (
                 <Link key={category.id} href={`/exams/${category.slug}`} className="group">
                   <Card className="relative h-full overflow-hidden border border-border/70 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-violet-400/50 group-hover:shadow-lg group-hover:shadow-primary/10">
                     <div
-                      className={`h-1.5 w-full bg-gradient-to-r ${categoryStripById[category.id] ?? categoryStripById[(index % 4) + 1]}`}
+                      className={`h-1.5 w-full bg-gradient-to-r ${categoryStripById[category.id] ?? DEFAULT_CATEGORY_STRIP}`}
                     />
                     <CardHeader>
                       <div className="text-2xl">{category.emoji}</div>
@@ -373,8 +374,8 @@ export default function LandingPage() {
                   <div>
                     <CardTitle className="text-base">Farhan MCQ</CardTitle>
                     <CardDescription>
-                      Parent Company: Farhan Software. Founder: Mojnu Miah.
-                      Estern Housing, K Block, Alubdi, Koborstan.
+                      Parent Company: Farhan Software. Founder: Mojnu Miah. Eastern
+                      Housing, K Block, Alubdi, Koborstan.
                     </CardDescription>
                   </div>
                 </CardHeader>
