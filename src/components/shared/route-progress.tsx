@@ -20,16 +20,20 @@ export function RouteProgress() {
       prevPathname.current = pathname;
       if (timerRef.current) clearInterval(timerRef.current);
 
+      let hideTimeout: ReturnType<typeof setTimeout> | undefined;
+
       const completeTimeout = setTimeout(() => {
         setProgress(100);
-        const hideTimeout = setTimeout(() => {
+        hideTimeout = setTimeout(() => {
           setVisible(false);
           setProgress(0);
         }, 300);
-        return () => clearTimeout(hideTimeout);
       }, 0);
 
-      return () => clearTimeout(completeTimeout);
+      return () => {
+        clearTimeout(completeTimeout);
+        if (hideTimeout) clearTimeout(hideTimeout);
+      };
     }
   }, [pathname]);
 

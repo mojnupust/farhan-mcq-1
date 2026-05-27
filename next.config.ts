@@ -49,13 +49,13 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     // Optimize package imports to reduce bundle size
-    optimizePackageImports: ["lucide-react", "radix-ui", "zod"],
+    optimizePackageImports: ["lucide-react", "zod"],
   },
 
   // Reduce JavaScript bundle size
   reactStrictMode: true,
 
-  // Power performance for production
+  // Remove X-Powered-By header for security
   poweredByHeader: false,
 };
 
