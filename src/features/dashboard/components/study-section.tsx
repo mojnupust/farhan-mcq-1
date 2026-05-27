@@ -12,7 +12,7 @@ const studyItems = [
     title: "বিষয়ভিত্তিক প্র্যাক্টিস",
     description: "বিষয় বেছে নিয়ে প্র্যাক্টিস করুন",
     icon: BookOpen,
-    href: "#",
+    href: "/exam-subject-topic",
     color: "text-emerald-600",
   },
   {
@@ -26,14 +26,14 @@ const studyItems = [
     title: "পরীক্ষার রুটিন",
     description: "আসন্ন পরীক্ষার তারিখ দেখুন",
     icon: Calendar,
-    href: "#",
+    href: "/routines",
     color: "text-amber-600",
   },
   {
     title: "ফেভারিট প্রশ্ন",
     description: "সংরক্ষিত প্রশ্ন পড়ুন",
     icon: Star,
-    href: "#",
+    href: "/favorites",
     color: "text-rose-600",
   },
 ];

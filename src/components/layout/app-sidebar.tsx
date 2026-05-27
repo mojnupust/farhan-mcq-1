@@ -85,7 +85,7 @@ function SidebarContent({
           href="/dashboard"
           className="text-lg font-semibold tracking-tight"
         >
-          📝 MCQ প্ল্যাটফর্ম
+          MCQ প্ল্যাটফর্ম
         </Link>
       </div>
 
@@ -221,7 +221,7 @@ export function AppSidebar({
           href="/dashboard"
           className="text-base font-semibold tracking-tight"
         >
-          📝 MCQ প্ল্যাটফর্ম
+          MCQ প্ল্যাটফর্ম
         </Link>
       </div>
     </>

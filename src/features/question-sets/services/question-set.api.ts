@@ -13,6 +13,7 @@ import type {
   QuestionSet,
   QuestionStats,
   ReviewQuestion,
+  TopicQuestionsResult,
   UpdateAppSettingsInput,
   UpdateQuestionInput,
   UpdateQuestionSetInput,
@@ -182,6 +183,19 @@ export const apiQuestionSetService: QuestionSetService = {
       {},
     );
     return res.data.isFavorite;
+  },
+
+  // Topic-based practice
+  async getQuestionsByTopic({ subject, topic, cursor, limit } = {}) {
+    const params = new URLSearchParams();
+    if (subject) params.set("subject", subject);
+    if (topic) params.set("topic", topic);
+    if (cursor) params.set("cursor", cursor);
+    if (limit) params.set("limit", String(limit));
+    const res = await apiClient.get<TopicQuestionsResult>(
+      `/v1/question-sets/by-topic?${params.toString()}`,
+    );
+    return res;
   },
 
   // App settings

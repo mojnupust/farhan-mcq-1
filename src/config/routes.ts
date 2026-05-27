@@ -38,6 +38,9 @@ export const ROUTES = {
   favorites: "/favorites",
   routine: "/routines",
   syllabus: "/syllabus",
+  syllabusDetail: (syllabusSlug: string) =>
+    `/syllabus/${syllabusSlug}` as const,
+  jobCircular: "/job-circular",
   jobAlerts: "#",
   blogPosts: "#",
   question: (slug: string) => `/${slug}` as const,
@@ -48,6 +51,7 @@ export const ROUTES = {
   adminSubCategories: "/admin/sub-categories",
   adminRoutines: "/admin/routines",
   adminSyllabus: "/admin/syllabus",
+  adminJobCircular: "/admin/job-circular",
   adminNotifications: "/admin/notifications",
   adminQuestions: "/admin/questions",
   adminQuestionSets: "/admin/question-sets",

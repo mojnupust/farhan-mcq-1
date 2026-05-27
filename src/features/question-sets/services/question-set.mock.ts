@@ -221,6 +221,9 @@ export const mockQuestionSetService: QuestionSetService = {
   async toggleFavorite() {
     return true;
   },
+  async getQuestionsByTopic() {
+    return { data: [], nextCursor: null, total: 0 };
+  },
 
   // App settings
   async getAppSettings() {

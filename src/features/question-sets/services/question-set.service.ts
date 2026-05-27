@@ -12,6 +12,7 @@ import type {
   QuestionSet,
   QuestionStats,
   ReviewQuestion,
+  TopicQuestionsResult,
   UpdateAppSettingsInput,
   UpdateQuestionInput,
   UpdateQuestionSetInput,
@@ -54,6 +55,14 @@ export interface QuestionSetService {
   getReviewQuestions(attemptId: string): Promise<ReviewQuestion[]>;
   getQuestionsForReview(questionSetId: string): Promise<ReviewQuestion[]>;
   getQuestionStats(questionId: string): Promise<QuestionStats>;
+
+  // Topic-based practice
+  getQuestionsByTopic(params: {
+    subject?: string;
+    topic?: string;
+    cursor?: string;
+    limit?: number;
+  }): Promise<TopicQuestionsResult>;
 
   // Favorites
   getFavoriteQuestions(): Promise<ReviewQuestion[]>;

@@ -213,10 +213,17 @@ export interface ReviewQuestion {
   correctAnswer: string;
   explanation: string | null;
   subject: string | null;
+  topic: string | null;
   sortOrder: number;
   userAnswer: string | null;
   isCorrect: boolean;
   isFavorite: boolean;
+}
+
+export interface TopicQuestionsResult {
+  data: ReviewQuestion[];
+  nextCursor: string | null;
+  total: number;
 }
 
 export interface QuestionStats {

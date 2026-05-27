@@ -2,6 +2,7 @@ import { ROUTES } from "@/config/routes";
 import {
   Bell,
   BookOpen,
+  Briefcase,
   Calendar,
   ClipboardList,
   CreditCard,
@@ -32,7 +33,7 @@ export const memberNav: NavItem[] = [
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
   { label: "রুটিন", href: ROUTES.routine, icon: Calendar },
   { label: "সিলেবাস", href: ROUTES.syllabus, icon: FileText },
-  { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.jobAlerts, icon: Megaphone },
+  { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.jobCircular, icon: Briefcase },
   { label: "ব্লগ পোস্ট", href: ROUTES.blogPosts, icon: ClipboardList },
   { label: "সাবস্ক্রিপশন", href: ROUTES.subscriptions, icon: Receipt },
   { label: "প্রোফাইল", href: ROUTES.profile, icon: User },
@@ -44,6 +45,7 @@ export const adminNav: NavItem[] = [
   { label: "সাব-ক্যাটাগরি", href: ROUTES.adminSubCategories, icon: BookOpen },
   { label: "রুটিন", href: ROUTES.adminRoutines, icon: Calendar },
   { label: "সিলেবাস", href: ROUTES.adminSyllabus, icon: FileText },
+  { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.adminJobCircular, icon: Briefcase },
   { label: "প্রশ্নসেট", href: ROUTES.adminQuestionSets, icon: ClipboardList },
   {
     label: "প্রশ্নসেট অটোমোশন",
