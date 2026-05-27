@@ -1,6 +1,9 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
+/** Default request timeout in milliseconds */
+const REQUEST_TIMEOUT = 15_000;
+
 class ApiError extends Error {
   public details?: { field: string; message: string }[];
 
@@ -33,23 +36,38 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(url, {
-    ...options,
-    headers,
-  });
+  // Add timeout via AbortController for resilience under high traffic
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    const message = body?.error?.message || `API error: ${res.status}`;
-    const details = body?.error?.details;
-    throw new ApiError(res.status, message, details);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const message = body?.error?.message || `API error: ${res.status}`;
+      const details = body?.error?.details;
+      throw new ApiError(res.status, message, details);
+    }
+
+    if (res.status === 204) {
+      return undefined as T;
+    }
+
+    return res.json();
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError(408, "Request timeout — please try again");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  if (res.status === 204) {
-    return undefined as T;
-  }
-
-  return res.json();
 }
 
 export const apiClient = {

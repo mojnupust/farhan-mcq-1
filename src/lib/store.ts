@@ -7,7 +7,7 @@ interface CacheEntry<T = unknown> {
 
 interface AppState {
   cache: Record<string, CacheEntry>;
-  /** Cache duration in milliseconds (default: 5 minutes) */
+  /** Cache duration in milliseconds (default: 10 minutes) */
   cacheDuration: number;
 
   /** Get cached data if still valid */
@@ -28,7 +28,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   cache: {},
-  cacheDuration: 5 * 60 * 1000, // 5 minutes
+  cacheDuration: 10 * 60 * 1000, // 10 minutes — reduced API calls under high traffic
 
   getCached: <T>(key: string): T | null => {
     const entry = get().cache[key];
