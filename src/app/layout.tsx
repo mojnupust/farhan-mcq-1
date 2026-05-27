@@ -1,12 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import { RouteProgress } from "@/components/shared/route-progress";
 
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind-siliguri",
   subsets: ["latin", "bengali"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://farhanmcq.com"), // your actual domain
@@ -64,6 +74,9 @@ export default function RootLayout({
   return (
     <html lang="bn">
       <body className={`${hindSiliguri.variable} font-hind antialiased`}>
+        <Suspense>
+          <RouteProgress />
+        </Suspense>
         {children}
       </body>
     </html>
