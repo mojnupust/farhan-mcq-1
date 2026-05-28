@@ -81,3 +81,8 @@ export interface CreateJobCircularInput {
 export interface UpdateJobCircularInput extends Partial<CreateJobCircularInput> {
   isActive?: boolean;
 }
+
+export interface BulkUpsertJobCircularItem extends CreateJobCircularInput {
+  id?: string;
+  isActive?: boolean;
+}

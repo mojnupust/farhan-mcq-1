@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  BulkUpsertJobCircularItem,
   CreateJobCircularInput,
   JobCircular,
   JobCircularFilter,
@@ -64,5 +65,17 @@ export const apiJobCircularService: JobCircularService = {
 
   async delete(id: string) {
     await apiClient.delete(`/v1/job-circulars/${id}`);
+  },
+
+  async bulkUpsert(items: BulkUpsertJobCircularItem[]) {
+    const res = await apiClient.post<{ data: JobCircular[] }>(
+      `/v1/job-circulars/bulk-upsert`,
+      { items },
+    );
+    return res.data;
+  },
+
+  async bulkDelete(ids: string[]) {
+    await apiClient.post(`/v1/job-circulars/bulk-delete`, { ids });
   },
 };

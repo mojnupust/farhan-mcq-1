@@ -45,8 +45,10 @@ import {
   Plus,
   RotateCcw,
   Search,
+  Table2,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 // ─── Constants ────────────────────────────────────────────────────────────
@@ -539,10 +541,18 @@ export default function AdminJobCircularPage() {
             মোট {total} টি বিজ্ঞপ্তি
           </p>
         </div>
-        <Button onClick={openNew} size="sm" className="gap-1.5">
-          <Plus className="size-4" />
-          নতুন যোগ করুন
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5" asChild>
+            <Link href="/admin/job-circular/bulk-edit">
+              <Table2 className="size-4" />
+              বাল্ক সম্পাদনা
+            </Link>
+          </Button>
+          <Button onClick={openNew} size="sm" className="gap-1.5">
+            <Plus className="size-4" />
+            নতুন যোগ করুন
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

@@ -1,4 +1,5 @@
 import type {
+  BulkUpsertJobCircularItem,
   CreateJobCircularInput,
   JobCircular,
   JobCircularFilter,
@@ -15,4 +16,6 @@ export interface JobCircularService {
   create(input: CreateJobCircularInput): Promise<JobCircular>;
   update(id: string, input: UpdateJobCircularInput): Promise<JobCircular>;
   delete(id: string): Promise<void>;
+  bulkUpsert(items: BulkUpsertJobCircularItem[]): Promise<JobCircular[]>;
+  bulkDelete(ids: string[]): Promise<void>;
 }
