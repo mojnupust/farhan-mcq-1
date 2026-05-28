@@ -18,7 +18,6 @@ import {
   Heart,
   Medal,
   PlayCircle,
-  Trophy,
 } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
@@ -68,20 +67,7 @@ export default function SubExamDashboardPage({
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
-    {
-      label: "বিষয়ভিত্তিক MCQ",
-      icon: Trophy,
-      href: ROUTES.subExamResults(slug, subSlug),
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
-    {
-      label: "টপিকভিত্তিক MCQ",
-      icon: Trophy,
-      href: ROUTES.subExamResults(slug, subSlug),
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
+
     {
       label: "আর্কাইভ",
       icon: FileText,
