@@ -22,16 +22,16 @@ export function AdminStatsBar({ stats, className }: AdminStatsBarProps) {
         className,
       )}
     >
-      {stats.map((stat, i) => (
+      {stats.map((stat) => (
         <div
-          key={i}
+          key={stat.label}
           className={cn(
             "flex items-center gap-3 rounded-xl border bg-card p-3.5 transition-all hover:shadow-sm hover:border-primary/20",
             stat.color,
           )}
         >
           {stat.icon && (
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               {stat.icon}
             </div>
           )}
