@@ -58,9 +58,7 @@ export default function DashboardPage() {
       <AnimateIn variant="fade-up" duration={400}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              হোম
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">হোম</h1>
             <p className="text-sm text-muted-foreground">
               স্বাগতম, {user?.name}
             </p>

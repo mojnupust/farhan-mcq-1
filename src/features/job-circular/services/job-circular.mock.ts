@@ -18,4 +18,8 @@ export const mockJobCircularService: JobCircularService = {
     throw new Error("Not implemented");
   },
   async delete() {},
+  async bulkUpsert() {
+    return [];
+  },
+  async bulkDelete() {},
 };

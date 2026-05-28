@@ -31,10 +31,6 @@ export const memberNav: NavItem[] = [
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
-  { label: "রুটিন", href: ROUTES.routine, icon: Calendar },
-  { label: "সিলেবাস", href: ROUTES.syllabus, icon: FileText },
-  { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.jobCircular, icon: Briefcase },
-  { label: "ব্লগ পোস্ট", href: ROUTES.blogPosts, icon: ClipboardList },
   { label: "সাবস্ক্রিপশন", href: ROUTES.subscriptions, icon: Receipt },
   { label: "প্রোফাইল", href: ROUTES.profile, icon: User },
 ];
