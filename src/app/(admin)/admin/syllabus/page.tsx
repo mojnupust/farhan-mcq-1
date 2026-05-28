@@ -35,7 +35,7 @@ import type {
 } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
 import { BookOpen, Code, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function slugify(text: string): string {
@@ -54,20 +54,7 @@ function HtmlContentEditor({
   value: string;
   onChange: (v: string) => void;
 }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showPreview, setShowPreview] = useState(false);
-
-  // Update iframe content when switching to preview
-  useEffect(() => {
-    if (showPreview && iframeRef.current) {
-      const doc = iframeRef.current.contentDocument;
-      if (doc) {
-        doc.open();
-        doc.write(value);
-        doc.close();
-      }
-    }
-  }, [showPreview, value]);
 
   return (
     <div className="space-y-2">
@@ -94,9 +81,9 @@ function HtmlContentEditor({
       {showPreview ? (
         <div className="border rounded-lg overflow-hidden bg-white">
           <iframe
-            ref={iframeRef}
+            srcDoc={value}
             className="w-full min-h-[500px] border-0"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts"
             title="সিলেবাস প্রিভিউ"
           />
         </div>
