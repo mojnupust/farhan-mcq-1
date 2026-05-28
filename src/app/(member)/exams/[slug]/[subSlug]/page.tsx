@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimateIn } from "@/components/ui/animate-in";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -218,20 +219,22 @@ export default function SubExamDashboardPage({
       {/* 6 Icon Cards Grid */}
       <div className="mt-6 grid grid-cols-3 gap-3">
         {cards.map((card, index) => (
-          <Link key={card.label} href={card.href} style={{ animationDelay: `${index * 60}ms` }}>
-            <Card className="group cursor-pointer card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30">
-              <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
-                <div
-                  className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-all duration-300 group-hover:scale-110 group-hover:shadow-md`}
-                >
-                  <card.icon className={`size-7 ${card.color}`} />
-                </div>
-                <span className="text-sm font-medium text-center group-hover:text-primary transition-colors duration-200">
-                  {card.label}
-                </span>
-              </CardContent>
-            </Card>
-          </Link>
+          <AnimateIn key={card.label} variant="fade-up" delay={index * 60} duration={400}>
+            <Link href={card.href}>
+              <Card className="group cursor-pointer card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30">
+                <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
+                  <div
+                    className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-all duration-300 group-hover:scale-110 group-hover:shadow-md`}
+                  >
+                    <card.icon className={`size-7 ${card.color}`} />
+                  </div>
+                  <span className="text-sm font-medium text-center group-hover:text-primary transition-colors duration-200">
+                    {card.label}
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+          </AnimateIn>
         ))}
       </div>
     </div>
