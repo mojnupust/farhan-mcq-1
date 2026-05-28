@@ -14,6 +14,7 @@ import {
   Clock,
   ExternalLink,
   FileText,
+  LayoutDashboard,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -85,11 +86,20 @@ export default function RoutinesPage() {
       <LandingHeader />
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">রুটিন</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            সকল পরীক্ষার সময়সূচি
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">রুটিন</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              সকল পরীক্ষার সময়সূচি
+            </p>
+          </div>
+          <Link
+            href={ROUTES.dashboard}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 transition-all duration-150 shrink-0"
+          >
+            <LayoutDashboard className="size-4" />
+            ড্যাশবোর্ড
+          </Link>
         </div>
 
         {/* Tabs */}

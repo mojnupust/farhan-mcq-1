@@ -1,5 +1,9 @@
+import {
+  FinalCTAButton,
+  HeroCTA,
+  PricingCTAButton,
+} from "@/components/landing-auth-cta";
 import { LandingHeader } from "@/components/landing-header";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,12 +12,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Award,
   BookOpen,
   ChevronRight,
   Clock,
   Lock,
-  LogInIcon,
   MessageCircle,
   PlayCircle,
   Radio,
@@ -215,17 +217,7 @@ export default function LandingPage() {
                 মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Button size="lg" className="text-base shadow-lg" asChild>
-                  <Link href="/dashboard">
-                    <LogInIcon />
-                    এখনই জয়েন করুন — মাত্র ৳১৯০/মাস
-                  </Link>
-                </Button>
-                <p className="text-sm text-muted-foreground">
-                  ✅ কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
-                </p>
-              </div>
+              <HeroCTA />
             </div>
           </div>
         </section>
@@ -400,12 +392,7 @@ export default function LandingPage() {
                   <p className="mt-4 text-xs text-muted-foreground text-center">
                     কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
                   </p>
-                  <Button className="mt-6 w-full text-base" size="lg" asChild>
-                    <Link href="/dashboard">
-                      <Award className="size-4" />
-                      এখনই শুরু করুন
-                    </Link>
-                  </Button>
+                  <PricingCTAButton />
                 </CardContent>
               </Card>
             </div>
@@ -477,17 +464,7 @@ export default function LandingPage() {
               প্রতিদিন হাজার হাজার প্রার্থী প্রস্তুতি নিচ্ছে। আপনি কি পিছিয়ে
               থাকবেন?
             </p>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="mt-8 text-base shadow-lg"
-              asChild
-            >
-              <Link href="/dashboard">
-                <LogInIcon />
-                এখনই জয়েন করুন
-              </Link>
-            </Button>
+            <FinalCTAButton />
           </div>
         </section>
       </main>

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/config/routes";
 import type {
   CircularStatus,
   JobCircular,
@@ -31,12 +32,14 @@ import {
   ExternalLink,
   Eye,
   Filter,
+  LayoutDashboard,
   RotateCcw,
   Search,
   Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // ─── Constants ────────────────────────────────────────────────────────────
@@ -436,18 +439,27 @@ export default function JobCircularPage() {
       <LandingHeader />
       <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Hero Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Briefcase className="size-5 text-primary" />
-            <h1 className="text-2xl font-semibold tracking-tight">
-              সরকারি চাকরির বিজ্ঞপ্তি
-            </h1>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Briefcase className="size-5 text-primary" />
+              <h1 className="text-2xl font-semibold tracking-tight">
+                সরকারি চাকরির বিজ্ঞপ্তি
+              </h1>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {total > 0
+                ? `মোট ${total.toLocaleString("bn-BD")} টি নিয়োগ বিজ্ঞপ্তি পাওয়া গেছে`
+                : "বাংলাদেশের সকল সরকারি নিয়োগ বিজ্ঞপ্তি"}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {total > 0
-              ? `মোট ${total.toLocaleString("bn-BD")} টি নিয়োগ বিজ্ঞপ্তি পাওয়া গেছে`
-              : "বাংলাদেশের সকল সরকারি নিয়োগ বিজ্ঞপ্তি"}
-          </p>
+          <Link
+            href={ROUTES.dashboard}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 transition-all duration-150 shrink-0"
+          >
+            <LayoutDashboard className="size-4" />
+            ড্যাশবোর্ড
+          </Link>
         </div>
 
         {/* Search + Quick Filters */}
