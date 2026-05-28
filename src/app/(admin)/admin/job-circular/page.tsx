@@ -1,5 +1,8 @@
 "use client";
 
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminStatsBar } from "@/components/admin/admin-stats-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,18 +41,22 @@ import type {
 import { jobCircularService } from "@/features/job-circular";
 import {
   Briefcase,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Eye,
   Pencil,
   Plus,
+  Radio,
   RotateCcw,
   Search,
   Table2,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -189,13 +196,16 @@ function CircularFormDialog({
           editing.id,
           payload as UpdateJobCircularInput,
         );
+        toast.success("বিজ্ঞপ্তি সফলভাবে আপডেট হয়েছে");
       } else {
         await jobCircularService.create(payload);
+        toast.success("নতুন বিজ্ঞপ্তি সফলভাবে যোগ হয়েছে");
       }
       onSaved();
       onClose();
     } catch (err) {
       console.error(err);
+      toast.error("অপারেশন ব্যর্থ হয়েছে");
     } finally {
       setSaving(false);
     }
@@ -512,9 +522,11 @@ export default function AdminJobCircularPage() {
     setDeletingId(id);
     try {
       await jobCircularService.delete(id);
+      toast.success("বিজ্ঞপ্তি মুছে ফেলা হয়েছে");
       await load();
     } catch (err) {
       console.error(err);
+      toast.error("মুছে ফেলা ব্যর্থ হয়েছে");
     } finally {
       setDeletingId(null);
     }
@@ -529,34 +541,59 @@ export default function AdminJobCircularPage() {
         })
       : "—";
 
+  const stats = useMemo(() => {
+    const live = circulars.filter((c) => c.status === "LIVE").length;
+    const upcoming = circulars.filter((c) => c.status === "UPCOMING").length;
+    return [
+      {
+        label: "মোট বিজ্ঞপ্তি",
+        value: total,
+        icon: <Briefcase className="size-4" />,
+      },
+      {
+        label: "সক্রিয়",
+        value: live,
+        icon: <Radio className="size-4" />,
+      },
+      {
+        label: "আসছে",
+        value: upcoming,
+        icon: <Clock className="size-4" />,
+      },
+      {
+        label: "মেয়াদোত্তীর্ণ",
+        value: circulars.filter((c) => c.status === "EXPIRED").length,
+        icon: <CheckCircle2 className="size-4" />,
+      },
+    ];
+  }, [circulars, total]);
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Briefcase className="size-5" />
-            চাকরির বিজ্ঞপ্তি ব্যবস্থাপনা
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            মোট {total} টি বিজ্ঞপ্তি
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5" asChild>
-            <Link href="/admin/job-circular/bulk-edit">
-              <Table2 className="size-4" />
-              বাল্ক সম্পাদনা
-            </Link>
-          </Button>
-          <Button onClick={openNew} size="sm" className="gap-1.5">
-            <Plus className="size-4" />
-            নতুন যোগ করুন
-          </Button>
-        </div>
-      </div>
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 space-y-5 page-enter">
+      <AdminPageHeader
+        title="চাকরির বিজ্ঞপ্তি"
+        subtitle="বিজ্ঞপ্তি পরিচালনা করুন"
+        icon={<Briefcase className="size-5" />}
+        count={total}
+        countLabel="টি বিজ্ঞপ্তি"
+      >
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin/job-circular/bulk-edit">
+            <Table2 className="size-4 mr-1.5" />
+            বাল্ক সম্পাদনা
+          </Link>
+        </Button>
+        <Button onClick={openNew} size="sm">
+          <Plus className="size-4 mr-1.5" />
+          নতুন যোগ করুন
+        </Button>
+      </AdminPageHeader>
+
+      {/* Stats */}
+      {total > 0 && <AdminStatsBar stats={stats} />}
 
       {/* Filters */}
-      <div className="flex gap-2 mb-4 flex-wrap">
+      <div className="flex gap-2 flex-wrap rounded-xl border bg-card/50 p-4">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
@@ -595,111 +632,130 @@ export default function AdminJobCircularPage() {
             setStatus("");
             setPage(1);
           }}
+          title="ফিল্টার রিসেট"
         >
           <RotateCcw className="size-4" />
         </Button>
       </div>
 
       {/* Table */}
-      <Card>
+      <Card className="overflow-hidden border-0 shadow-sm">
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-4">
+            <div className="p-6">
               <TableSkeleton rows={8} />
             </div>
           ) : circulars.length === 0 ? (
-            <div className="py-16 text-center text-muted-foreground">
-              <Briefcase className="mx-auto size-10 mb-3 text-muted-foreground/30" />
-              কোনো বিজ্ঞপ্তি পাওয়া যায়নি
-            </div>
+            <AdminEmptyState
+              icon={<Briefcase className="size-7" />}
+              title="কোনো বিজ্ঞপ্তি পাওয়া যায়নি"
+              description="ফিল্টার পরিবর্তন করুন অথবা নতুন বিজ্ঞপ্তি যোগ করুন"
+              action={
+                <Button size="sm" onClick={openNew}>
+                  <Plus className="size-4 mr-1.5" />
+                  নতুন বিজ্ঞপ্তি যোগ করুন
+                </Button>
+              }
+            />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>প্রতিষ্ঠান / পদ</TableHead>
-                  <TableHead>ধরন</TableHead>
-                  <TableHead>পদ</TableHead>
-                  <TableHead>শেষ তারিখ</TableHead>
-                  <TableHead>অবস্থা</TableHead>
-                  <TableHead className="text-center">
-                    <Eye className="size-4 inline" />
-                  </TableHead>
-                  <TableHead className="text-right">কার্যক্রম</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {circulars.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="max-w-xs">
-                      <p className="font-medium text-sm truncate">{c.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {c.organizationName}
-                        {c.gjobId && (
-                          <span className="ml-1 font-mono text-muted-foreground/60">
-                            #{c.gjobId}
-                          </span>
-                        )}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs">
-                        {ORG_TYPES.find((o) => o.value === c.orgType)?.label ??
-                          c.orgType}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {c.totalPosts || "—"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(c.deadline)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`text-xs border-0 ${STATUS_COLORS[c.status]}`}
-                      >
-                        {STATUSES.find((s) => s.value === c.status)?.label ??
-                          c.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center text-sm text-muted-foreground">
-                      {c.viewCount.toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-7"
-                          onClick={() => openEdit(c)}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-7 text-destructive hover:text-destructive"
-                          onClick={() => handleDelete(c.id)}
-                          disabled={deletingId === c.id}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead>প্রতিষ্ঠান / পদ</TableHead>
+                    <TableHead>ধরন</TableHead>
+                    <TableHead className="text-center">পদ</TableHead>
+                    <TableHead>শেষ তারিখ</TableHead>
+                    <TableHead>অবস্থা</TableHead>
+                    <TableHead className="text-center">
+                      <Eye className="size-4 inline" />
+                    </TableHead>
+                    <TableHead className="text-right">কার্যক্রম</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {circulars.map((c) => (
+                    <TableRow
+                      key={c.id}
+                      className="group transition-colors hover:bg-primary/[0.02]"
+                    >
+                      <TableCell className="max-w-xs">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm truncate leading-tight">
+                            {c.title}
+                          </span>
+                          <span className="text-xs text-muted-foreground truncate mt-0.5">
+                            {c.organizationName}
+                            {c.gjobId && (
+                              <span className="ml-1 font-mono text-muted-foreground/60">
+                                #{c.gjobId}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs font-normal">
+                          {ORG_TYPES.find((o) => o.value === c.orgType)
+                            ?.label ?? c.orgType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center text-sm tabular-nums">
+                        {c.totalPosts || "—"}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {formatDate(c.deadline)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`text-xs border-0 ${STATUS_COLORS[c.status]}`}
+                        >
+                          {STATUSES.find((s) => s.value === c.status)?.label ??
+                            c.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-muted-foreground tabular-nums">
+                        {c.viewCount.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-8"
+                            onClick={() => openEdit(c)}
+                            title="সম্পাদনা"
+                          >
+                            <Pencil className="size-3.5" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDelete(c.id)}
+                            disabled={deletingId === c.id}
+                            title="মুছে ফেলুন"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between rounded-xl border bg-card/50 p-3">
           <p className="text-sm text-muted-foreground">
             পৃষ্ঠা {page} / {totalPages}
           </p>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             <Button
               size="sm"
               variant="outline"

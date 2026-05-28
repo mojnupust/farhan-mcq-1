@@ -1,5 +1,8 @@
 "use client";
 
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminStatsBar } from "@/components/admin/admin-stats-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,14 +34,18 @@ import { questionSetService } from "@/features/question-sets";
 import {
   ArrowLeft,
   CheckCircle2,
+  ClipboardList,
   GripVertical,
+  HelpCircle,
   Pencil,
   Plus,
   Sparkles,
+  Table2,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const OPTION_LABELS = ["ক", "খ", "গ", "ঘ"] as const;
 
@@ -119,6 +126,7 @@ export default function AdminQuestionSetQuestionsPage({
           subject: form.subject || undefined,
           sortOrder: form.sortOrder,
         });
+        toast.success("প্রশ্ন সফলভাবে আপডেট হয়েছে");
       } else {
         await questionSetService.createQuestion({
           questionSetId,
@@ -126,13 +134,14 @@ export default function AdminQuestionSetQuestionsPage({
           explanation: form.explanation || undefined,
           subject: form.subject || undefined,
         });
+        toast.success("নতুন প্রশ্ন সফলভাবে যোগ হয়েছে");
       }
       setDialogOpen(false);
       resetForm();
       await reloadQuestions();
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "সংরক্ষণ ব্যর্থ");
+      toast.error(err instanceof Error ? err.message : "সংরক্ষণ ব্যর্থ");
     } finally {
       setSaving(false);
     }
@@ -158,9 +167,11 @@ export default function AdminQuestionSetQuestionsPage({
     if (!confirm("এই প্রশ্ন মুছে ফেলতে চান?")) return;
     try {
       await questionSetService.deleteQuestion(id);
+      toast.success("প্রশ্ন মুছে ফেলা হয়েছে");
       await reloadQuestions();
     } catch (err) {
       console.error(err);
+      toast.error("মুছে ফেলা ব্যর্থ হয়েছে");
     }
   };
 
@@ -169,52 +180,74 @@ export default function AdminQuestionSetQuestionsPage({
     return idx >= 0 ? OPTION_LABELS[idx] : key;
   };
 
+  const stats = useMemo(() => {
+    const withExplanation = questions.filter((q) => q.explanation).length;
+    const subjects = new Set(questions.map((q) => q.subject).filter(Boolean))
+      .size;
+    return [
+      {
+        label: "মোট প্রশ্ন",
+        value: questions.length,
+        icon: <HelpCircle className="size-4" />,
+      },
+      {
+        label: "ব্যাখ্যা সহ",
+        value: withExplanation,
+        icon: <CheckCircle2 className="size-4" />,
+      },
+      {
+        label: "বিষয়",
+        value: subjects,
+        icon: <ClipboardList className="size-4" />,
+      },
+    ];
+  }, [questions]);
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 space-y-5 page-enter">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <Button variant="ghost" size="icon" asChild>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className="shrink-0" asChild>
           <Link href="/admin/question-sets">
             <ArrowLeft className="size-5" />
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-xl font-semibold tracking-tight">
-            প্রশ্ন ব্যবস্থাপনা
-          </h1>
-          {questionSet && (
-            <p className="text-sm text-muted-foreground">
-              {questionSet.title} — {questions.length} টি প্রশ্ন
-            </p>
-          )}
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/admin/question-sets/${questionSetId}/ai-import`}>
-            <Sparkles className="size-4 mr-1" />
-            AI আমদানি
-          </Link>
-        </Button>
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/admin/question-sets/${questionSetId}/bulk-edit`}>
-            বাল্ক এডিট
-          </Link>
-        </Button>
-        <Dialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen} // Simplified: don't reset form here yet
-        >
-          <DialogTrigger asChild>
-            <Button
-              size="sm"
-              onClick={() => {
-                resetForm();
-                setDialogOpen(true);
-              }}
-            >
-              <Plus className="size-4 mr-1" />
-              প্রশ্ন যোগ করুন
+          <AdminPageHeader
+            title="প্রশ্ন ব্যবস্থাপনা"
+            subtitle={questionSet?.title}
+            icon={<HelpCircle className="size-5" />}
+            count={questions.length}
+            countLabel="টি প্রশ্ন"
+          >
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/admin/question-sets/${questionSetId}/ai-import`}>
+                <Sparkles className="size-4 mr-1.5" />
+                AI আমদানি
+              </Link>
             </Button>
-          </DialogTrigger>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/admin/question-sets/${questionSetId}/bulk-edit`}>
+                <Table2 className="size-4 mr-1.5" />
+                বাল্ক এডিট
+              </Link>
+            </Button>
+            <Dialog
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    resetForm();
+                    setDialogOpen(true);
+                  }}
+                >
+                  <Plus className="size-4 mr-1.5" />
+                  প্রশ্ন যোগ করুন
+                </Button>
+              </DialogTrigger>
           <DialogContent
             className="max-w-2xl max-h-[90vh] overflow-y-auto"
             onCloseAutoFocus={(e) => {
@@ -448,32 +481,52 @@ export default function AdminQuestionSetQuestionsPage({
             )}
           </DialogContent>
         </Dialog>
+          </AdminPageHeader>
+        </div>
       </div>
+
+      {/* Stats */}
+      {questions.length > 0 && (
+        <AdminStatsBar
+          stats={stats}
+          className="grid-cols-3 sm:grid-cols-3"
+        />
+      )}
 
       {/* Question List */}
       {loading ? (
         <ListSkeleton count={5} />
       ) : questions.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              কোনো প্রশ্ন নেই। উপরের বোতাম দিয়ে প্রশ্ন যোগ করুন।
-            </p>
-          </CardContent>
-        </Card>
+        <AdminEmptyState
+          icon={<HelpCircle className="size-7" />}
+          title="কোনো প্রশ্ন নেই"
+          description="এই প্রশ্নসেটে এখনো কোনো প্রশ্ন যোগ করা হয়নি। উপরের বোতাম দিয়ে প্রশ্ন যোগ করুন।"
+          action={
+            <Button
+              size="sm"
+              onClick={() => {
+                resetForm();
+                setDialogOpen(true);
+              }}
+            >
+              <Plus className="size-4 mr-1.5" />
+              প্রথম প্রশ্ন যোগ করুন
+            </Button>
+          }
+        />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {questions.map((q) => (
             <Card
               key={q.id}
-              id={`question-${q.id}`} // <--- Add this line
-              className="transition-all hover:shadow-sm hover:border-primary/20"
+              id={`question-${q.id}`}
+              className="group transition-all hover:shadow-sm hover:border-primary/20"
             >
               <CardContent className="py-4">
                 <div className="flex items-start gap-3">
                   <div className="flex items-center gap-2 pt-0.5">
-                    <GripVertical className="size-4 text-gray-300" />
-                    <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    <GripVertical className="size-4 text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors" />
+                    <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary tabular-nums">
                       {q.sortOrder}
                     </span>
                   </div>
@@ -484,7 +537,7 @@ export default function AdminQuestionSetQuestionsPage({
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
                       <span>
                         সঠিক:{" "}
-                        <span className="font-bold text-green-600">
+                        <span className="font-bold text-emerald-600">
                           {correctAnswerLabel(q.correctAnswer)}
                         </span>
                       </span>
@@ -496,27 +549,29 @@ export default function AdminQuestionSetQuestionsPage({
                       {q.explanation && (
                         <Badge
                           variant="outline"
-                          className="text-xs text-blue-600 border-blue-200"
+                          className="text-xs text-blue-600 border-blue-200 bg-blue-50/50"
                         >
                           ব্যাখ্যা আছে
                         </Badge>
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       size="icon"
                       variant="ghost"
                       className="size-8"
                       onClick={() => handleEdit(q)}
+                      title="সম্পাদনা"
                     >
                       <Pencil className="size-3.5" />
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="size-8 text-red-500 hover:text-red-600"
+                      className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={() => handleDelete(q.id)}
+                      title="মুছে ফেলুন"
                     >
                       <Trash2 className="size-3.5" />
                     </Button>
