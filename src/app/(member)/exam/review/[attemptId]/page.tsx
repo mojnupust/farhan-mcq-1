@@ -138,7 +138,7 @@ export default function ExamReviewPage({
 
   return (
     <>
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>

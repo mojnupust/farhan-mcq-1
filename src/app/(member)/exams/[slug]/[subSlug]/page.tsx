@@ -117,7 +117,7 @@ export default function SubExamDashboardPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
       {/* Back + Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
@@ -132,7 +132,7 @@ export default function SubExamDashboardPage({
 
       {/* Live Question Set Card */}
       {liveSet ? (
-        <Card className="mt-6 overflow-hidden border border-green-200/60 bg-gradient-to-br from-green-50 via-emerald-50/40 to-white shadow-md shadow-green-100/50">
+        <Card className="mt-6 overflow-hidden border border-green-200/60 bg-gradient-to-br from-green-50 via-emerald-50/40 to-white shadow-md shadow-green-100/50 card-hover-lift">
           <CardContent className="py-0 px-0">
             {/* Top accent bar */}
             <div className="h-1 w-full bg-gradient-to-r from-green-400 via-emerald-500 to-green-600" />
@@ -217,16 +217,16 @@ export default function SubExamDashboardPage({
 
       {/* 6 Icon Cards Grid */}
       <div className="mt-6 grid grid-cols-3 gap-3">
-        {cards.map((card) => (
-          <Link key={card.label} href={card.href}>
-            <Card className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/30">
+        {cards.map((card, index) => (
+          <Link key={card.label} href={card.href} style={{ animationDelay: `${index * 60}ms` }}>
+            <Card className="group cursor-pointer card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30">
               <CardContent className="flex flex-col items-center justify-center py-6 gap-3">
                 <div
-                  className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-transform group-hover:scale-110`}
+                  className={`flex size-14 items-center justify-center rounded-2xl ${card.bg} transition-all duration-300 group-hover:scale-110 group-hover:shadow-md`}
                 >
                   <card.icon className={`size-7 ${card.color}`} />
                 </div>
-                <span className="text-sm font-medium text-center">
+                <span className="text-sm font-medium text-center group-hover:text-primary transition-colors duration-200">
                   {card.label}
                 </span>
               </CardContent>

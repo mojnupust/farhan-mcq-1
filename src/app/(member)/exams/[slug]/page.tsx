@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
@@ -72,88 +73,97 @@ export default function ExamCategoryPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
       {/* Back + Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/dashboard">
-            <ArrowLeft className="size-5" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <span className="text-3xl">{category.icon || "📝"}</span>
-            {category.name}
-          </h1>
+      <AnimateIn variant="fade-up" duration={400}>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/dashboard">
+              <ArrowLeft className="size-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+              <span className="text-3xl animate-float">{category.icon || "📝"}</span>
+              {category.name}
+            </h1>
+          </div>
         </div>
-      </div>
+      </AnimateIn>
 
       {/* User Summary Card */}
       {summary && (
-        <Card className="mt-6 bg-linear-to-r from-primary/5 to-primary/10 border-primary/20">
-          <CardContent className="py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-                  <Target className="size-5 text-primary" />
+        <AnimateIn variant="scale-up" delay={100} duration={500}>
+          <Card className="mt-6 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/3 to-transparent opacity-50" />
+            <CardContent className="py-4 relative">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+                    <Target className="size-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold count-up">
+                      {summary.totalQuestionsFaced}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      মোট প্রশ্নের সম্মুখীন
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">
-                    {summary.totalQuestionsFaced}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    মোট প্রশ্নের সম্মুখীন
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-full bg-emerald-500/10">
+                    <Trophy className="size-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-emerald-600 count-up">
+                      {summary.totalCorrect}
+                    </p>
+                    <p className="text-xs text-muted-foreground">সঠিক উত্তর</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-emerald-500/10">
-                  <Trophy className="size-5 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-emerald-600">
-                    {summary.totalCorrect}
-                  </p>
-                  <p className="text-xs text-muted-foreground">সঠিক উত্তর</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </AnimateIn>
       )}
 
       {/* Sub-Exam List */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold tracking-tight mb-3">
-          পরীক্ষার তালিকা
-        </h2>
-        {subCategories.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                এই ক্যাটাগরিতে এখনো কোনো সাব-ক্যাটাগরি যোগ হয়নি
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {subCategories.map((sub) => (
-              <Link key={sub.id} href={`/exams/${slug}/${sub.slug}`}>
-                <Card className="group transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
-                  <CardHeader className="py-4">
-                    <div className="flex flex-row items-center justify-between">
-                      <CardTitle className="text-base font-medium group-hover:text-primary transition-colors truncate">
-                        {sub.name}
-                      </CardTitle>
-                      <ChevronRight className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      <AnimateIn variant="fade-up" delay={200} duration={500}>
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold tracking-tight mb-3">
+            পরীক্ষার তালিকা
+          </h2>
+          {subCategories.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  এই ক্যাটাগরিতে এখনো কোনো সাব-ক্যাটাগরি যোগ হয়নি
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              {subCategories.map((sub, index) => (
+                <AnimateIn key={sub.id} variant="fade-up" delay={index * 50} duration={400}>
+                  <Link href={`/exams/${slug}/${sub.slug}`}>
+                    <Card className="group card-hover-lift glow-on-hover cursor-pointer transition-all duration-300 hover:border-primary/30">
+                      <CardHeader className="py-4">
+                        <div className="flex flex-row items-center justify-between">
+                          <CardTitle className="text-base font-medium group-hover:text-primary transition-colors duration-200 truncate">
+                            {sub.name}
+                          </CardTitle>
+                          <ChevronRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200" />
+                        </div>
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                </AnimateIn>
+              ))}
+            </div>
+          )}
+        </div>
+      </AnimateIn>
     </div>
   );
 }

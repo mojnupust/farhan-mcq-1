@@ -128,7 +128,7 @@ function CircularCard({ circular }: { circular: JobCircular }) {
 
   return (
     <Card
-      className={`group overflow-hidden transition-all hover:shadow-md hover:border-primary/30 ${isExpired ? "opacity-70" : ""}`}
+      className={`group overflow-hidden card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30 ${isExpired ? "opacity-70" : ""}`}
     >
       <CardContent className="p-0">
         <div className="flex gap-0">
@@ -437,7 +437,7 @@ export default function JobCircularPage() {
   return (
     <>
       <LandingHeader />
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Hero Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>

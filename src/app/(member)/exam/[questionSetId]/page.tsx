@@ -457,18 +457,18 @@ export default function ExamPage({
                               type="button"
                               onClick={() => handleAnswer(question.id, key)}
                               disabled={isLocked}
-                              className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 text-left transition-all ${
+                              className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 text-left transition-all duration-200 ${
                                 isSelected
-                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.01]"
                                   : isLocked
                                     ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
-                                    : "border-gray-200 hover:border-primary/50 hover:bg-gray-50 cursor-pointer"
+                                    : "border-gray-200 hover:border-primary/50 hover:bg-gray-50 hover:shadow-sm active:scale-[0.99] cursor-pointer"
                               }`}
                             >
                               <span
-                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-200 ${
                                   isSelected
-                                    ? "bg-primary text-white"
+                                    ? "bg-primary text-white shadow-md shadow-primary/30"
                                     : "bg-gray-100 text-gray-600"
                                 }`}
                               >

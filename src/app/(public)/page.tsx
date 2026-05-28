@@ -4,6 +4,7 @@ import {
   PricingCTAButton,
 } from "@/components/landing-auth-cta";
 import { LandingHeader } from "@/components/landing-header";
+import { AnimateIn } from "@/components/ui/animate-in";
 import {
   Card,
   CardContent,
@@ -197,27 +198,41 @@ export default function LandingPage() {
       <main>
         {/* ── Hero ── */}
         <section className="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-background">
-          <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float" />
+            <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/3 blur-3xl animate-float-delayed" />
+          </div>
+          <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28 relative">
             <div className="max-w-2xl">
               {/* Badge */}
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-                <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-                ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
-              </div>
+              <AnimateIn variant="fade-up" duration={500}>
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+                  <span className="relative size-2 rounded-full bg-green-500">
+                    <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
+                  </span>
+                  ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
+                </div>
+              </AnimateIn>
 
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                সরকারি চাকরিতে
-                <span className="text-primary"> সফল হওয়ার</span>
-                <br />
-                সবচেয়ে স্মার্ট উপায়
-              </h1>
-              <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
-                BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার জন্য
-                পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং অভিজ্ঞ
-                মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
-              </p>
+              <AnimateIn variant="fade-up" delay={100} duration={600}>
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                  সরকারি চাকরিতে
+                  <span className="text-primary"> সফল হওয়ার</span>
+                  <br />
+                  সবচেয়ে স্মার্ট উপায়
+                </h1>
+              </AnimateIn>
+              <AnimateIn variant="fade-up" delay={200} duration={600}>
+                <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
+                  BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার জন্য
+                  পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং অভিজ্ঞ
+                  মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
+                </p>
+              </AnimateIn>
 
-              <HeroCTA />
+              <AnimateIn variant="fade-up" delay={300} duration={600}>
+                <HeroCTA />
+              </AnimateIn>
             </div>
           </div>
         </section>
@@ -226,11 +241,13 @@ export default function LandingPage() {
         <section className="border-b bg-primary text-primary-foreground">
           <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="text-2xl font-bold sm:text-3xl">{stat.value}</p>
-                  <p className="mt-1 text-sm opacity-80">{stat.label}</p>
-                </div>
+              {stats.map((stat, index) => (
+                <AnimateIn key={stat.label} variant="fade-up" delay={index * 100} duration={500}>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold sm:text-3xl">{stat.value}</p>
+                    <p className="mt-1 text-sm opacity-80">{stat.label}</p>
+                  </div>
+                </AnimateIn>
               ))}
             </div>
           </div>
@@ -239,31 +256,34 @@ export default function LandingPage() {
         {/* ── Benefits ── */}
         <section className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                আমাদের সদস্যরা যা পাবেন
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                সরকারি চাকরিতে সফলতার <strong>complete solution</strong> —
-                সবকিছু এক জায়গায়
-              </p>
-            </div>
+            <AnimateIn variant="fade-up" duration={500}>
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  আমাদের সদস্যরা যা পাবেন
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  সরকারি চাকরিতে সফলতার <strong>complete solution</strong> —
+                  সবকিছু এক জায়গায়
+                </p>
+              </div>
+            </AnimateIn>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {benefits.map((benefit) => (
-                <Card
-                  key={benefit.title}
-                  className="border bg-card hover:shadow-md transition-shadow"
-                >
-                  <CardHeader>
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                      <benefit.icon className="size-5 text-primary" />
-                    </div>
-                    <CardTitle className="text-base mt-2">
-                      {benefit.title}
-                    </CardTitle>
-                    <CardDescription>{benefit.description}</CardDescription>
-                  </CardHeader>
-                </Card>
+              {benefits.map((benefit, index) => (
+                <AnimateIn key={benefit.title} variant="fade-up" delay={index * 80} duration={500}>
+                  <Card
+                    className="border bg-card card-hover-lift glow-on-hover h-full"
+                  >
+                    <CardHeader>
+                      <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
+                        <benefit.icon className="size-5 text-primary" />
+                      </div>
+                      <CardTitle className="text-base mt-2">
+                        {benefit.title}
+                      </CardTitle>
+                      <CardDescription>{benefit.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </AnimateIn>
               ))}
             </div>
           </div>
@@ -272,42 +292,45 @@ export default function LandingPage() {
         {/* ── MCQ Library ── */}
         <section className="border-b bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  MCQ লাইব্রেরি
-                </h2>
-                <p className="mt-1 text-muted-foreground">
-                  সাইন ইন করুন এবং প্র্যাকটিস শুরু করুন।
-                </p>
+            <AnimateIn variant="fade-up" duration={500}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                    MCQ লাইব্রেরি
+                  </h2>
+                  <p className="mt-1 text-muted-foreground">
+                    সাইন ইন করুন এবং প্র্যাকটিস শুরু করুন।
+                  </p>
+                </div>
+                <BookOpen className="size-8 text-muted-foreground hidden sm:block animate-float" />
               </div>
-              <BookOpen className="size-8 text-muted-foreground hidden sm:block" />
-            </div>
+            </AnimateIn>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/exams/${category.slug}`}
-                  className="group"
-                >
-                  <Card className="h-full transition-all group-hover:border-primary/40 group-hover:shadow-md">
-                    <CardHeader className="pb-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <CardTitle className="text-sm mt-2">
-                        {category.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <PlayCircle className="size-3" />
-                          <span>{category.count} MCQ</span>
+              {categories.map((category, index) => (
+                <AnimateIn key={category.id} variant="fade-up" delay={index * 100} duration={500}>
+                  <Link
+                    href={`/exams/${category.slug}`}
+                    className="group"
+                  >
+                    <Card className="h-full card-hover-lift glow-on-hover group-hover:border-primary/40">
+                      <CardHeader className="pb-3">
+                        <span className="text-2xl transition-transform duration-300 inline-block group-hover:scale-110">{category.icon}</span>
+                        <CardTitle className="text-sm mt-2">
+                          {category.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <PlayCircle className="size-3" />
+                            <span>{category.count} MCQ</span>
+                          </div>
+                          <Lock className="size-3" />
                         </div>
-                        <Lock className="size-3" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </AnimateIn>
               ))}
             </div>
           </div>
@@ -316,32 +339,36 @@ export default function LandingPage() {
         {/* ── Testimonials ── */}
         <section className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                শিক্ষার্থীরা কী বলছেন
-              </h2>
-            </div>
+            <AnimateIn variant="fade-up" duration={500}>
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  শিক্ষার্থীরা কী বলছেন
+                </h2>
+              </div>
+            </AnimateIn>
             <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              {testimonials.map((t) => (
-                <Card key={t.name} className="border">
-                  <CardHeader>
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: t.stars }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className="size-4 fill-yellow-400 text-yellow-400"
-                        />
-                      ))}
-                    </div>
-                    <CardDescription className="text-foreground/80 italic">
-                      &quot;{t.text}&quot;
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm font-medium">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </CardContent>
-                </Card>
+              {testimonials.map((t, index) => (
+                <AnimateIn key={t.name} variant="fade-up" delay={index * 120} duration={500}>
+                  <Card className="border card-hover-lift h-full">
+                    <CardHeader>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: t.stars }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="size-4 fill-yellow-400 text-yellow-400"
+                          />
+                        ))}
+                      </div>
+                      <CardDescription className="text-foreground/80 italic">
+                        &quot;{t.text}&quot;
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm font-medium">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                    </CardContent>
+                  </Card>
+                </AnimateIn>
               ))}
             </div>
           </div>
@@ -350,121 +377,134 @@ export default function LandingPage() {
         {/* ── Pricing ── */}
         <section className="border-b bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <div className="mx-auto max-w-md text-center">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                সহজ ও সাশ্রয়ী মূল্য
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                একটি মেম্বারশিপ — সব কিছু অন্তর্ভুক্ত।
-              </p>
-              <Card className="mt-8 border-primary/30 shadow-lg">
-                <CardHeader className="text-center pb-2">
-                  <div className="mx-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary w-fit">
-                    সবচেয়ে জনপ্রিয়
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    bKash বা Nagad-এ পেমেন্ট
-                  </p>
-                  <CardTitle className="text-4xl font-bold mt-1">
-                    ৳১৯০
-                    <span className="text-lg font-normal text-muted-foreground">
-                      {" "}
-                      / মাস
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-left text-sm">
-                    {[
-                      "সকল MCQ ও ভিডিও কন্টেন্ট",
-                      "সাপ্তাহিক লাইভ সেশন",
-                      "প্রাইভেট ফেসবুক কমিউনিটি",
-                      "সব পরীক্ষার মডেল টেস্ট",
-                      "পার্সোনালাইজড প্রগ্রেস ট্র্যাকিং",
-                      "তাৎক্ষণিক ফলাফল ও ব্যাখ্যা",
-                    ].map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <ChevronRight className="mt-0.5 size-4 shrink-0 text-primary" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-4 text-xs text-muted-foreground text-center">
-                    কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
-                  </p>
-                  <PricingCTAButton />
-                </CardContent>
-              </Card>
-            </div>
+            <AnimateIn variant="scale-up" duration={600}>
+              <div className="mx-auto max-w-md text-center">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  সহজ ও সাশ্রয়ী মূল্য
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  একটি মেম্বারশিপ — সব কিছু অন্তর্ভুক্ত।
+                </p>
+                <Card className="mt-8 border-primary/30 shadow-lg card-hover-lift">
+                  <CardHeader className="text-center pb-2">
+                    <div className="mx-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary w-fit">
+                      সবচেয়ে জনপ্রিয়
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      bKash বা Nagad-এ পেমেন্ট
+                    </p>
+                    <CardTitle className="text-4xl font-bold mt-1">
+                      ৳১৯০
+                      <span className="text-lg font-normal text-muted-foreground">
+                        {" "}
+                        / মাস
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3 text-left text-sm">
+                      {[
+                        "সকল MCQ ও ভিডিও কন্টেন্ট",
+                        "সাপ্তাহিক লাইভ সেশন",
+                        "প্রাইভেট ফেসবুক কমিউনিটি",
+                        "সব পরীক্ষার মডেল টেস্ট",
+                        "পার্সোনালাইজড প্রগ্রেস ট্র্যাকিং",
+                        "তাৎক্ষণিক ফলাফল ও ব্যাখ্যা",
+                      ].map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <ChevronRight className="mt-0.5 size-4 shrink-0 text-primary" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-xs text-muted-foreground text-center">
+                      কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
+                    </p>
+                    <PricingCTAButton />
+                  </CardContent>
+                </Card>
+              </div>
+            </AnimateIn>
           </div>
         </section>
 
         {/* ── About ── */}
         <section className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              আমাদের সম্পর্কে
-            </h2>
-            <div className="mt-6 max-w-2xl">
-              <p className="text-lg font-medium">Farhan MCQ</p>
-              <p className="text-sm text-muted-foreground">
-                Farhan Software | প্রতিষ্ঠাতা: Mojnu Miah
-              </p>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                প্রস্তুতির শুরুতেই সঠিক দিকনির্দেশনা পেলে সময় অনেকটাই বাঁচানো
-                সম্ভব। Farhan MCQ আপনাকে শুরু থেকেই একটি পরিষ্কার roadmap দেয়।
-                আমাদের লক্ষ্য — প্রতিটি শিক্ষার্থীকে এমনভাবে প্রস্তুত করা যেন
-                তারা আত্মবিশ্বাসের সাথে যেকোনো পরীক্ষায় অংশ নিতে পারে।
-              </p>
-              <p className="mt-4 text-sm italic text-muted-foreground">
-                কবি সুকান্ত ভট্টাচার্য আমাদের অনুপ্রেরণা —
-                <br />
-                <em>
-                  &quot;ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমার চাঁদ যেন ঝলসানো
-                  রুটি&quot;
-                </em>
-              </p>
-            </div>
+            <AnimateIn variant="fade-up" duration={500}>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                আমাদের সম্পর্কে
+              </h2>
+              <div className="mt-6 max-w-2xl">
+                <p className="text-lg font-medium">Farhan MCQ</p>
+                <p className="text-sm text-muted-foreground">
+                  Farhan Software | প্রতিষ্ঠাতা: Mojnu Miah
+                </p>
+                <p className="mt-4 text-muted-foreground leading-relaxed">
+                  প্রস্তুতির শুরুতেই সঠিক দিকনির্দেশনা পেলে সময় অনেকটাই বাঁচানো
+                  সম্ভব। Farhan MCQ আপনাকে শুরু থেকেই একটি পরিষ্কার roadmap দেয়।
+                  আমাদের লক্ষ্য — প্রতিটি শিক্ষার্থীকে এমনভাবে প্রস্তুত করা যেন
+                  তারা আত্মবিশ্বাসের সাথে যেকোনো পরীক্ষায় অংশ নিতে পারে।
+                </p>
+                <p className="mt-4 text-sm italic text-muted-foreground">
+                  কবি সুকান্ত ভট্টাচার্য আমাদের অনুপ্রেরণা —
+                  <br />
+                  <em>
+                    &quot;ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমার চাঁদ যেন ঝলসানো
+                    রুটি&quot;
+                  </em>
+                </p>
+              </div>
+            </AnimateIn>
           </div>
         </section>
 
         {/* ── FAQ ── */}
         <section className="border-b bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              সচরাচর জিজ্ঞাসা
-            </h2>
+            <AnimateIn variant="fade-up" duration={500}>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                সচরাচর জিজ্ঞাসা
+              </h2>
+            </AnimateIn>
             <div className="mt-8 max-w-2xl space-y-2">
               {faqs.map((faq, index) => (
-                <details
-                  key={index}
-                  className="group border-b pb-4 [&[open]>summary>svg]:rotate-180"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-medium transition-colors hover:text-primary [&::-webkit-details-marker]:hidden list-none">
-                    {faq.question}
-                    <ChevronRight className="size-4 shrink-0 rotate-90 text-muted-foreground transition-transform duration-200" />
-                  </summary>
-                  <p className="pb-2 text-sm text-muted-foreground">
-                    {faq.answer}
-                  </p>
-                </details>
+                <AnimateIn key={index} variant="fade-up" delay={index * 60} duration={400}>
+                  <details
+                    className="group border-b pb-4 [&[open]>summary>svg]:rotate-180"
+                  >
+                    <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-medium transition-colors hover:text-primary [&::-webkit-details-marker]:hidden list-none">
+                      {faq.question}
+                      <ChevronRight className="size-4 shrink-0 rotate-90 text-muted-foreground transition-transform duration-200" />
+                    </summary>
+                    <p className="pb-2 text-sm text-muted-foreground">
+                      {faq.answer}
+                    </p>
+                  </details>
+                </AnimateIn>
               ))}
             </div>
           </div>
         </section>
 
         {/* ── Final CTA ── */}
-        <section className="border-b bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
-            <Clock className="mx-auto size-10 mb-4 opacity-80" />
-            <h2 className="text-2xl font-bold sm:text-3xl">
-              আজই শুরু করুন — দেরি না করাই ভালো!
-            </h2>
-            <p className="mt-3 text-primary-foreground/80 max-w-md mx-auto">
-              প্রতিদিন হাজার হাজার প্রার্থী প্রস্তুতি নিচ্ছে। আপনি কি পিছিয়ে
-              থাকবেন?
-            </p>
-            <FinalCTAButton />
+        <section className="border-b bg-primary text-primary-foreground relative overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-20 -right-20 size-60 rounded-full bg-white/5 blur-2xl animate-float" />
+            <div className="absolute -bottom-20 -left-20 size-60 rounded-full bg-white/5 blur-2xl animate-float-delayed" />
+          </div>
+          <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20 relative">
+            <AnimateIn variant="scale-up" duration={600}>
+              <Clock className="mx-auto size-10 mb-4 opacity-80" />
+              <h2 className="text-2xl font-bold sm:text-3xl">
+                আজই শুরু করুন — দেরি না করাই ভালো!
+              </h2>
+              <p className="mt-3 text-primary-foreground/80 max-w-md mx-auto">
+                প্রতিদিন হাজার হাজার প্রার্থী প্রস্তুতি নিচ্ছে। আপনি কি পিছিয়ে
+                থাকবেন?
+              </p>
+              <FinalCTAButton />
+            </AnimateIn>
           </div>
         </section>
       </main>

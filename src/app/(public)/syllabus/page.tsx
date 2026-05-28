@@ -68,7 +68,7 @@ export default function SyllabusPage() {
   return (
     <>
       <LandingHeader />
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
@@ -94,7 +94,7 @@ export default function SyllabusPage() {
             placeholder="সিলেবাস খুঁজুন..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-lg border border-input bg-background pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-lg border border-input bg-background pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring transition-shadow duration-200"
           />
         </div>
 
@@ -135,11 +135,11 @@ export default function SyllabusPage() {
                         s.slug,
                       )}
                     >
-                      <Card className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/30 h-full">
+                      <Card className="group cursor-pointer card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30 h-full">
                         <CardContent className="py-4 px-4">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                              <p className="font-medium text-sm leading-snug group-hover:text-primary transition-colors duration-200 line-clamp-2">
                                 {s.title}
                               </p>
                               <Badge
@@ -149,7 +149,7 @@ export default function SyllabusPage() {
                                 {group.name}
                               </Badge>
                             </div>
-                            <ChevronRight className="size-5 shrink-0 text-muted-foreground group-hover:text-primary transition-colors mt-0.5" />
+                            <ChevronRight className="size-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200 mt-0.5" />
                           </div>
                         </CardContent>
                       </Card>
