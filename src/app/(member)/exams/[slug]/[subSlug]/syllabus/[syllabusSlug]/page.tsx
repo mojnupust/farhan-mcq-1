@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
+import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import type { Syllabus } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
 import { ArrowLeft } from "lucide-react";
@@ -10,9 +11,7 @@ import Link from "next/link";
 import { use, useEffect, useState } from "react";
 
 /**
- * Renders markdown/MDX content as HTML.
- * Supports: headings, bold, italic, lists (ordered/unordered),
- * links, images, YouTube embeds, and plain text.
+ * Renders markdown/MDX content as HTML (legacy support).
  */
 function renderContent(content: string): string {
   let html = content;
@@ -162,11 +161,15 @@ export default function SyllabusDetailPage({
         {/* Content */}
         <Card className="mt-6">
           <CardContent className="py-4 prose prose-sm max-w-none">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: renderContent(syllabus.content),
-              }}
-            />
+            {syllabus.contentType === "html" ? (
+              <SyllabusHtmlViewer content={syllabus.content} />
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: renderContent(syllabus.content),
+                }}
+              />
+            )}
           </CardContent>
         </Card>
       </div>

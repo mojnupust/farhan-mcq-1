@@ -1,4 +1,5 @@
 import { LandingHeader } from "@/components/landing-header";
+import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SyllabusWithCategory } from "@/features/syllabus";
@@ -305,11 +306,15 @@ export default async function PublicSyllabusDetailPage({ params }: Props) {
         {/* Content */}
         <Card>
           <CardContent className="py-6 prose prose-sm max-w-none">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: renderContent(syllabus.content),
-              }}
-            />
+            {syllabus.contentType === "html" ? (
+              <SyllabusHtmlViewer content={syllabus.content} />
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: renderContent(syllabus.content),
+                }}
+              />
+            )}
           </CardContent>
         </Card>
       </main>

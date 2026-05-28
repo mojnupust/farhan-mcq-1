@@ -28,10 +28,14 @@ import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import type { SubExamCategory } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
-import type { CreateSyllabusInput, Syllabus } from "@/features/syllabus";
+import type {
+  CreateSyllabusInput,
+  Syllabus,
+  SyllabusContentType,
+} from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
-import { BookOpen, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { BookOpen, Code, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 function slugify(text: string): string {
@@ -42,220 +46,37 @@ function slugify(text: string): string {
     .trim();
 }
 
-// ─── MDX Content Renderer ────────────────────────────────────────────
-function renderMdx(content: string): string {
-  let html = content;
-
-  // YouTube embeds
-  html = html.replace(
-    /!\[youtube\]\((https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)[^)]*)\)/gi,
-    (_m, _u, id) =>
-      `<div class="my-4 aspect-video"><iframe src="https://www.youtube.com/embed/${id}" class="w-full h-full rounded-lg" frameborder="0" allowfullscreen></iframe></div>`,
-  );
-  html = html.replace(
-    /\{\{youtube:(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)[^}]*)\}\}/gi,
-    (_m, _u, id) =>
-      `<div class="my-4 aspect-video"><iframe src="https://www.youtube.com/embed/${id}" class="w-full h-full rounded-lg" frameborder="0" allowfullscreen></iframe></div>`,
-  );
-
-  // Images
-  html = html.replace(
-    /!\[([^\]]*)\]\(([^)]+)\)/g,
-    '<img src="$2" alt="$1" class="my-4 max-w-full rounded-lg" />',
-  );
-  // Links
-  html = html.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline">$1</a>',
-  );
-  // Headings
-  html = html.replace(
-    /^### (.+)$/gm,
-    '<h3 class="text-lg font-semibold mt-6 mb-2">$1</h3>',
-  );
-  html = html.replace(
-    /^## (.+)$/gm,
-    '<h2 class="text-xl font-semibold mt-8 mb-3">$1</h2>',
-  );
-  html = html.replace(
-    /^# (.+)$/gm,
-    '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>',
-  );
-  // Bold / Italic
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  // Lists
-  html = html.replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>');
-  html = html.replace(
-    /^\d+\. (.+)$/gm,
-    '<li class="ml-4 list-decimal">$1</li>',
-  );
-  html = html.replace(
-    /(<li class="ml-4 list-disc">[^]*?<\/li>(\n|$))+/g,
-    (m) => `<ul class="my-2 space-y-1">${m}</ul>`,
-  );
-  html = html.replace(
-    /(<li class="ml-4 list-decimal">[^]*?<\/li>(\n|$))+/g,
-    (m) => `<ol class="my-2 space-y-1">${m}</ol>`,
-  );
-  // Paragraphs
-  html = html
-    .split("\n")
-    .map((line) => {
-      const t = line.trim();
-      if (!t) return "";
-      if (/^<(h[1-6]|ul|ol|li|div|img|a|\/)/i.test(t)) return line;
-      return `<p class="my-2">${t}</p>`;
-    })
-    .join("\n");
-  return html;
-}
-
-// ─── MDX Editor Component ────────────────────────────────────────────
-function MdxEditor({
+// ─── HTML Content Editor ─────────────────────────────────────────────
+function HtmlContentEditor({
   value,
   onChange,
 }: {
   value: string;
   onChange: (v: string) => void;
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const insertAtCursor = useCallback(
-    (before: string, after: string = "") => {
-      const ta = textareaRef.current;
-      if (!ta) return;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const selected = value.substring(start, end);
-      const newText =
-        value.substring(0, start) +
-        before +
-        selected +
-        after +
-        value.substring(end);
-      onChange(newText);
-      // Re-focus after state update
-      requestAnimationFrame(() => {
-        ta.focus();
-        ta.setSelectionRange(
-          start + before.length,
-          start + before.length + selected.length,
-        );
-      });
-    },
-    [value, onChange],
-  );
+  // Update iframe content when switching to preview
+  useEffect(() => {
+    if (showPreview && iframeRef.current) {
+      const doc = iframeRef.current.contentDocument;
+      if (doc) {
+        doc.open();
+        doc.write(value);
+        doc.close();
+      }
+    }
+  }, [showPreview, value]);
 
   return (
     <div className="space-y-2">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-1 border rounded-lg p-1.5 bg-muted/30">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("# ", "\n")}
-          title="Heading 1"
-        >
-          H1
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("## ", "\n")}
-          title="Heading 2"
-        >
-          H2
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("### ", "\n")}
-          title="Heading 3"
-        >
-          H3
-        </Button>
-        <div className="w-px bg-border mx-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs font-bold"
-          onClick={() => insertAtCursor("**", "**")}
-          title="Bold"
-        >
-          B
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs italic"
-          onClick={() => insertAtCursor("*", "*")}
-          title="Italic"
-        >
-          I
-        </Button>
-        <div className="w-px bg-border mx-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("- ", "\n")}
-          title="Bullet List"
-        >
-          • List
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("1. ", "\n")}
-          title="Numbered List"
-        >
-          1. List
-        </Button>
-        <div className="w-px bg-border mx-1" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("[", "](url)")}
-          title="Link"
-        >
-          🔗
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("![alt](", ")")}
-          title="Image"
-        >
-          🖼️
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={() => insertAtCursor("![youtube](https://youtu.be/", ")")}
-          title="YouTube Video"
-        >
-          ▶️ YT
-        </Button>
+      <div className="flex items-center gap-2 border rounded-lg p-1.5 bg-muted/30">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Code className="size-3.5" />
+          <span>HTML কোড পেস্ট করুন (Claude থেকে কপি করা .html ফাইল)</span>
+        </div>
         <div className="ml-auto">
           <Button
             type="button"
@@ -271,18 +92,21 @@ function MdxEditor({
 
       {/* Editor / Preview */}
       {showPreview ? (
-        <Card>
-          <CardContent className="py-4 prose prose-sm max-w-none min-h-75">
-            <div dangerouslySetInnerHTML={{ __html: renderMdx(value) }} />
-          </CardContent>
-        </Card>
+        <div className="border rounded-lg overflow-hidden bg-white">
+          <iframe
+            ref={iframeRef}
+            className="w-full min-h-[500px] border-0"
+            sandbox="allow-scripts allow-same-origin"
+            title="সিলেবাস প্রিভিউ"
+          />
+        </div>
       ) : (
         <textarea
-          ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-75 rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          placeholder="এখানে MDX কন্টেন্ট লিখুন...\n\n# শিরোনাম\n## উপ-শিরোনাম\n\n- বুলেট আইটেম\n1. নম্বরযুক্ত আইটেম\n\n**বোল্ড**, *ইটালিক*\n\n[লিংক](url)\n![ইমেজ](url)\n![youtube](https://youtu.be/VIDEO_ID)"
+          className="w-full min-h-[500px] rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          placeholder={`এখানে Claude থেকে কপি করা HTML কোড পেস্ট করুন...\n\n<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    /* আপনার CSS স্টাইল */\n  </style>\n</head>\n<body>\n  <!-- আপনার কন্টেন্ট -->\n  <script>\n    // আপনার JavaScript\n  </script>\n</body>\n</html>`}
+          spellCheck={false}
         />
       )}
     </div>
@@ -290,11 +114,12 @@ function MdxEditor({
 }
 
 // ─── Page ────────────────────────────────────────────────────────────
-const emptyForm: CreateSyllabusInput = {
+const emptyForm: CreateSyllabusInput & { contentType: SyllabusContentType } = {
   subExamCategoryId: "",
   title: "",
   slug: "",
   content: "",
+  contentType: "html",
   sortOrder: 0,
 };
 
@@ -307,7 +132,9 @@ export default function AdminSyllabusPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<CreateSyllabusInput>(emptyForm);
+  const [form, setForm] = useState<
+    CreateSyllabusInput & { contentType: SyllabusContentType }
+  >(emptyForm);
 
   // Load categories
   useEffect(() => {
@@ -384,6 +211,7 @@ export default function AdminSyllabusPage() {
           title: form.title,
           slug: form.slug,
           content: form.content,
+          contentType: form.contentType,
           sortOrder: form.sortOrder,
         });
         toast.success("সিলেবাস সফলভাবে আপডেট হয়েছে");
@@ -409,6 +237,7 @@ export default function AdminSyllabusPage() {
       title: s.title,
       slug: s.slug,
       content: s.content,
+      contentType: s.contentType || "mdx",
       sortOrder: s.sortOrder,
     });
     setEditingId(s.id);
@@ -504,8 +333,8 @@ export default function AdminSyllabusPage() {
                 </div>
               </div>
               <div>
-                <Label>কন্টেন্ট (MDX)</Label>
-                <MdxEditor
+                <Label>কন্টেন্ট (HTML)</Label>
+                <HtmlContentEditor
                   value={form.content}
                   onChange={(content) => setForm((f) => ({ ...f, content }))}
                 />
