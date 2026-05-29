@@ -345,6 +345,10 @@ html {
   50% { opacity: 0.85; }
 }
 
+.subtle-pulse {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
 /* Smooth number tick animation */
 @keyframes numberTick {
   0% { transform: translateY(0); opacity: 1; }

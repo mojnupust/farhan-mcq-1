@@ -486,7 +486,7 @@ export default function ExamPage({
                                 className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
                                   isSelected
                                     ? "bg-primary text-white shadow-md shadow-primary/30 scale-110"
-                                    : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
+                                    : "bg-gray-100 text-gray-600"
                                 }`}
                               >
                                 {OPTION_LABELS[i]}
