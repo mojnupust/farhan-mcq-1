@@ -328,111 +328,64 @@ html {
   animation: progressFill 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Staggered question card entrance */
-@keyframes questionSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* Smooth option selection ripple */
+@keyframes optionSelect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
-.question-enter {
-  animation: questionSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
+.option-selected {
+  animation: optionSelect 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Option pop-in effect */
-@keyframes optionPop {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Subtle background pulse for answered questions */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
 
-.option-enter {
-  animation: optionPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
+.subtle-pulse {
+  animation: subtlePulse 3s ease-in-out infinite;
 }
 
-/* Answer reveal animation */
-@keyframes answerReveal {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-    filter: blur(2px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
-  }
-}
-
-.answer-reveal {
-  animation: answerReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Celebration pulse for correct answer */
-@keyframes correctPulse {
-  0% { box-shadow: 0 0 0 0 oklch(0.72 0.17 142 / 40%); }
-  70% { box-shadow: 0 0 0 8px oklch(0.72 0.17 142 / 0%); }
-  100% { box-shadow: 0 0 0 0 oklch(0.72 0.17 142 / 0%); }
-}
-
-.correct-pulse {
-  animation: correctPulse 1s ease-out;
-}
-
-/* Progress bar glow animation */
-@keyframes progressGlow {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-.progress-glow {
-  animation: progressGlow 2s ease-in-out infinite;
-}
-
-/* Smooth number counter tick */
-@keyframes tickUp {
-  0% { transform: translateY(100%); opacity: 0; }
+/* Smooth number tick animation */
+@keyframes numberTick {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-4px); opacity: 0.7; }
   100% { transform: translateY(0); opacity: 1; }
 }
 
-.tick-up {
-  animation: tickUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.number-tick {
+  animation: numberTick 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Scroll progress indicator */
-.scroll-progress-bar {
-  background: linear-gradient(90deg, oklch(0.55 0.2 260), oklch(0.65 0.25 300));
-  transition: width 0.15s ease-out;
+/* Gradient shimmer for progress bars */
+@keyframes progressShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* Subtle card breathing on idle */
-@keyframes subtleBreath {
-  0%, 100% { box-shadow: 0 1px 3px oklch(0 0 0 / 5%); }
-  50% { box-shadow: 0 4px 12px oklch(0 0 0 / 8%); }
+.progress-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 25%,
+    oklch(1 0 0 / 20%) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: progressShimmer 2s infinite ease-in-out;
 }
 
-.card-breathe:hover {
-  animation: subtleBreath 3s ease-in-out infinite;
+/* Elastic bounce for interactive elements */
+@keyframes elasticBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.95); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); }
 }
 
-/* Badge bounce for new items */
-@keyframes badgeBounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.badge-bounce {
-  animation: badgeBounce 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+.elastic-tap:active {
+  animation: elasticBounce 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
