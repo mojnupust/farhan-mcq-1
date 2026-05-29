@@ -368,7 +368,7 @@ export default function AnswersPage({
                 >
                   <Heart
                     className={`size-4 mr-1 transition-transform duration-300 ${
-                      favorites.has(question.id) ? "fill-rose-500 scale-110" : ""
+                      favorites.has(question.id) ? "fill-rose-500 scale-110 heart-pop" : ""
                     }`}
                   />
                   ফেভারিট

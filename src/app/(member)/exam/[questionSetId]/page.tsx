@@ -343,7 +343,7 @@ export default function ExamPage({
   return (
     <div className="min-h-screen bg-gray-50" ref={scrollContainerRef}>
       {/* Top Bar: Timer + Subject Filter + Submit */}
-      <div className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur-sm shadow-sm">
+      <div className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-2">
           {/* Timer */}
           <div
@@ -385,7 +385,7 @@ export default function ExamPage({
         {/* Progress bar */}
         <div className="h-0.5 w-full bg-gray-100">
           <div
-            className="h-full bg-gradient-to-r from-primary via-emerald-500 to-primary transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-primary via-emerald-500 to-primary transition-all duration-500 ease-out progress-glow"
             style={{
               width: `${questions.length > 0 ? (answeredCount / questions.length) * 100 : 0}%`,
             }}
