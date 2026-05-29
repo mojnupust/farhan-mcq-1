@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   AlertTriangleIcon,
   ArrowUp,
+  CheckCircle2,
   Clock,
   PackageOpen,
   Send,
@@ -338,11 +339,11 @@ export default function ExamPage({
   return (
     <div className="min-h-screen bg-gray-50" ref={scrollContainerRef}>
       {/* Top Bar: Timer + Subject Filter + Submit */}
-      <div className="sticky top-0 z-50 border-b bg-white shadow-sm">
+      <div className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-2">
           {/* Timer */}
           <div
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-lg font-bold transition-colors duration-300 ${
               timeLeft < 60
                 ? "bg-red-100 text-red-600 animate-pulse"
                 : timeLeft < 300
@@ -354,10 +355,15 @@ export default function ExamPage({
             {formatTime(timeLeft)}
           </div>
 
-          {/* Title */}
-          <h1 className="hidden text-sm font-semibold sm:block truncate max-w-50">
-            {questionSet.title}
-          </h1>
+          {/* Center: Progress indicator */}
+          <div className="hidden sm:flex items-center gap-2">
+            <h1 className="text-sm font-semibold truncate max-w-40">
+              {questionSet.title}
+            </h1>
+            <span className="text-xs text-muted-foreground bg-gray-100 rounded-full px-2 py-0.5">
+              {answeredCount}/{questions.length}
+            </span>
+          </div>
 
           {/* Submit */}
           <Button
@@ -365,10 +371,21 @@ export default function ExamPage({
             variant="destructive"
             onClick={() => setShowSubmitDialog(true)}
             disabled={submitting}
+            className="active:scale-95 transition-all duration-150"
           >
             <Send className="size-4 mr-1.5" />
             জমা দিন
           </Button>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-0.5 w-full bg-gray-100">
+          <div
+            className="h-full bg-gradient-to-r from-primary via-emerald-500 to-primary transition-all duration-500 ease-out"
+            style={{
+              width: `${questions.length > 0 ? (answeredCount / questions.length) * 100 : 0}%`,
+            }}
+          />
         </div>
 
         {/* Subject Filter */}
@@ -457,24 +474,29 @@ export default function ExamPage({
                               type="button"
                               onClick={() => handleAnswer(question.id, key)}
                               disabled={isLocked}
-                              className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 text-left transition-all duration-200 ${
+                              className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 text-left transition-all duration-300 ${
                                 isSelected
-                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.01]"
+                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.01] shadow-sm shadow-primary/10"
                                   : isLocked
-                                    ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
-                                    : "border-gray-200 hover:border-primary/50 hover:bg-gray-50 hover:shadow-sm active:scale-[0.99] cursor-pointer"
+                                    ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed scale-[0.99]"
+                                    : "border-gray-200 hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-sm active:scale-[0.98] cursor-pointer"
                               }`}
                             >
                               <span
-                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-200 ${
+                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
                                   isSelected
-                                    ? "bg-primary text-white shadow-md shadow-primary/30"
-                                    : "bg-gray-100 text-gray-600"
+                                    ? "bg-primary text-white shadow-md shadow-primary/30 scale-110"
+                                    : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
                                 }`}
                               >
                                 {OPTION_LABELS[i]}
                               </span>
                               <span className="text-base">{optionText}</span>
+                              {isSelected && (
+                                <span className="ml-auto text-primary">
+                                  <CheckCircle2 className="size-5" />
+                                </span>
+                              )}
                             </button>
                           );
                         })}
@@ -491,7 +513,8 @@ export default function ExamPage({
 
           {/* Question Palette (Sidebar) */}
           <div className="lg:sticky lg:top-30 lg:self-start">
-            <Card>
+            <Card className="overflow-hidden">
+              <div className="h-0.5 w-full bg-gradient-to-r from-primary/40 via-emerald-400/40 to-primary/40" />
               <CardContent className="py-4">
                 <h3 className="mb-3 text-sm font-semibold text-center">
                   প্রশ্ন নম্বর
@@ -505,18 +528,35 @@ export default function ExamPage({
                         type="button"
                         key={q.id}
                         onClick={() => scrollToQuestion(q.id)}
-                        className={`flex size-9 items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                        className={`flex size-9 items-center justify-center rounded-lg text-xs font-bold transition-all duration-300 active:scale-90 ${
                           isCurrent
-                            ? "bg-primary text-white ring-2 ring-primary/30"
+                            ? "bg-primary text-white ring-2 ring-primary/30 scale-105 shadow-sm shadow-primary/20"
                             : isAnswered
-                              ? "bg-green-500 text-white"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              ? "bg-green-500 text-white shadow-sm shadow-green-500/20"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105"
                         }`}
                       >
                         {q.sortOrder}
                       </button>
                     );
                   })}
+                </div>
+                {/* Progress summary */}
+                <div className="mt-4 rounded-lg bg-gray-50 p-3">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span>অগ্রগতি</span>
+                    <span className="font-semibold text-foreground">
+                      {answeredCount}/{questions.length}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-green-500 transition-all duration-500 ease-out"
+                      style={{
+                        width: `${questions.length > 0 ? (answeredCount / questions.length) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
                 </div>
                 <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
@@ -539,7 +579,7 @@ export default function ExamPage({
         <button
           type="button"
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all hover:bg-primary/90 active:scale-95"
+          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-90 animate-in fade-in slide-in-from-bottom-4"
           title="উপরে যান"
         >
           <ArrowUp className="size-5" />

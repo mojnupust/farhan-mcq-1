@@ -327,3 +327,61 @@ html {
 .progress-animate {
   animation: progressFill 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Smooth option selection ripple */
+@keyframes optionSelect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.option-selected {
+  animation: optionSelect 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Subtle background pulse for answered questions */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Smooth number tick animation */
+@keyframes numberTick {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-4px); opacity: 0.7; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.number-tick {
+  animation: numberTick 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Gradient shimmer for progress bars */
+@keyframes progressShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.progress-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 25%,
+    oklch(1 0 0 / 20%) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: progressShimmer 2s infinite ease-in-out;
+}
+
+/* Elastic bounce for interactive elements */
+@keyframes elasticBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.95); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.elastic-tap:active {
+  animation: elasticBounce 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
