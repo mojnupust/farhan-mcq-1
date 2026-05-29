@@ -335,14 +335,25 @@ export default function ExamPage({
     }
   }
 
+  const progressPercent = questions.length
+    ? Math.round((answeredCount / questions.length) * 100)
+    : 0;
+
   return (
     <div className="min-h-screen bg-gray-50" ref={scrollContainerRef}>
       {/* Top Bar: Timer + Subject Filter + Submit */}
-      <div className="sticky top-0 z-50 border-b bg-white shadow-sm">
+      <div className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur-sm shadow-sm">
+        {/* Progress Bar */}
+        <div className="h-1 w-full bg-gray-100">
+          <div
+            className="h-full scroll-progress-bar rounded-r-full transition-all duration-500 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-2">
           {/* Timer */}
           <div
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-lg font-bold ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-lg font-bold transition-colors duration-300 ${
               timeLeft < 60
                 ? "bg-red-100 text-red-600 animate-pulse"
                 : timeLeft < 300
@@ -354,10 +365,15 @@ export default function ExamPage({
             {formatTime(timeLeft)}
           </div>
 
-          {/* Title */}
-          <h1 className="hidden text-sm font-semibold sm:block truncate max-w-50">
-            {questionSet.title}
-          </h1>
+          {/* Center: Progress Badge */}
+          <div className="hidden sm:flex items-center gap-2">
+            <h1 className="text-sm font-semibold truncate max-w-32">
+              {questionSet.title}
+            </h1>
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary transition-all duration-300">
+              {answeredCount}/{questions.length}
+            </span>
+          </div>
 
           {/* Submit */}
           <Button
@@ -365,6 +381,7 @@ export default function ExamPage({
             variant="destructive"
             onClick={() => setShowSubmitDialog(true)}
             disabled={submitting}
+            className="transition-transform duration-200 hover:scale-105 active:scale-95"
           >
             <Send className="size-4 mr-1.5" />
             জমা দিন
@@ -407,7 +424,7 @@ export default function ExamPage({
         <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
           {/* All Questions - Scrollable */}
           <div className="space-y-4">
-            {filteredQuestions.map((question) => {
+            {filteredQuestions.map((question, qIdx) => {
               const optionAnswer = answers[question.id];
               return (
                 <div
@@ -416,12 +433,14 @@ export default function ExamPage({
                     if (el) questionRefs.current.set(question.id, el);
                   }}
                   data-question-id={question.id}
+                  className="question-enter"
+                  style={{ animationDelay: `${Math.min(qIdx * 60, 300)}ms` }}
                 >
-                  <Card>
+                  <Card className="transition-all duration-300 hover:shadow-md card-breathe">
                     <CardContent className="py-5">
                       {/* Question Number + Subject */}
                       <div className="mb-3 flex items-center gap-2">
-                        <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                        <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-sm">
                           {question.sortOrder}
                         </span>
                         {question.subject && (
@@ -430,8 +449,8 @@ export default function ExamPage({
                           </span>
                         )}
                         {optionAnswer && (
-                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                            উত্তর দেওয়া হয়েছে
+                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce">
+                            ✓ উত্তর দেওয়া হয়েছে
                           </span>
                         )}
                       </div>
@@ -457,19 +476,20 @@ export default function ExamPage({
                               type="button"
                               onClick={() => handleAnswer(question.id, key)}
                               disabled={isLocked}
-                              className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 text-left transition-all duration-200 ${
+                              className={`option-enter flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-200 ${
                                 isSelected
-                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.01]"
+                                  ? "border-primary bg-primary/5 ring-2 ring-primary/20 scale-[1.01] shadow-sm"
                                   : isLocked
-                                    ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
-                                    : "border-gray-200 hover:border-primary/50 hover:bg-gray-50 hover:shadow-sm active:scale-[0.99] cursor-pointer"
+                                    ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
+                                    : "border-gray-200 hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-sm active:scale-[0.98] cursor-pointer"
                               }`}
+                              style={{ animationDelay: `${(qIdx * 60) + (i * 50) + 100}ms` }}
                             >
                               <span
-                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-200 ${
+                                className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
                                   isSelected
-                                    ? "bg-primary text-white shadow-md shadow-primary/30"
-                                    : "bg-gray-100 text-gray-600"
+                                    ? "bg-primary text-white shadow-md shadow-primary/30 scale-110"
+                                    : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
                                 }`}
                               >
                                 {OPTION_LABELS[i]}
@@ -491,11 +511,18 @@ export default function ExamPage({
 
           {/* Question Palette (Sidebar) */}
           <div className="lg:sticky lg:top-30 lg:self-start">
-            <Card>
+            <Card className="transition-shadow duration-300 hover:shadow-md">
               <CardContent className="py-4">
-                <h3 className="mb-3 text-sm font-semibold text-center">
+                <h3 className="mb-2 text-sm font-semibold text-center">
                   প্রশ্ন নম্বর
                 </h3>
+                {/* Mini progress */}
+                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-500 ease-out progress-glow"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
                 <div className="grid grid-cols-5 gap-x-3 gap-y-2">
                   {filteredQuestions.map((q, i) => {
                     const isAnswered = answers[q.id] !== undefined;
@@ -505,11 +532,11 @@ export default function ExamPage({
                         type="button"
                         key={q.id}
                         onClick={() => scrollToQuestion(q.id)}
-                        className={`flex size-9 items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                        className={`flex size-9 items-center justify-center rounded-lg text-xs font-bold transition-all duration-200 hover:scale-110 active:scale-95 ${
                           isCurrent
-                            ? "bg-primary text-white ring-2 ring-primary/30"
+                            ? "bg-primary text-white ring-2 ring-primary/30 shadow-md"
                             : isAnswered
-                              ? "bg-green-500 text-white"
+                              ? "bg-green-500 text-white shadow-sm"
                               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                       >
@@ -520,7 +547,7 @@ export default function ExamPage({
                 </div>
                 <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <span className="size-3 rounded bg-green-500" />
+                    <span className="size-3 rounded bg-green-500 shadow-sm" />
                     উত্তর দেওয়া ({answeredCount})
                   </div>
                   <div className="flex items-center gap-2">
@@ -539,7 +566,7 @@ export default function ExamPage({
         <button
           type="button"
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all hover:bg-primary/90 active:scale-95"
+          className="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-all duration-300 hover:bg-primary/90 hover:scale-110 hover:shadow-xl active:scale-95"
           title="উপরে যান"
         >
           <ArrowUp className="size-5" />
