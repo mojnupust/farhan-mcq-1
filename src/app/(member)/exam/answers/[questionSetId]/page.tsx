@@ -133,6 +133,19 @@ export default function AnswersPage({
     [globalShowAnswers, hiddenAnswers],
   );
 
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight > 0) {
+        setScrollProgress(Math.round((window.scrollY / scrollHeight) * 100));
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
@@ -160,16 +173,19 @@ export default function AnswersPage({
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="transition-transform duration-200 hover:scale-110 active:scale-95">
             <ArrowLeft className="size-5" />
           </Button>
           <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
+          <Badge variant="secondary" className="ml-1">
+            {filteredQuestions.length} প্রশ্ন
+          </Badge>
           <div className="ml-auto">
             <Button
               size="sm"
               variant={globalShowAnswers ? "outline" : "default"}
               onClick={handleGlobalToggle}
-              className="gap-1.5"
+              className="gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
             >
               {globalShowAnswers ? (
                 <>
@@ -193,6 +209,7 @@ export default function AnswersPage({
               size="sm"
               variant={subjectFilter === null ? "default" : "outline"}
               onClick={() => setSubjectFilter(null)}
+              className="transition-all duration-200 hover:scale-105 active:scale-95"
             >
               সকল ({questions.length})
             </Button>
@@ -204,6 +221,7 @@ export default function AnswersPage({
                   size="sm"
                   variant={subjectFilter === s ? "default" : "outline"}
                   onClick={() => setSubjectFilter(s)}
+                  className="transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   {s} ({count})
                 </Button>
@@ -212,15 +230,23 @@ export default function AnswersPage({
           </div>
         )}
 
+        {/* Scroll Progress */}
+        <div className="mb-4 h-1 w-full rounded-full bg-gray-100 overflow-hidden">
+          <div
+            className="h-full scroll-progress-bar rounded-full transition-all duration-300"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+
         {/* Questions - Flat View */}
         <div className="space-y-6">
-          {filteredQuestions.map((question) => (
-            <div key={question.id}>
+          {filteredQuestions.map((question, qIdx) => (
+            <div key={question.id} className="question-enter" style={{ animationDelay: `${Math.min(qIdx * 80, 400)}ms` }}>
               {/* Question Card */}
-              <Card>
+              <Card className="transition-all duration-300 hover:shadow-md card-breathe overflow-hidden">
                 <CardContent className="py-5">
                   <div className="mb-3 flex items-center gap-2">
-                    <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                    <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-sm">
                       {question.sortOrder}
                     </span>
                     {question.subject && (
@@ -247,16 +273,17 @@ export default function AnswersPage({
                       return (
                         <div
                           key={key}
-                          className={`flex w-full items-center gap-3 rounded-lg border-2 p-3.5 ${
+                          className={`answer-reveal flex w-full items-center gap-3 rounded-xl border-2 p-3.5 transition-all duration-300 ${
                             isCorrectAnswer
-                              ? "border-green-400 bg-green-50"
-                              : "border-gray-200"
+                              ? "border-green-400 bg-green-50 shadow-sm correct-pulse"
+                              : "border-gray-200 hover:border-gray-300"
                           }`}
+                          style={{ animationDelay: `${i * 80}ms` }}
                         >
                           <span
-                            className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                            className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
                               isCorrectAnswer
-                                ? "bg-green-500 text-white"
+                                ? "bg-green-500 text-white shadow-md shadow-green-500/30"
                                 : "bg-gray-100 text-gray-600"
                             }`}
                           >
@@ -264,7 +291,7 @@ export default function AnswersPage({
                           </span>
                           <span className="text-base flex-1">{optionText}</span>
                           {isCorrectAnswer && (
-                            <CheckCircle2 className="size-5 text-green-500" />
+                            <CheckCircle2 className="size-5 text-green-500 animate-[iconBounce_0.4s_ease]" />
                           )}
                         </div>
                       );
@@ -277,7 +304,8 @@ export default function AnswersPage({
                       return (
                         <div
                           key={key}
-                          className="flex w-full items-center gap-3 rounded-lg border-2 border-gray-200 p-3.5"
+                          className="flex w-full items-center gap-3 rounded-xl border-2 border-gray-200 p-3.5 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50/50"
+                          style={{ animationDelay: `${i * 50}ms` }}
                         >
                           <span className="flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold bg-gray-100 text-gray-600">
                             {OPTION_LABELS[i]}
@@ -294,7 +322,7 @@ export default function AnswersPage({
                   size="sm"
                   variant={isAnswerVisible(question.id) ? "outline" : "default"}
                   onClick={() => handleToggleIndividual(question.id)}
-                  className="gap-1.5"
+                  className="gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   {isAnswerVisible(question.id) ? (
                     <>
@@ -312,6 +340,7 @@ export default function AnswersPage({
                   size="sm"
                   variant="outline"
                   onClick={() => handleShowStats(question.id)}
+                  className="transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   <BarChart3 className="size-4 mr-1" />
                   বিশ্লেষণ
@@ -321,6 +350,7 @@ export default function AnswersPage({
                     size="sm"
                     variant="outline"
                     onClick={() => setActiveExplanation(question.explanation!)}
+                    className="transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <BookOpen className="size-4 mr-1" />
                     ব্যাখ্যা
@@ -330,15 +360,15 @@ export default function AnswersPage({
                   size="sm"
                   variant="outline"
                   onClick={() => handleToggleFavorite(question.id)}
-                  className={
+                  className={`transition-all duration-200 hover:scale-105 active:scale-95 ${
                     favorites.has(question.id)
                       ? "text-rose-500 border-rose-200 bg-rose-50"
                       : ""
-                  }
+                  }`}
                 >
                   <Heart
-                    className={`size-4 mr-1 ${
-                      favorites.has(question.id) ? "fill-rose-500" : ""
+                    className={`size-4 mr-1 transition-transform duration-300 ${
+                      favorites.has(question.id) ? "fill-rose-500 scale-110" : ""
                     }`}
                   />
                   ফেভারিট
@@ -359,11 +389,11 @@ export default function AnswersPage({
         <DialogContent className="max-h-[80vh] overflow-y-auto w-full sm:max-w-lg p-4 sm:p-6 hide-scrollbar">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <BookOpen className="size-5" />
+              <BookOpen className="size-5 text-primary" />
               ব্যাখ্যা
             </DialogTitle>
           </DialogHeader>
-          <div className="prose prose-sm max-w-none whitespace-pre-wrap">
+          <div className="prose prose-sm max-w-none whitespace-pre-wrap page-enter rounded-lg bg-muted/30 p-4">
             {activeExplanation}
           </div>
         </DialogContent>

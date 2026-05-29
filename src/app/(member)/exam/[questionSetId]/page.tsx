@@ -336,6 +336,10 @@ export default function ExamPage({
     }
   }
 
+  const progressPercent = questions.length
+    ? Math.round((answeredCount / questions.length) * 100)
+    : 0;
+
   return (
     <div className="min-h-screen bg-gray-50" ref={scrollContainerRef}>
       {/* Top Bar: Timer + Subject Filter + Submit */}
@@ -424,7 +428,7 @@ export default function ExamPage({
         <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
           {/* All Questions - Scrollable */}
           <div className="space-y-4">
-            {filteredQuestions.map((question) => {
+            {filteredQuestions.map((question, qIdx) => {
               const optionAnswer = answers[question.id];
               return (
                 <div
@@ -433,12 +437,14 @@ export default function ExamPage({
                     if (el) questionRefs.current.set(question.id, el);
                   }}
                   data-question-id={question.id}
+                  className="question-enter"
+                  style={{ animationDelay: `${Math.min(qIdx * 60, 300)}ms` }}
                 >
-                  <Card>
+                  <Card className="transition-all duration-300 hover:shadow-md card-breathe">
                     <CardContent className="py-5">
                       {/* Question Number + Subject */}
                       <div className="mb-3 flex items-center gap-2">
-                        <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                        <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-sm">
                           {question.sortOrder}
                         </span>
                         {question.subject && (
@@ -447,8 +453,8 @@ export default function ExamPage({
                           </span>
                         )}
                         {optionAnswer && (
-                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                            উত্তর দেওয়া হয়েছে
+                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce" aria-label="উত্তর দেওয়া হয়েছে">
+                            ✓ উত্তর দেওয়া হয়েছে
                           </span>
                         )}
                       </div>
@@ -481,6 +487,7 @@ export default function ExamPage({
                                     ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed scale-[0.99]"
                                     : "border-gray-200 hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-sm active:scale-[0.98] cursor-pointer"
                               }`}
+                              style={{ animationDelay: `${(qIdx * 60) + (i * 50) + 100}ms` }}
                             >
                               <span
                                 className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
@@ -516,9 +523,16 @@ export default function ExamPage({
             <Card className="overflow-hidden">
               <div className="h-0.5 w-full bg-gradient-to-r from-primary/40 via-emerald-400/40 to-primary/40" />
               <CardContent className="py-4">
-                <h3 className="mb-3 text-sm font-semibold text-center">
+                <h3 className="mb-2 text-sm font-semibold text-center">
                   প্রশ্ন নম্বর
                 </h3>
+                {/* Mini progress */}
+                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-500 ease-out progress-glow"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
                 <div className="grid grid-cols-5 gap-x-3 gap-y-2">
                   {filteredQuestions.map((q, i) => {
                     const isAnswered = answers[q.id] !== undefined;
@@ -560,7 +574,7 @@ export default function ExamPage({
                 </div>
                 <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <span className="size-3 rounded bg-green-500" />
+                    <span className="size-3 rounded bg-green-500 shadow-sm" />
                     উত্তর দেওয়া ({answeredCount})
                   </div>
                   <div className="flex items-center gap-2">
