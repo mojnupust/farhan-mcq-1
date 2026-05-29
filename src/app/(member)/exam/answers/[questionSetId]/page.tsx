@@ -133,6 +133,19 @@ export default function AnswersPage({
     [globalShowAnswers, hiddenAnswers],
   );
 
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight > 0) {
+        setScrollProgress(Math.round((window.scrollY / scrollHeight) * 100));
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
@@ -221,7 +234,7 @@ export default function AnswersPage({
         <div className="mb-4 h-1 w-full rounded-full bg-gray-100 overflow-hidden">
           <div
             className="h-full scroll-progress-bar rounded-full transition-all duration-300"
-            style={{ width: `${filteredQuestions.length > 0 ? 100 : 0}%` }}
+            style={{ width: `${scrollProgress}%` }}
           />
         </div>
 

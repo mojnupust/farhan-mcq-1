@@ -449,7 +449,7 @@ export default function ExamPage({
                           </span>
                         )}
                         {optionAnswer && (
-                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce">
+                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce" aria-label="উত্তর দেওয়া হয়েছে">
                             ✓ উত্তর দেওয়া হয়েছে
                           </span>
                         )}
