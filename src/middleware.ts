@@ -12,6 +12,44 @@ const PROTECTED_PREFIXES = [
 
 const ADMIN_PREFIXES = ["/admin"];
 
+// ─── Security Headers ──────────────────────────────────────────────────────
+const securityHeaders = {
+  // Prevent MIME-type sniffing
+  "X-Content-Type-Options": "nosniff",
+  // Prevent clickjacking
+  "X-Frame-Options": "DENY",
+  // DNS prefetch for performance
+  "X-DNS-Prefetch-Control": "on",
+  // Strict referrer policy
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  // Enforce HTTPS (1 year)
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  // Disable browser features that aren't needed
+  "Permissions-Policy":
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+  // Prevent XSS attacks in older browsers
+  "X-XSS-Protection": "1; mode=block",
+  // Content Security Policy — strict but allows required resources
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https: blob:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://generativelanguage.googleapis.com",
+    "frame-src 'self' https://www.youtube.com https://youtube.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ].join("; "),
+  // Prevent cross-origin information leakage
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Cross-Origin-Embedder-Policy": "credentialless",
+};
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -25,10 +63,10 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  // Add security and performance headers
-  response.headers.set("X-DNS-Prefetch-Control", "on");
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "origin-when-cross-origin");
+  // Apply all security headers
+  for (const [key, value] of Object.entries(securityHeaders)) {
+    response.headers.set(key, value);
+  }
 
   // In mock mode, allow all routes
   // When real auth is implemented, check session here

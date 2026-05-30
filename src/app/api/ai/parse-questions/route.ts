@@ -1,8 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // gemini-2.0-flash — free tier (15 RPM, 1500 RPD). Change if needed.
 const GEMINI_MODEL = "gemini-flash-latest";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+// Rate limit: 10 requests per minute per IP
+const RATE_LIMIT_CONFIG = { maxRequests: 10, windowMs: 60_000 };
+
+// Maximum input text length to prevent abuse
+const MAX_RAW_TEXT_LENGTH = 50_000;
 
 // ============================================================
 // MCQ Question Factory — buildPrompt()
@@ -143,6 +151,26 @@ ${rawText}
 }
 
 export async function POST(req: NextRequest) {
+  // ─── Rate Limiting ─────────────────────────────────────────────────────────
+  const clientIp = getClientIp(req.headers);
+  const rateLimitResult = rateLimit(clientIp, RATE_LIMIT_CONFIG);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+          ),
+          "X-RateLimit-Remaining": "0",
+        },
+      },
+    );
+  }
+
+  // ─── API Key Check ─────────────────────────────────────────────────────────
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
@@ -154,32 +182,40 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: {
-    rawText?: string;
-    subjectHint?: string;
-    startSortOrder?: number;
-    expectedCount?: number;
-    examType?: ExamType;
-  };
+  // ─── Input Validation ──────────────────────────────────────────────────────
+  const bodySchema = z.object({
+    rawText: z.string().min(1).max(MAX_RAW_TEXT_LENGTH),
+    subjectHint: z.string().max(200).optional().default(""),
+    startSortOrder: z.number().int().min(1).max(10000).optional().default(1),
+    expectedCount: z.number().int().min(1).max(100).optional().default(25),
+    examType: z.enum(["BCS", "NTRCA", "Primary", "Bank", "Custom"]).optional().default("NTRCA"),
+  });
+
+  let body: z.infer<typeof bodySchema>;
   try {
-    body = (await req.json()) as typeof body;
+    const rawBody = await req.json();
+    const parsed = bodySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request body", details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
+    body = parsed.data;
   } catch {
     return NextResponse.json(
-      { error: "Invalid request body" },
+      { error: "Invalid JSON body" },
       { status: 400 },
     );
   }
 
   const {
     rawText,
-    subjectHint = "",
-    startSortOrder = 1,
-    expectedCount = 25,
-    examType = "NTRCA",
+    subjectHint,
+    startSortOrder,
+    expectedCount,
+    examType,
   } = body;
-  if (!rawText?.trim()) {
-    return NextResponse.json({ error: "rawText is required" }, { status: 400 });
-  }
 
   const prompt = buildPrompt({
     rawText: rawText.trim(),

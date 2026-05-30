@@ -6,6 +6,7 @@ import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import type { Syllabus } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
@@ -166,7 +167,7 @@ export default function SyllabusDetailPage({
             ) : (
               <div
                 dangerouslySetInnerHTML={{
-                  __html: renderContent(syllabus.content),
+                  __html: sanitizeHtml(renderContent(syllabus.content)),
                 }}
               />
             )}

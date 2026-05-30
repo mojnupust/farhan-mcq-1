@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { ROUTES } from "@/config/routes";
 import { getPublicQuestion } from "@/features/questions/services/question.api";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 // ─── ISR: revalidate every hour; never render at request time ──────────────
 export const revalidate = 3600;
@@ -262,9 +263,9 @@ export default async function QuestionPage({ params }: Props) {
               </h2>
               <div
                 className="prose prose-sm max-w-none rounded-xl border border-border bg-card px-5 py-4 text-card-foreground dark:prose-invert [&_.ex-badge.correct]:rounded-full [&_.ex-badge.correct]:bg-green-100 [&_.ex-badge.correct]:px-3 [&_.ex-badge.correct]:py-1 [&_.ex-badge.correct]:text-green-800 [&_.ex-table]:w-full [&_.ex-table]:border-collapse [&_.ex-table_td]:border [&_.ex-table_td]:border-border [&_.ex-table_td]:px-3 [&_.ex-table_td]:py-2 [&_.ex-table_th]:border [&_.ex-table_th]:border-border [&_.ex-table_th]:bg-muted [&_.ex-table_th]:px-3 [&_.ex-table_th]:py-2 [&_.ex-table_th]:text-left"
-                // explanation is admin-authored HTML — safe to render directly
+                // explanation is admin-authored HTML — sanitized for XSS protection
 
-                dangerouslySetInnerHTML={{ __html: question.explanation }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(question.explanation) }}
               />
             </section>
           )}

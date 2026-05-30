@@ -3,6 +3,7 @@ import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SyllabusWithCategory } from "@/features/syllabus";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -311,7 +312,7 @@ export default async function PublicSyllabusDetailPage({ params }: Props) {
             ) : (
               <div
                 dangerouslySetInnerHTML={{
-                  __html: renderContent(syllabus.content),
+                  __html: sanitizeHtml(renderContent(syllabus.content)),
                 }}
               />
             )}
