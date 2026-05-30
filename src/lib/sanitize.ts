@@ -90,7 +90,7 @@ const ALLOWED_TAG_ATTRS: Record<string, Set<string>> = {
 };
 
 // Only allow these URL schemes
-const SAFE_URL_SCHEMES = /^(https?:\/\/|mailto:|tel:|\/|#|data:image\/)/i;
+const SAFE_URL_SCHEMES = /^(https?:\/\/|mailto:|tel:|\/|#|data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);)/i;
 
 // Dangerous patterns to strip from attribute values
 const DANGEROUS_ATTR_PATTERN =

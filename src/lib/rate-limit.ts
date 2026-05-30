@@ -84,6 +84,6 @@ export function getClientIp(headers: Headers): string {
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     headers.get("x-real-ip") ||
     headers.get("cf-connecting-ip") ||
-    "unknown"
+    "anonymous-" + Math.random().toString(36).slice(2, 8)
   );
 }
