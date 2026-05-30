@@ -311,7 +311,7 @@ A custom hook that provides:
 
 The API client (`src/lib/api-client.ts`) provides:
 
-- ******** authentication** — Auto-attaches JWT from localStorage
+- **Automatic auth** — Auto-attaches JWT token from localStorage
 - **Request timeout** — 15-second timeout with AbortController
 - **Structured error handling** — `ApiError` class with status, message, and field-level details
 - **Full CRUD methods** — `get`, `post`, `put`, `patch`, `delete`
@@ -406,7 +406,7 @@ features/<feature-name>/
 | **No X-Powered-By** | Removed to prevent framework fingerprinting |
 | **Environment Validation** | Zod-based runtime validation prevents misconfiguration |
 | **Request Timeout** | 15s AbortController prevents hanging connections |
-| **Auth Token Management** | ****** from localStorage with automatic injection |
+| **Auth Token Management** | JWT read from localStorage with automatic header injection |
 
 ---
 
