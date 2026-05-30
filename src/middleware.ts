@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
+const API_ORIGIN =
+  process.env.NEXT_PUBLIC_API_ORIGIN || "http://localhost:3002";
 
 // Route protection stub — replace with real auth (e.g., NextAuth) later
 const PROTECTED_PREFIXES = [
@@ -38,7 +39,7 @@ const securityHeaders = {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' https://fonts.gstatic.com",
-    `connect-src 'self' ${API_URL} https://generativelanguage.googleapis.com`,
+    `connect-src 'self' ${API_ORIGIN} https://generativelanguage.googleapis.com`,
     "frame-src 'self' https://www.youtube.com https://youtube.com",
     "object-src 'none'",
     "base-uri 'self'",
