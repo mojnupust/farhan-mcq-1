@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeSyllabusHtml } from "@/lib/syllabus-html";
 import { useEffect, useState } from "react";
 
 /**
@@ -49,7 +50,7 @@ export function SyllabusHtmlViewer({ content }: { content: string }) {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  const srcdoc = wrapWithResizeScript(content);
+  const srcdoc = wrapWithResizeScript(normalizeSyllabusHtml(content));
 
   return (
     <iframe

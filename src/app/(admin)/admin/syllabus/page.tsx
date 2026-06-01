@@ -34,7 +34,17 @@ import type {
   SyllabusContentType,
 } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
-import { BookOpen, Code, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
+import { normalizeSyllabusHtml } from "@/lib/syllabus-html";
+import {
+  BookOpen,
+  Code,
+  Eye,
+  FileCode2,
+  FolderOpen,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -58,30 +68,39 @@ function HtmlContentEditor({
 
   return (
     <div className="space-y-2">
-      {/* Toolbar */}
       <div className="flex items-center gap-2 border rounded-lg p-1.5 bg-muted/30">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Code className="size-3.5" />
           <span>HTML কোড পেস্ট করুন (Claude থেকে কপি করা .html ফাইল)</span>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex gap-1">
+          <Button
+            type="button"
+            variant={!showPreview ? "default" : "outline"}
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setShowPreview(false)}
+          >
+            <FileCode2 className="size-3 mr-1" />
+            কোড
+          </Button>
           <Button
             type="button"
             variant={showPreview ? "default" : "outline"}
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={() => setShowPreview(!showPreview)}
+            onClick={() => setShowPreview(true)}
           >
-            {showPreview ? "এডিটর" : "প্রিভিউ"}
+            <Eye className="size-3 mr-1" />
+            প্রিভিউ
           </Button>
         </div>
       </div>
 
-      {/* Editor / Preview */}
       {showPreview ? (
         <div className="border rounded-lg overflow-hidden bg-white">
           <iframe
-            srcDoc={value}
+            srcDoc={normalizeSyllabusHtml(value)}
             className="w-full min-h-[500px] border-0"
             sandbox="allow-scripts"
             title="সিলেবাস প্রিভিউ"
@@ -93,6 +112,86 @@ function HtmlContentEditor({
           onChange={(e) => onChange(e.target.value)}
           className="w-full min-h-[500px] rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           placeholder={`এখানে Claude থেকে কপি করা HTML কোড পেস্ট করুন...\n\n<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    /* আপনার CSS স্টাইল */\n  </style>\n</head>\n<body>\n  <!-- আপনার কন্টেন্ট -->\n  <script>\n    // আপনার JavaScript\n  </script>\n</body>\n</html>`}
+          spellCheck={false}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── MDX Content Editor ──────────────────────────────────────────────
+function MdxContentEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [showPreview, setShowPreview] = useState(false);
+
+  // Minimal MDX→HTML for preview (headings, bold, lists, paragraphs)
+  function renderMdxPreview(text: string): string {
+    let html = text;
+    html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+    html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+    html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+    html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
+    html = html.replace(/(<li>[\s\S]*?<\/li>\n?)+/g, (m) => `<ul>${m}</ul>`);
+    html = html
+      .split("\n")
+      .map((line) => {
+        const t = line.trim();
+        if (!t || t.startsWith("<")) return line;
+        return `<p>${t}</p>`;
+      })
+      .join("\n");
+    return html;
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 border rounded-lg p-1.5 bg-muted/30">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Code className="size-3.5" />
+          <span>Markdown / MDX কন্টেন্ট লিখুন</span>
+        </div>
+        <div className="ml-auto flex gap-1">
+          <Button
+            type="button"
+            variant={!showPreview ? "default" : "outline"}
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setShowPreview(false)}
+          >
+            <FileCode2 className="size-3 mr-1" />
+            কোড
+          </Button>
+          <Button
+            type="button"
+            variant={showPreview ? "default" : "outline"}
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setShowPreview(true)}
+          >
+            <Eye className="size-3 mr-1" />
+            প্রিভিউ
+          </Button>
+        </div>
+      </div>
+
+      {showPreview ? (
+        <div
+          className="border rounded-lg overflow-auto bg-white p-4 min-h-[300px] prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: renderMdxPreview(value) }}
+        />
+      ) : (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full min-h-[400px] rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          placeholder={`# সিলেবাস শিরোনাম\n\n## বিষয়সমূহ\n\n- বিষয় ১\n- বিষয় ২\n\n## বিস্তারিত\n\nএখানে **গুরুত্বপূর্ণ** তথ্য লিখুন।`}
           spellCheck={false}
         />
       )}
@@ -223,8 +322,9 @@ export default function AdminSyllabusPage() {
       subExamCategoryId: s.subExamCategoryId,
       title: s.title,
       slug: s.slug,
-      content: s.content,
-      contentType: s.contentType || "mdx",
+      content:
+        s.contentType === "html" ? normalizeSyllabusHtml(s.content) : s.content,
+      contentType: s.contentType || "html",
       sortOrder: s.sortOrder,
     });
     setEditingId(s.id);
@@ -268,9 +368,7 @@ export default function AdminSyllabusPage() {
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingId
-                  ? "সিলেবাস সম্পাদনা"
-                  : "নতুন সিলেবাস তৈরি করুন"}
+                {editingId ? "সিলেবাস সম্পাদনা" : "নতুন সিলেবাস তৈরি করুন"}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -320,11 +418,48 @@ export default function AdminSyllabusPage() {
                 </div>
               </div>
               <div>
-                <Label>কন্টেন্ট (HTML)</Label>
-                <HtmlContentEditor
-                  value={form.content}
-                  onChange={(content) => setForm((f) => ({ ...f, content }))}
-                />
+                <Label className="mb-2 block">কন্টেন্ট টাইপ</Label>
+                <div className="flex gap-2 mb-3">
+                  <Button
+                    type="button"
+                    variant={
+                      form.contentType === "html" ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() =>
+                      setForm((f) => ({ ...f, contentType: "html" }))
+                    }
+                  >
+                    <Code className="size-3.5 mr-1.5" />
+                    HTML
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={form.contentType === "mdx" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() =>
+                      setForm((f) => ({ ...f, contentType: "mdx" }))
+                    }
+                  >
+                    <FileCode2 className="size-3.5 mr-1.5" />
+                    MDX
+                  </Button>
+                </div>
+                <Label>
+                  কন্টেন্ট (
+                  {form.contentType === "html" ? "HTML" : "Markdown/MDX"})
+                </Label>
+                {form.contentType === "html" ? (
+                  <HtmlContentEditor
+                    value={form.content}
+                    onChange={(content) => setForm((f) => ({ ...f, content }))}
+                  />
+                ) : (
+                  <MdxContentEditor
+                    value={form.content}
+                    onChange={(content) => setForm((f) => ({ ...f, content }))}
+                  />
+                )}
               </div>
               <Button type="submit" className="w-full">
                 {editingId ? "আপডেট করুন" : "তৈরি করুন"}
@@ -399,6 +534,7 @@ export default function AdminSyllabusPage() {
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
                     <TableHead>শিরোনাম</TableHead>
                     <TableHead>স্লাগ</TableHead>
+                    <TableHead className="text-center">টাইপ</TableHead>
                     <TableHead className="text-center">ক্রম</TableHead>
                     <TableHead className="text-center">স্ট্যাটাস</TableHead>
                     <TableHead className="text-right">অ্যাকশন</TableHead>
@@ -413,6 +549,11 @@ export default function AdminSyllabusPage() {
                       <TableCell className="font-medium">{s.title}</TableCell>
                       <TableCell className="text-muted-foreground text-sm font-mono text-xs">
                         {s.slug}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-xs font-mono">
+                          {s.contentType === "html" ? "HTML" : "MDX"}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-center tabular-nums">
                         {s.sortOrder}

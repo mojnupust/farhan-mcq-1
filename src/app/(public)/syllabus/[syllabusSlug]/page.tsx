@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SyllabusWithCategory } from "@/features/syllabus";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { looksLikeHtmlContent } from "@/lib/syllabus-html";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -307,7 +308,8 @@ export default async function PublicSyllabusDetailPage({ params }: Props) {
         {/* Content */}
         <Card>
           <CardContent className="py-6 prose prose-sm max-w-none">
-            {syllabus.contentType === "html" ? (
+            {syllabus.contentType === "html" ||
+            looksLikeHtmlContent(syllabus.content) ? (
               <SyllabusHtmlViewer content={syllabus.content} />
             ) : (
               <div

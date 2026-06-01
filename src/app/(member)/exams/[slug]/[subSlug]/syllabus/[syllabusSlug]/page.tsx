@@ -1,12 +1,13 @@
 "use client";
 
+import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
-import { SyllabusHtmlViewer } from "@/components/syllabus-html-viewer";
 import type { Syllabus } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { looksLikeHtmlContent } from "@/lib/syllabus-html";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
@@ -129,50 +130,54 @@ export default function SyllabusDetailPage({
 
   if (loading) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-          <ContentSkeleton />
-        </div>
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+        <ContentSkeleton />
+      </div>
     );
   }
 
   if (!syllabus) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-muted-foreground py-12">
-            সিলেবাস পাওয়া যায়নি
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+        <p className="text-center text-muted-foreground py-12">
+          সিলেবাস পাওয়া যায়নি
+        </p>
+      </div>
     );
   }
 
-  return (
-          <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/exams/${slug}/${subSlug}/syllabus`}>
-              <ArrowLeft className="size-5" />
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {syllabus.title}
-          </h1>
-        </div>
+  // Detect HTML content: use iframe viewer if contentType is html OR content looks like HTML
+  const isHtmlContent =
+    syllabus.contentType === "html" || looksLikeHtmlContent(syllabus.content);
 
-        {/* Content */}
-        <Card className="mt-6">
-          <CardContent className="py-4 prose prose-sm max-w-none">
-            {syllabus.contentType === "html" ? (
-              <SyllabusHtmlViewer content={syllabus.content} />
-            ) : (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHtml(renderContent(syllabus.content)),
-                }}
-              />
-            )}
-          </CardContent>
-        </Card>
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={`/exams/${slug}/${subSlug}/syllabus`}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {syllabus.title}
+        </h1>
       </div>
+
+      {/* Content */}
+      <Card className="mt-6">
+        <CardContent className="py-4 prose prose-sm max-w-none">
+          {isHtmlContent ? (
+            <SyllabusHtmlViewer content={syllabus.content} />
+          ) : (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(renderContent(syllabus.content)),
+              }}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
