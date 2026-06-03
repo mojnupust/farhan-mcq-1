@@ -1,8 +1,8 @@
+import { RouteProgress } from "@/components/shared/route-progress";
 import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
-import { RouteProgress } from "@/components/shared/route-progress";
 
 const hindSiliguri = Hind_Siliguri({
   variable: "--font-hind-siliguri",
@@ -20,6 +20,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://farhanmcq.com"), // your actual domain
+
+  icons: {
+    icon: [
+      { url: "/farhanmcq-favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/farhanmcq-favicon.svg",
+  },
 
   title: {
     default: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",

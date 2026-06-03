@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand-logo";
 import {
   FinalCTAButton,
   HeroCTA,
@@ -197,7 +198,7 @@ export default function LandingPage() {
 
       <main>
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-background">
+        <section className="relative overflow-hidden border-b bg-linear-to-br from-primary/5 via-background to-background">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute -top-40 -right-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float" />
             <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/3 blur-3xl animate-float-delayed" />
@@ -205,7 +206,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28 relative">
             <div className="max-w-2xl">
               {/* Badge */}
-              <AnimateIn variant="fade-up" duration={500}>
+              <AnimateIn variant="fade-up" delay={50} duration={500}>
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
                   <span className="relative size-2 rounded-full bg-green-500">
                     <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
@@ -224,9 +225,9 @@ export default function LandingPage() {
               </AnimateIn>
               <AnimateIn variant="fade-up" delay={200} duration={600}>
                 <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
-                  BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার জন্য
-                  পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং অভিজ্ঞ
-                  মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
+                  BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার
+                  জন্য পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং
+                  অভিজ্ঞ মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
                 </p>
               </AnimateIn>
 
@@ -242,9 +243,16 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               {stats.map((stat, index) => (
-                <AnimateIn key={stat.label} variant="fade-up" delay={index * 100} duration={500}>
+                <AnimateIn
+                  key={stat.label}
+                  variant="fade-up"
+                  delay={index * 100}
+                  duration={500}
+                >
                   <div className="text-center">
-                    <p className="text-2xl font-bold sm:text-3xl">{stat.value}</p>
+                    <p className="text-2xl font-bold sm:text-3xl">
+                      {stat.value}
+                    </p>
                     <p className="mt-1 text-sm opacity-80">{stat.label}</p>
                   </div>
                 </AnimateIn>
@@ -269,10 +277,13 @@ export default function LandingPage() {
             </AnimateIn>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((benefit, index) => (
-                <AnimateIn key={benefit.title} variant="fade-up" delay={index * 80} duration={500}>
-                  <Card
-                    className="border bg-card card-hover-lift glow-on-hover h-full"
-                  >
+                <AnimateIn
+                  key={benefit.title}
+                  variant="fade-up"
+                  delay={index * 80}
+                  duration={500}
+                >
+                  <Card className="border bg-card card-hover-lift glow-on-hover h-full">
                     <CardHeader>
                       <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
                         <benefit.icon className="size-5 text-primary" />
@@ -307,14 +318,18 @@ export default function LandingPage() {
             </AnimateIn>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {categories.map((category, index) => (
-                <AnimateIn key={category.id} variant="fade-up" delay={index * 100} duration={500}>
-                  <Link
-                    href={`/exams/${category.slug}`}
-                    className="group"
-                  >
+                <AnimateIn
+                  key={category.id}
+                  variant="fade-up"
+                  delay={index * 100}
+                  duration={500}
+                >
+                  <Link href={`/exams/${category.slug}`} className="group">
                     <Card className="h-full card-hover-lift glow-on-hover group-hover:border-primary/40">
                       <CardHeader className="pb-3">
-                        <span className="text-2xl transition-transform duration-300 inline-block group-hover:scale-110">{category.icon}</span>
+                        <span className="text-2xl transition-transform duration-300 inline-block group-hover:scale-110">
+                          {category.icon}
+                        </span>
                         <CardTitle className="text-sm mt-2">
                           {category.name}
                         </CardTitle>
@@ -348,7 +363,12 @@ export default function LandingPage() {
             </AnimateIn>
             <div className="mt-10 grid gap-6 sm:grid-cols-3">
               {testimonials.map((t, index) => (
-                <AnimateIn key={t.name} variant="fade-up" delay={index * 120} duration={500}>
+                <AnimateIn
+                  key={t.name}
+                  variant="fade-up"
+                  delay={index * 120}
+                  duration={500}
+                >
                   <Card className="border card-hover-lift h-full">
                     <CardHeader>
                       <div className="flex gap-0.5">
@@ -436,22 +456,29 @@ export default function LandingPage() {
                 আমাদের সম্পর্কে
               </h2>
               <div className="mt-6 max-w-2xl">
-                <p className="text-lg font-medium">Farhan MCQ</p>
-                <p className="text-sm text-muted-foreground">
+                <BrandLogo
+                  orientation="stacked"
+                  showSubtitle
+                  iconClassName="size-12"
+                  titleClassName="text-xl"
+                  subtitleClassName="max-w-md text-sm"
+                />
+                <p className="mt-2 text-sm text-muted-foreground">
                   Farhan Software | প্রতিষ্ঠাতা: Mojnu Miah
                 </p>
                 <p className="mt-4 text-muted-foreground leading-relaxed">
                   প্রস্তুতির শুরুতেই সঠিক দিকনির্দেশনা পেলে সময় অনেকটাই বাঁচানো
-                  সম্ভব। Farhan MCQ আপনাকে শুরু থেকেই একটি পরিষ্কার roadmap দেয়।
-                  আমাদের লক্ষ্য — প্রতিটি শিক্ষার্থীকে এমনভাবে প্রস্তুত করা যেন
-                  তারা আত্মবিশ্বাসের সাথে যেকোনো পরীক্ষায় অংশ নিতে পারে।
+                  সম্ভব। Farhan MCQ আপনাকে শুরু থেকেই একটি পরিষ্কার roadmap
+                  দেয়। আমাদের লক্ষ্য — প্রতিটি শিক্ষার্থীকে এমনভাবে প্রস্তুত
+                  করা যেন তারা আত্মবিশ্বাসের সাথে যেকোনো পরীক্ষায় অংশ নিতে
+                  পারে।
                 </p>
                 <p className="mt-4 text-sm italic text-muted-foreground">
                   কবি সুকান্ত ভট্টাচার্য আমাদের অনুপ্রেরণা —
                   <br />
                   <em>
-                    &quot;ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমার চাঁদ যেন ঝলসানো
-                    রুটি&quot;
+                    &quot;ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমার চাঁদ যেন
+                    ঝলসানো রুটি&quot;
                   </em>
                 </p>
               </div>
@@ -469,10 +496,13 @@ export default function LandingPage() {
             </AnimateIn>
             <div className="mt-8 max-w-2xl space-y-2">
               {faqs.map((faq, index) => (
-                <AnimateIn key={index} variant="fade-up" delay={index * 60} duration={400}>
-                  <details
-                    className="group border-b pb-4 [&[open]>summary>svg]:rotate-180"
-                  >
+                <AnimateIn
+                  key={index}
+                  variant="fade-up"
+                  delay={index * 60}
+                  duration={400}
+                >
+                  <details className="group border-b pb-4 [&[open]>summary>svg]:rotate-180">
                     <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-medium transition-colors hover:text-primary [&::-webkit-details-marker]:hidden list-none">
                       {faq.question}
                       <ChevronRight className="size-4 shrink-0 rotate-90 text-muted-foreground transition-transform duration-200" />
@@ -513,7 +543,7 @@ export default function LandingPage() {
       <footer className="border-t">
         <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <p className="font-semibold text-sm">Farhan MCQ</p>
+            <BrandLogo iconClassName="size-8" titleClassName="text-sm" />
             <p className="text-xs text-muted-foreground">
               © 2026 Farhan Software. All rights reserved.
             </p>

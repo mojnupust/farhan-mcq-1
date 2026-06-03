@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,16 +34,14 @@ export function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-lg font-bold tracking-tight text-primary">
-              Farhan MCQ
-            </span>
-            <span className="hidden rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary sm:inline">
-              সরকারি চাকরি প্রস্তুতি
-            </span>
+        <div className="flex items-center gap-4 lg:gap-6">
+          <Link href="/" className="shrink-0">
+            <BrandLogo
+              iconClassName="size-9"
+              titleClassName="text-base text-primary sm:text-lg"
+            />
           </Link>
 
           {/* Nav links */}
@@ -80,7 +79,9 @@ export function LandingHeader() {
                     alt={user.name ?? "User"}
                   />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
-                    {(user.name ?? user.mobile ?? "U").slice(0, 2).toUpperCase()}
+                    {(user.name ?? user.mobile ?? "U")
+                      .slice(0, 2)
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </button>

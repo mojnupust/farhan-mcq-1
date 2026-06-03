@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,11 +82,11 @@ function SidebarContent({
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="px-4 py-5">
-        <Link
-          href="/dashboard"
-          className="text-lg font-semibold tracking-tight"
-        >
-          MCQ প্ল্যাটফর্ম
+        <Link href="/dashboard" className="block">
+          <BrandLogo
+            iconClassName="size-8"
+            titleClassName="text-base text-primary"
+          />
         </Link>
       </div>
 
@@ -217,11 +218,12 @@ export function AppSidebar({
             />
           </SheetContent>
         </Sheet>
-        <Link
-          href="/dashboard"
-          className="text-base font-semibold tracking-tight"
-        >
-          MCQ প্ল্যাটফর্ম
+        <Link href="/dashboard" className="block min-w-0">
+          <BrandLogo
+            iconClassName="size-8"
+            titleClassName="text-sm text-primary"
+            className="gap-2"
+          />
         </Link>
       </div>
     </>
