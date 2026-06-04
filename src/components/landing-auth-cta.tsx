@@ -39,7 +39,7 @@ export function HeroCTA() {
       <Button size="lg" className="text-base shadow-lg" asChild>
         <Link href="/dashboard">
           <LogInIcon />
-          এখনই জয়েন করুন — মাত্র ৳১৯০/মাস
+          এখনই জয়েন করুন — মাত্র ৳৩৯/মাস
         </Link>
       </Button>
       <p className="text-sm text-muted-foreground">

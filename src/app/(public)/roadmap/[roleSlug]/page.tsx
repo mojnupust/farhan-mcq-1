@@ -1,3 +1,4 @@
+import { LandingHeader } from "@/components/landing-header";
 import { JOB_ROLES } from "@/features/roadmap/roadmap-data";
 import { RoadmapVisualizer } from "@/features/roadmap/roadmap-visualizer";
 import { ArrowLeft } from "lucide-react";
@@ -9,7 +10,9 @@ interface PageProps {
   params: Promise<{ roleSlug: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { roleSlug } = await params;
   const role = JOB_ROLES.find((r) => r.slug === roleSlug);
   if (!role) return { title: "রোডম্যাপ পাওয়া যায়নি" };
@@ -32,20 +35,23 @@ export default async function RoadmapRolePage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4 py-6 sm:py-8">
-      <div className="mx-auto max-w-3xl">
-        {/* Back navigation */}
-        <Link
-          href="/roadmap"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" />
-          সব রোডম্যাপ দেখুন
-        </Link>
+    <>
+      <LandingHeader />
+      <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4 py-6 sm:py-8">
+        <div className="mx-auto max-w-3xl">
+          {/* Back navigation */}
+          <Link
+            href="/roadmap"
+            className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            সব রোডম্যাপ দেখুন
+          </Link>
 
-        {/* Roadmap Visualizer */}
-        <RoadmapVisualizer role={role} />
-      </div>
-    </main>
+          {/* Roadmap Visualizer */}
+          <RoadmapVisualizer role={role} />
+        </div>
+      </main>
+    </>
   );
 }

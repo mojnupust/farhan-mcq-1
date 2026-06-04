@@ -13,22 +13,49 @@ import type { ExamCategory } from "@/features/exam-categories/types";
 
 const categories: ExamCategory[] = [
   {
-    id: "1",
+    id: "cmnv744ou0000uxikhrsi1w7d",
     icon: "💼",
     slug: "job-solution",
     name: "জব সল্যুশন",
     sortOrder: 1,
     isActive: true,
-    createdAt: "2024-01-01T00:00:00.000Z",
+    createdAt: "2026-04-12T03:20:05.309Z",
   },
   {
-    id: "2",
+    id: "cmnv744su0001uxikvsyca1aw",
     icon: "📚",
     slug: "teacher-recruitment",
     name: "শিক্ষক নিয়োগ ও নিবন্ধন",
     sortOrder: 2,
     isActive: true,
-    createdAt: "2024-01-01T00:00:00.000Z",
+    createdAt: "2026-04-12T03:20:05.455Z",
+  },
+  {
+    id: "cmpytccrz0004uxvgpsyr0bw9",
+    icon: "🏦",
+    slug: "bank-recruitment",
+    name: "ব্যাংক জব প্রস্তুতি [coming soon]",
+    sortOrder: 3,
+    isActive: true,
+    createdAt: "2026-06-04T01:25:03.791Z",
+  },
+  {
+    id: "cmpytjb760005uxvgwkmkcmez",
+    icon: "👨‍💼",
+    slug: "bcs-preparation",
+    name: "বিসিএস (BCS) প্রস্তুতি [coming soon]",
+    sortOrder: 4,
+    isActive: true,
+    createdAt: "2026-06-04T01:30:28.339Z",
+  },
+  {
+    id: "cmpyudvp30006uxvg3ypt4mnn",
+    icon: "🫰",
+    slug: "11-20-grade-job-preparation",
+    name: "১১ থেকে ২০তম গ্রেডের সরকারি চাকরি প্রস্তুতি",
+    sortOrder: 5,
+    isActive: true,
+    createdAt: "2026-06-04T01:54:14.583Z",
   },
 ];
 

@@ -132,7 +132,7 @@ const testimonials = [
   {
     name: "মো. তানভীর",
     role: "ব্যাংক নিয়োগ প্রার্থী",
-    text: "মাত্র ৳১৯০/মাসে এত সুন্দর একটি প্ল্যাটফর্ম! কমিউনিটির সবাই অনেক সহযোগিতামূলক।",
+    text: "মাত্র ৳৩৯/মাসে এত সুন্দর একটি প্ল্যাটফর্ম! কমিউনিটির সবাই অনেক সহযোগিতামূলক।",
     stars: 5,
   },
 ];
@@ -414,7 +414,7 @@ export default function LandingPage() {
                       bKash বা Nagad-এ পেমেন্ট
                     </p>
                     <CardTitle className="text-4xl font-bold mt-1">
-                      ৳১৯০
+                      ৳৩৯
                       <span className="text-lg font-normal text-muted-foreground">
                         {" "}
                         / মাস

@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   LogInIcon,
   LogOut,
+  Route,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,6 +27,7 @@ const NAV_LINKS = [
   { href: "/routines", label: "রুটিন", icon: Calendar },
   { href: "/syllabus", label: "সিলেবাস", icon: BookOpen },
   { href: "/job-circular", label: "চাকরির বিজ্ঞপ্তি", icon: Briefcase },
+  { href: "/roadmap", label: "ক্যারিয়ার রোডম্যাপ", icon: Route },
 ];
 
 export function LandingHeader() {
