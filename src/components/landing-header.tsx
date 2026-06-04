@@ -26,8 +26,8 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/routines", label: "রুটিন", icon: Calendar },
   { href: "/syllabus", label: "সিলেবাস", icon: BookOpen },
-  { href: "/job-circular", label: "চাকরির বিজ্ঞপ্তি", icon: Briefcase },
-  { href: "/roadmap", label: "ক্যারিয়ার রোডম্যাপ", icon: Route },
+  { href: "/job-circular", label: "নিয়োগ বিজ্ঞপ্তি", icon: Briefcase },
+  { href: "/roadmap", label: "রোডম্যাপ", icon: Route },
 ];
 
 export function LandingHeader() {
