@@ -91,7 +91,7 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-1 space-y-1">
         {navItems.map((item, index) => (
           <NavLink key={index} item={item} onClick={onNavClick} />
         ))}
@@ -200,7 +200,7 @@ export function AppSidebar({
           </SheetTrigger>
           <SheetContent
             side="left"
-            className="w-60 p-0"
+            className="w-60 p-0 h-full"
             showCloseButton={false}
           >
             <SheetTitle className="sr-only">Navigation</SheetTitle>

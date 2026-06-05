@@ -695,7 +695,10 @@ export default function AdminJobCircularPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-xs font-normal">
+                        <Badge
+                          variant="outline"
+                          className="text-xs font-normal"
+                        >
                           {ORG_TYPES.find((o) => o.value === c.orgType)
                             ?.label ?? c.orgType}
                         </Badge>
@@ -718,7 +721,7 @@ export default function AdminJobCircularPage() {
                         {c.viewCount.toLocaleString()}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-0.5">
                           <Button
                             size="icon"
                             variant="ghost"

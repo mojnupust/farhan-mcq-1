@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useId } from "react"; // ← add this
 
 type BrandMarkProps = {
   className?: string;
@@ -17,6 +18,8 @@ type BrandLogoProps = {
 const DEFAULT_SUBTITLE = "সরকারি চাকরিতে সফল হওয়ার সবচেয়ে স্মার্ট উপায়";
 
 export function BrandMark({ className }: BrandMarkProps) {
+  const gradientId = useId(); // ← unique ID per instance
+
   return (
     <svg
       viewBox="0 0 64 64"
@@ -30,7 +33,7 @@ export function BrandMark({ className }: BrandMarkProps) {
         width="52"
         height="52"
         rx="15"
-        fill="url(#farhanmcq-bg)"
+        fill={`url(#${gradientId})`} // ← reference the unique ID
       />
       <path
         fill="#F8FAFC"
@@ -45,7 +48,7 @@ export function BrandMark({ className }: BrandMarkProps) {
       />
       <defs>
         <linearGradient
-          id="farhanmcq-bg"
+          id={gradientId} // ← unique per instance, no collision
           x1="11"
           y1="10"
           x2="53"

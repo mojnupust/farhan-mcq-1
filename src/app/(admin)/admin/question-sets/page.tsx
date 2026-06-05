@@ -540,7 +540,10 @@ export default function AdminQuestionSetsPage() {
                         {formatDate(qs.date)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-normal text-xs">
+                        <Badge
+                          variant="outline"
+                          className="font-normal text-xs"
+                        >
                           {qs.subject}
                         </Badge>
                       </TableCell>
@@ -573,7 +576,7 @@ export default function AdminQuestionSetsPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex justify-end gap-0.5">
                           <Button
                             variant="ghost"
                             size="icon"
