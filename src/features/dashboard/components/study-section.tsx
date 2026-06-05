@@ -15,16 +15,18 @@ const studyItems = [
     href: "/exam-subject-topic",
     color: "text-emerald-600",
     bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-    borderColor: "group-hover:border-emerald-200 dark:group-hover:border-emerald-800",
+    borderColor:
+      "group-hover:border-emerald-200 dark:group-hover:border-emerald-800",
   },
   {
-    title: "মডেল টেস্ট",
-    description: "পূর্ণাঙ্গ মডেল টেস্ট দিন",
+    title: "সাপ্তাহিক মডেল টেস্ট",
+    description: "প্রতি সপ্তাহে সম্পূর্ণ বিনামূল্যে পূর্ণাঙ্গ মডেল টেস্ট দিন",
     icon: ClipboardList,
-    href: "#",
+    href: "/free-saptahik-model-test",
     color: "text-violet-600",
     bgColor: "bg-violet-50 dark:bg-violet-950/30",
-    borderColor: "group-hover:border-violet-200 dark:group-hover:border-violet-800",
+    borderColor:
+      "group-hover:border-violet-200 dark:group-hover:border-violet-800",
   },
   {
     title: "পরীক্ষার রুটিন",
@@ -33,7 +35,8 @@ const studyItems = [
     href: "/routines",
     color: "text-amber-600",
     bgColor: "bg-amber-50 dark:bg-amber-950/30",
-    borderColor: "group-hover:border-amber-200 dark:group-hover:border-amber-800",
+    borderColor:
+      "group-hover:border-amber-200 dark:group-hover:border-amber-800",
   },
   {
     title: "ফেভারিট প্রশ্ন",
@@ -51,9 +54,13 @@ export function StudySection() {
     <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
       {studyItems.map((item) => (
         <Link key={item.title} href={item.href}>
-          <Card className={`group card-hover-lift cursor-pointer h-full transition-all duration-300 ${item.borderColor}`}>
+          <Card
+            className={`group card-hover-lift cursor-pointer h-full transition-all duration-300 ${item.borderColor}`}
+          >
             <CardHeader className="p-4">
-              <div className={`inline-flex size-10 items-center justify-center rounded-xl ${item.bgColor} transition-transform duration-300 group-hover:scale-105`}>
+              <div
+                className={`inline-flex size-10 items-center justify-center rounded-xl ${item.bgColor} transition-transform duration-300 group-hover:scale-105`}
+              >
                 <item.icon className={`size-5 ${item.color}`} />
               </div>
               <CardTitle className="text-sm font-medium mt-2">
