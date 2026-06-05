@@ -22,7 +22,7 @@ const studyItems = [
     title: "সাপ্তাহিক মডেল টেস্ট",
     description: "প্রতি সপ্তাহে সম্পূর্ণ বিনামূল্যে পূর্ণাঙ্গ মডেল টেস্ট দিন",
     icon: ClipboardList,
-    href: "/free-saptahik-model-test",
+    href: "/exams/free-saptahik-model-test",
     color: "text-violet-600",
     bgColor: "bg-violet-50 dark:bg-violet-950/30",
     borderColor:
