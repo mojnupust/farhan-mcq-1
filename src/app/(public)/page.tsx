@@ -1,10 +1,17 @@
 import { BrandLogo } from "@/components/brand-logo";
+
 import {
   FinalCTAButton,
   HeroCTA,
   PricingCTAButton,
 } from "@/components/landing-auth-cta";
 import { LandingHeader } from "@/components/landing-header";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { AnimateIn } from "@/components/ui/animate-in";
 import {
   Card,
@@ -487,32 +494,22 @@ export default function LandingPage() {
         </section>
 
         {/* ── FAQ ── */}
-        <section className="border-b bg-muted/40">
+        <section className="border-t bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <AnimateIn variant="fade-up" duration={500}>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                সচরাচর জিজ্ঞাসা
-              </h2>
-            </AnimateIn>
-            <div className="mt-8 max-w-2xl space-y-2">
-              {faqs.map((faq, index) => (
-                <AnimateIn
-                  key={index}
-                  variant="fade-up"
-                  delay={index * 60}
-                  duration={400}
-                >
-                  <details className="group border-b pb-4 [&[open]>summary>svg]:rotate-180">
-                    <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-medium transition-colors hover:text-primary [&::-webkit-details-marker]:hidden list-none">
-                      {faq.question}
-                      <ChevronRight className="size-4 shrink-0 rotate-90 text-muted-foreground transition-transform duration-200" />
-                    </summary>
-                    <p className="pb-2 text-sm text-muted-foreground">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Frequently asked questions
+            </h2>
+            <div className="mt-8 max-w-2xl">
+              <Accordion type="single" collapsible className="w-full">
+                {faqs.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`}>
+                    <AccordionTrigger>{faq.question}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">
                       {faq.answer}
-                    </p>
-                  </details>
-                </AnimateIn>
-              ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>

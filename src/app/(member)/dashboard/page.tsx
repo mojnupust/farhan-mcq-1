@@ -4,60 +4,14 @@ import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth";
 import { StudySection } from "@/features/dashboard/components/study-section";
+import type { ExamCategory } from "@/features/exam-categories";
+import { examCategoryService } from "@/features/exam-categories";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import type { ExamCategory } from "@/features/exam-categories/types";
-
-const categories: ExamCategory[] = [
-  {
-    id: "cmnv744ou0000uxikhrsi1w7d",
-    icon: "💼",
-    slug: "job-solution",
-    name: "জব সল্যুশন",
-    sortOrder: 1,
-    isActive: true,
-    createdAt: "2026-04-12T03:20:05.309Z",
-  },
-  {
-    id: "cmnv744su0001uxikvsyca1aw",
-    icon: "📚",
-    slug: "teacher-recruitment",
-    name: "শিক্ষক নিয়োগ ও নিবন্ধন",
-    sortOrder: 2,
-    isActive: true,
-    createdAt: "2026-04-12T03:20:05.455Z",
-  },
-  {
-    id: "cmpytccrz0004uxvgpsyr0bw9",
-    icon: "🏦",
-    slug: "bank-recruitment",
-    name: "ব্যাংক জব প্রস্তুতি [coming soon]",
-    sortOrder: 3,
-    isActive: true,
-    createdAt: "2026-06-04T01:25:03.791Z",
-  },
-  {
-    id: "cmpytjb760005uxvgwkmkcmez",
-    icon: "👨‍💼",
-    slug: "bcs-preparation",
-    name: "বিসিএস (BCS) প্রস্তুতি [coming soon]",
-    sortOrder: 4,
-    isActive: true,
-    createdAt: "2026-06-04T01:30:28.339Z",
-  },
-  {
-    id: "cmpyudvp30006uxvg3ypt4mnn",
-    icon: "🫰",
-    slug: "11-20-grade-job-preparation",
-    name: "১১ থেকে ২০তম গ্রেডের সরকারি চাকরি প্রস্তুতি",
-    sortOrder: 5,
-    isActive: true,
-    createdAt: "2026-06-04T01:54:14.583Z",
-  },
-];
+import { useEffect, useState } from "react";
 
 const motivationalQuotes = [
   "প্রতিদিন একটু একটু করে এগিয়ে যান — সফলতা আসবেই! 🚀",
@@ -69,7 +23,12 @@ const motivationalQuotes = [
 // TODO: replace with real auth session
 export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth();
+  const [categories, setCategories] = useState<ExamCategory[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    examCategoryService.getAll().then(setCategories).catch(console.error);
+  }, []);
 
   if (!isLoading && !user) {
     router.push("/login");
