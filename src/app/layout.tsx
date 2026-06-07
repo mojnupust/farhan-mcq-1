@@ -15,19 +15,26 @@ const hindSiliguri = Hind_Siliguri({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0d1b2e" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1b2e" },
+  ],
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://farhanmcq.com"), // your actual domain
+  metadataBase: new URL("https://farhanmcq.com"),
 
   icons: {
     icon: [
-      { url: "/farhanmcq-favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/farhanmcq-favicon.svg",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [{ rel: "manifest", url: "/site.webmanifest" }],
   },
 
   title: {
@@ -66,7 +73,7 @@ export const metadata: Metadata = {
     title: "Farhan MCQ — সরকারি চাকরি প্রস্তুতি",
     description:
       "BCS, ব্যাংক ও সরকারি চাকরির Live MCQ অনুশীলন ও লাইভ মডেল টেস্ট।",
-    // images: ["https://yourdomain.com/og-image.jpg"],
+    // images: ["https://farhanmcq.com/og-image.jpg"],
   },
 
   robots: {
