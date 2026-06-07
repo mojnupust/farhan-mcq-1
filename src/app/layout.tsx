@@ -1,3 +1,4 @@
+// app/layout.tsx
 import { RouteProgress } from "@/components/shared/route-progress";
 import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
@@ -23,19 +24,6 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://farhanmcq.com"),
-
-  icons: {
-    icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [{ rel: "manifest", url: "/site.webmanifest" }],
-  },
 
   title: {
     default: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",
@@ -65,7 +53,7 @@ export const metadata: Metadata = {
     title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",
     description:
       "বিষয়ভিত্তিক MCQ, Live পরীক্ষা ও বিগত বছরের প্রশ্ন সমাধান — সব এক জায়গায়।",
-    // images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }], // ✅ og-image বানালে uncomment করো
   },
 
   twitter: {
@@ -73,12 +61,16 @@ export const metadata: Metadata = {
     title: "Farhan MCQ — সরকারি চাকরি প্রস্তুতি",
     description:
       "BCS, ব্যাংক ও সরকারি চাকরির Live MCQ অনুশীলন ও লাইভ মডেল টেস্ট।",
-    // images: ["https://farhanmcq.com/og-image.jpg"],
+    images: ["https://farhanmcq.com/og-image.png"], // ✅ og-image বানালে uncomment করো
   },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -89,6 +81,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn">
+      {/* ✅ <head> ব্লক লাগবে না — Next.js নিজেই সব inject করবে */}
       <body className={`${hindSiliguri.variable} font-hind antialiased`}>
         <Suspense>
           <RouteProgress />
