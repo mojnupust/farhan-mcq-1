@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { ProfileSkeleton } from "@/components/ui/loading-skeleton";
 import { subscriptionService, useSubscription } from "@/features/subscriptions";
 import type { UserProfileDto } from "@/features/subscriptions/types";
-import { User } from "lucide-react";
+import { Send, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -125,19 +125,25 @@ export default function ProfilePage() {
 
       {/* Active Package */}
       {!loading && !subLoading && !activePackage && (
-        <Card className="mt-4 border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950">
-          <CardContent className="py-4">
+        <Card className="mt-4 ">
+          <CardContent className="py-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                কোনো সক্রিয় প্যাকেজ নেই।
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="shrink-0 border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900"
-              >
-                <Link href="/subscriptions">প্যাকেজ কিনুন</Link>
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">⚡</span>
+                <div>
+                  <p className="text-sm font-medium">
+                    কোনো সক্রিয় প্যাকেজ নেই
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    প্যাকেজ কিনে প্রস্তুতি শুরু করুন
+                  </p>
+                </div>
+              </div>
+              <Button size="sm" asChild>
+                <Link href="/subscriptions">
+                  <Send className="size-3.5 mr-1.5" />
+                  প্যাকেজ কিনুন
+                </Link>
               </Button>
             </div>
           </CardContent>
