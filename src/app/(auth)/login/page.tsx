@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,10 +108,9 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="mx-auto w-full max-w-sm">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            MCQ প্ল্যাটফর্ম
-          </h1>
+        <div className="flex flex-col items-center">
+          <BrandMark />
+          <h1 className="text-2xl font-semibold tracking-tight">Farhan MCQ</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             আপনার অ্যাকাউন্টে লগইন করুন
           </p>
