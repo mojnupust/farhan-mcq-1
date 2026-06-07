@@ -23,7 +23,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://farhanmcq.com"),
+  metadataBase: new URL("https://www.farhanmcq.com"),
+  alternates: {
+    canonical: "https://www.farhanmcq.com",
+  },
 
   title: {
     default: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",
