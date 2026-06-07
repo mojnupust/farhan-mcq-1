@@ -2,15 +2,16 @@
 
 import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/features/auth";
 import { StudySection } from "@/features/dashboard/components/study-section";
 import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
+import { useSubscription } from "@/features/subscriptions";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useEffect, useState } from "react";
 
 const motivationalQuotes = [
@@ -20,11 +21,13 @@ const motivationalQuotes = [
   "আপনি পারবেন — শুধু চেষ্টা চালিয়ে যান! 💪",
 ];
 
-// TODO: replace with real auth session
 export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth();
+  const { activePackage, isLoading: subLoading } = useSubscription();
   const [categories, setCategories] = useState<ExamCategory[]>([]);
   const router = useRouter();
+
+  console.log(activePackage, "Active Package");
 
   useEffect(() => {
     examCategoryService.getAll().then(setCategories).catch(console.error);
@@ -56,6 +59,28 @@ export default function DashboardPage() {
           )}
         </div>
       </AnimateIn>
+
+      {/* No Active Package Warning */}
+      {/* Active Package */}
+      {!isLoading && !subLoading && !activePackage && (
+        <Card className="mt-4 border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950">
+          <CardContent className="py-0">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                কোনো সক্রিয় প্যাকেজ নেই।
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="shrink-0 border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900"
+              >
+                <Link href="/subscriptions">প্যাকেজ কিনুন</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Daily Motivation */}
       <AnimateIn variant="fade-up" delay={100} duration={500}>
