@@ -3,6 +3,7 @@
 import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth";
 import { StudySection } from "@/features/dashboard/components/study-section";
 import type { ExamCategory } from "@/features/exam-categories";
@@ -21,16 +22,56 @@ const motivationalQuotes = [
   "আপনি পারবেন — শুধু চেষ্টা চালিয়ে যান! 💪",
 ];
 
+// Skeleton for active package card
+function ActivePackageSkeleton() {
+  return (
+    <Card className="mt-4">
+      <CardContent className="py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <Skeleton className="size-7 rounded-full" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-3.5 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-24 rounded-md" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Skeleton for category grid
+function CategoryGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="rounded-xl border bg-card p-4 space-y-3">
+          <Skeleton className="size-10 rounded-lg" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-3.5 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user, isLoading, isAdmin } = useAuth();
   const { activePackage, isLoading: subLoading } = useSubscription();
   const [categories, setCategories] = useState<ExamCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const router = useRouter();
 
-  console.log(activePackage, "Active Package");
-
   useEffect(() => {
-    examCategoryService.getAll().then(setCategories).catch(console.error);
+    examCategoryService
+      .getAll()
+      .then(setCategories)
+      .catch(console.error)
+      .finally(() => setCategoriesLoading(false));
   }, []);
 
   if (!isLoading && !user) {
@@ -60,9 +101,11 @@ export default function DashboardPage() {
         </div>
       </AnimateIn>
 
-      {/* Active Package */}
-      {!isLoading && !subLoading && !activePackage && (
-        <Card className="mt-4 ">
+      {/* Active Package — skeleton while loading */}
+      {isLoading || subLoading ? (
+        <ActivePackageSkeleton />
+      ) : !activePackage ? (
+        <Card className="mt-4">
           <CardContent className="py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
@@ -85,7 +128,7 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {/* Daily Motivation */}
       <AnimateIn variant="fade-up" delay={100} duration={500}>
@@ -105,7 +148,11 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold tracking-tight mb-4">
             পরীক্ষার ক্যাটাগরি
           </h2>
-          <CategoryGrid categories={categories} />
+          {categoriesLoading ? (
+            <CategoryGridSkeleton />
+          ) : (
+            <CategoryGrid categories={categories} />
+          )}
         </div>
       </AnimateIn>
 

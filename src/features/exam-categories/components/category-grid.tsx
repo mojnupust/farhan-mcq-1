@@ -12,10 +12,12 @@ const bgColors = [
 
 export function CategoryGrid({ categories }: { categories: ExamCategory[] }) {
   return (
-    <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
       {categories.map((category, index) => (
         <Link key={category.id} href={`/exams/${category.slug}`}>
-          <Card className={`group card-hover-lift glow-on-hover icon-bounce-hover cursor-pointer h-full border bg-gradient-to-br ${bgColors[index % bgColors.length]} hover:border-primary/40`}>
+          <Card
+            className={`group card-hover-lift glow-on-hover icon-bounce-hover cursor-pointer h-full border bg-gradient-to-br ${bgColors[index % bgColors.length]} hover:border-primary/40`}
+          >
             <CardHeader className="items-center text-center">
               <span className="icon-target text-4xl transition-transform duration-300 group-hover:scale-110">
                 {category.icon || "📝"}
