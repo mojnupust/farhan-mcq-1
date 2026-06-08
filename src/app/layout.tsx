@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
 
   title: {
-    default: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",
+    default: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
     template: "%s | Farhan MCQ",
   },
 
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "bn_BD",
     siteName: "Farhan MCQ",
-    title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ প্রস্তুতি প্ল্যাটফর্ম",
+    title: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
     description:
       "বিষয়ভিত্তিক MCQ, Live পরীক্ষা ও বিগত বছরের প্রশ্ন সমাধান — সব এক জায়গায়।",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }], // ✅ og-image বানালে uncomment করো
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Farhan MCQ — সরকারি চাকরি প্রস্তুতি",
+    title: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
     description:
       "BCS, ব্যাংক ও সরকারি চাকরির Live MCQ অনুশীলন ও লাইভ মডেল টেস্ট।",
     images: ["https://farhanmcq.com/og-image.png"], // ✅ og-image বানালে uncomment করো

@@ -38,15 +38,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ MCQ প্রস্তুতি প্ল্যাটফর্ম",
+  title: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
   description:
     "BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA সহ সকল সরকারি চাকরির MCQ প্রস্তুতি নিন।",
-  alternates: { canonical: "https://farhanmcq.com" },
+  alternates: { canonical: "https://www.farhanmcq.com" },
   openGraph: {
-    title: "Farhan MCQ — সরকারি চাকরির পূর্ণাঙ্গ MCQ প্রস্তুতি",
+    title: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
     description:
       "BCS, ব্যাংক ও প্রাইমারি শিক্ষক নিয়োগসহ সকল সরকারি চাকরির MCQ অনুশীলন করুন।",
-    url: "https://farhanmcq.com",
+    url: "https://www.farhanmcq.com",
     type: "website",
     locale: "bn_BD",
     siteName: "Farhan MCQ",
@@ -177,7 +177,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Farhan MCQ",
-    url: "https://farhanmcq.com",
+    url: "https://www.farhanmcq.com",
     description: "সরকারি চাকরির MCQ প্রস্তুতি প্ল্যাটফর্ম",
     publisher: {
       "@type": "Organization",
@@ -186,9 +186,9 @@ export default function LandingPage() {
     },
     offers: {
       "@type": "Offer",
-      price: "190",
+      price: "39",
       priceCurrency: "BDT",
-      url: "https://farhanmcq.com/dashboard",
+      url: "https://www.farhanmcq.com/dashboard",
       availability: "https://schema.org/InStock",
     },
   };

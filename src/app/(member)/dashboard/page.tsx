@@ -114,9 +114,6 @@ export default function DashboardPage() {
                   <p className="text-sm font-medium">
                     কোনো সক্রিয় প্যাকেজ নেই
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    প্যাকেজ কিনে প্রস্তুতি শুরু করুন
-                  </p>
                 </div>
               </div>
               <Button size="sm" asChild>
