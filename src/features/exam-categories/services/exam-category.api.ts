@@ -8,10 +8,12 @@ import type {
 import type { ExamCategoryService } from "./exam-category.service";
 
 export const apiExamCategoryService: ExamCategoryService = {
-  async getAll() {
-    const res = await apiClient.get<{ data: ExamCategory[] }>(
-      "/v1/exam-categories",
-    );
+  async getAll(activeOnly?: boolean) {
+    const url =
+      activeOnly === false
+        ? "/v1/exam-categories?activeOnly=false" // ← pass it
+        : "/v1/exam-categories";
+    const res = await apiClient.get<{ data: ExamCategory[] }>(url);
     return res.data;
   },
   async getBySlug(slug: string) {

@@ -41,7 +41,8 @@ const mockCategories: ExamCategory[] = [
 ];
 
 export const mockExamCategoryService: ExamCategoryService = {
-  async getAll() {
+  async getAll(_activeOnly?: boolean) {
+    // ← add param (mock ignores it)
     return mockCategories;
   },
   async getBySlug(slug: string) {

@@ -6,7 +6,7 @@ import type {
 } from "../types";
 
 export interface ExamCategoryService {
-  getAll(): Promise<ExamCategory[]>;
+  getAll(activeOnly?: boolean): Promise<ExamCategory[]>;
   getBySlug(slug: string): Promise<ExamCategory>;
   create(input: CreateExamCategoryInput): Promise<ExamCategory>;
   update(id: string, input: UpdateExamCategoryInput): Promise<ExamCategory>;

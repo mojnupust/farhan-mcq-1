@@ -52,7 +52,7 @@ export default function AdminCategoriesPage() {
 
   const loadCategories = async () => {
     try {
-      const data = await examCategoryService.getAll();
+      const data = await examCategoryService.getAll(false); // ← false পাঠাও
       setCategories(data);
     } catch (err) {
       console.error(err);

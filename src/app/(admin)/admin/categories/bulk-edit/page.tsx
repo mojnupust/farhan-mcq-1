@@ -71,7 +71,7 @@ export default function CategoriesBulkEditPage() {
 
   useEffect(() => {
     examCategoryService
-      .getAll()
+      .getAll(false)
       .then((cats) => {
         setRows(cats.map(categoryToRow));
         originalIds.current = new Set(cats.map((c) => c.id));
