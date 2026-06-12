@@ -3,13 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ContentSkeleton, ListSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  ContentSkeleton,
+  ListSkeleton,
+} from "@/components/ui/loading-skeleton";
 import type { QuestionStats, ReviewQuestion } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import {
@@ -413,7 +416,7 @@ export default function ExamReviewPage({
 
       {/* Explanation Dialog */}
       <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto w-full sm:max-w-lg p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="size-5" />
