@@ -385,7 +385,7 @@ export default function ExamReviewPage({
         {/* Question Palette */}
         <Card className="mt-4">
           <CardContent className="py-4">
-            <div className="grid grid-cols-10 gap-10">
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-x-3 gap-y-2">
               {filteredQuestions.map((q, i) => {
                 const isCurrent = i === currentIndex;
                 let colorClass = "bg-gray-100 text-gray-600";
