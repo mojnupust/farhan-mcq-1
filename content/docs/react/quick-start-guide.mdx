@@ -1,0 +1,1696 @@
+---
+title: React JS Quick Start Guide — বাংলায় সম্পূর্ণ গাইড
+description: React শেখার সম্পূর্ণ বাংলা গাইড — JSX, Component, Props, State, Hooks, Router সহ হাতে-কলমে Student Result Tracker প্রজেক্ট
+---
+
+> 🎯 **লক্ষ্য:** এই একটি টিউটোরিয়াল পড়লে React-এর ৮০%+ প্র্যাকটিক্যাল কনসেপ্ট ক্লিয়ার হয়ে যাবে — এবং তুমি নিজে একটি পূর্ণাঙ্গ অ্যাপ বানাতে পারবে।
+
+এই লেখাটি যদি মন দিয়ে পড়েন এবং প্রতিটি কোড নিজে টাইপ করেন, আমি নিশ্চিত আপনি _**React-এর জরুরি ধারণাগুলো আত্মস্থ করতে পারবেন**_ — এবং সেটা প্রতিদিনের কোডিংয়ে কাজে লাগবে।
+
+---
+
+## 🗂️ এই টিউটোরিয়ালে যা যা পাবেন
+
+- **Vite** দিয়ে React প্রজেক্ট শুরু, ফাইল/ফোল্ডার স্ট্রাকচার
+- **JSX** — HTML-like syntax কীভাবে JavaScript-এ কাজ করে
+- **Component** — UI কে ছোট ছোট পুনর্ব্যবহারযোগ্য ব্লকে ভাগ করা
+- **Props** — Parent থেকে Child-এ ডাটা পাঠানো
+- **State (useState)** — UI-কে ডায়নামিক করা
+- **Events** — ইউজারের ইন্টারঅ্যাকশন ধরা
+- **List & Keys** — অ্যারে থেকে UI রেন্ডার করা
+- **Conditional Rendering** — শর্ত অনুযায়ী UI দেখানো বা লুকানো
+- **Forms** — Controlled Input দিয়ে ডাটা নেওয়া
+- **useEffect** — API কল, DOM manipulation ও cleanup
+- **Lifting State Up & Context API** — Component-এর মধ্যে ডাটা শেয়ার
+- **React Router** — মাল্টিপেজ Navigation
+- **Custom Hook** — Reusable logic আলাদা করা
+- **Performance** — memo, useMemo, useCallback
+- **Build & Deploy** — Vercel-এ live করা
+
+---
+
+## 📌 সারা টিউটোরিয়ালের কমন প্রজেক্ট: **Student Result Tracker**
+
+আমরা সারা টিউটোরিয়াল জুড়ে একটি সিঙ্গেল প্রজেক্ট বানাবো — **Student Result Tracker**।
+
+এই অ্যাপে থাকবে:
+- ছাত্রের নাম, রোল নম্বর, বিষয়ভিত্তিক নম্বর
+- স্বয়ংক্রিয় গ্রেড ক্যালকুলেশন (A+, A, B, C, D, F)
+- নতুন ছাত্র যোগ করা এবং মুছে ফেলা
+- গ্রেড অনুযায়ী ফিল্টার করা
+- API থেকে ছাত্রের ডাটা লোড করা
+
+প্রতিটি কনসেপ্ট শেখার সাথে সাথে এই প্রজেক্টে সেটা যোগ হবে। শেষে তোমার কাছে একটি পূর্ণাঙ্গ কার্যকর অ্যাপ থাকবে।
+
+---
+
+## সূচিপত্র
+
+1. [React কী এবং কেন?](#react-কী-এবং-কেন)
+2. [প্রি-রেকুইজিট ও Environment Setup](#প্রি-রেকুইজিট-ও-environment-setup)
+3. [Vite দিয়ে প্রজেক্ট তৈরি](#vite-দিয়ে-প্রজেক্ট-তৈরি)
+4. [প্রজেক্ট ফোল্ডার স্ট্রাকচার](#প্রজেক্ট-ফোল্ডার-স্ট্রাকচার)
+5. [JSX — JavaScript-এর ভেতরে HTML](#jsx--javascriptএর-ভেতরে-html)
+6. [Component — UI-এর ছোট ব্লক](#component--uiএর-ছোট-ব্লক)
+7. [Props — Parent থেকে Child-এ ডাটা](#props--parent-থেকে-childএ-ডাটা)
+8. [State ও useState — UI জীবন্ত করা](#state-ও-usestate--ui-জীবন্ত-করা)
+9. [Events — ইউজারের ইন্টারঅ্যাকশন](#events--ইউজারের-ইন্টারঅ্যাকশন)
+10. [List ও Keys — অ্যারে থেকে UI](#list-ও-keys--অ্যারে-থেকে-ui)
+11. [Conditional Rendering](#conditional-rendering)
+12. [Forms ও Controlled Components](#forms-ও-controlled-components)
+13. [useEffect — Side Effects ও API Call](#useeffect--side-effects-ও-api-call)
+14. [Lifting State Up ও Context API](#lifting-state-up-ও-context-api)
+15. [React Router — Multipage Navigation](#react-router--multipage-navigation)
+16. [Custom Hook — Reusable Logic](#custom-hook--reusable-logic)
+17. [Performance Optimization](#performance-optimization)
+18. [Build ও Deployment](#build-ও-deployment)
+19. [প্রজেক্ট আইডিয়া ও পরবর্তী ধাপ](#প্রজেক্ট-আইডিয়া-ও-পরবর্তী-ধাপ)
+
+---
+
+## 1. React কী এবং কেন?
+
+**React** হলো Facebook (Meta)-এর তৈরি একটি **JavaScript UI Library**। এটা দিয়ে আমরা ওয়েব অ্যাপ্লিকেশনের **User Interface (UI)** বানাই।
+
+### React কেন ব্যবহার করবো?
+
+ধরো তুমি একটি পুরনো পদ্ধতিতে (Plain JavaScript + DOM Manipulation) একটি লিস্ট বানালে — ছাত্র যোগ করলে, মুছলে, আপডেট করলে প্রতিবার পুরো DOM রিফ্রেশ করতে হয়। এটা **ধীর** এবং **ত্রুটিপ্রবণ**।
+
+React-এ **Virtual DOM** আছে। React প্রথমে মেমোরিতে একটি Virtual DOM তৈরি করে, তারপর আসল DOM-এর সাথে তুলনা করে (**Diffing**) — শুধু যা পরিবর্তন হয়েছে সেটুকুই আপডেট করে (**Reconciliation**)। এতে পারফরম্যান্স অনেক ভালো।
+
+### React-এর মূল মানসিকতা (Mental Model)
+
+```
+UI = f(state)
+```
+
+অর্থাৎ — **UI হলো state-এর একটি ফাংশন।** State পরিবর্তন হলে UI স্বয়ংক্রিয়ভাবে আপডেট হয়। তোমাকে DOM manually আপডেট করতে হবে না।
+
+---
+
+## 2. প্রি-রেকুইজিট ও Environment Setup
+
+### যা জানা থাকতে হবে
+
+| টপিক | কী কী লাগবে |
+|------|------------|
+| **HTML** | Tags, Attributes, Forms |
+| **CSS** | Selectors, Box Model, Flexbox |
+| **JavaScript (ES6+)** | `let/const`, Arrow Functions, Template Literals, Destructuring, Spread Operator, Array Methods (`map`, `filter`, `reduce`), Modules (`import/export`), Promises, `async/await` |
+
+> ⚠️ JavaScript ES6+ না জেনে React শেখা কঠিন। আগে JavaScript ভালো করে শিখে আসো।
+
+### সফটওয়্যার ইনস্টল করো
+
+1. **Node.js** (v18 বা তার উপরে) — [nodejs.org](https://nodejs.org) থেকে LTS ভার্সন নামাও
+2. **VS Code** — [code.visualstudio.com](https://code.visualstudio.com)
+3. **VS Code Extensions:**
+   - **ES7+ React/Redux/React-Native snippets** — shortcut দিয়ে কোড লেখো
+   - **Prettier** — কোড ফরম্যাট করো
+   - **Auto Rename Tag** — JSX tag rename সহজ করে
+
+Terminal খুলে চেক করো:
+
+```bash
+node -v    # v18.x.x বা তার উপরে দেখাবে
+npm -v     # 9.x.x বা তার উপরে দেখাবে
+```
+
+---
+
+## 3. Vite দিয়ে প্রজেক্ট তৈরি
+
+### Vite কেন?
+
+পুরনো `create-react-app` অনেক ধীর। **Vite** আধুনিক JavaScript Bundler যা:
+- **esbuild** ব্যবহার করে — ১০০x দ্রুত ট্রান্সপাইল করে
+- **Hot Module Replacement (HMR)** — কোড সেভ করলেই browser আপডেট হয়, page refresh ছাড়াই
+- Production build-এ **Rollup** ব্যবহার করে — optimized output
+
+### প্রজেক্ট তৈরি
+
+```bash
+# Vite দিয়ে React প্রজেক্ট তৈরি
+npm create vite@latest student-result-tracker -- --template react
+
+# প্রজেক্ট ফোল্ডারে যাও
+cd student-result-tracker
+
+# Dependencies ইনস্টল করো
+npm install
+
+# Development server চালু করো
+npm run dev
+```
+
+Browser-এ `http://localhost:5173` খোলো — React অ্যাপ দেখবে।
+
+### Tailwind CSS সেটআপ
+
+আমরা styling-এর জন্য **Tailwind CSS** ব্যবহার করবো — এটি utility-first CSS framework। প্রতিটি class একটি specific CSS property control করে।
+
+```bash
+npm install tailwindcss @tailwindcss/vite
+```
+
+**`vite.config.js`** আপডেট করো:
+
+```js
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+```
+
+**`src/index.css`** এ Tailwind import করো:
+
+```css
+@import "tailwindcss";
+```
+
+---
+
+## 4. প্রজেক্ট ফোল্ডার স্ট্রাকচার
+
+**Scaffolding** মানে হলো — প্রজেক্ট শুরুর আগেই একটি সুসংগঠিত ফোল্ডার কাঠামো তৈরি করা যাতে পরে কোড কোথায় রাখবে বুঝতে সুবিধা হয়।
+
+আমাদের **Student Result Tracker** প্রজেক্টের জন্য:
+
+```
+student-result-tracker/
+  ├─ index.html
+  ├─ vite.config.js
+  ├─ package.json
+  └─ src/
+      ├─ main.jsx              ← Entry point: ReactDOM.createRoot এখানে
+      ├─ App.jsx               ← Root component
+      ├─ index.css             ← Global styles + Tailwind
+      │
+      ├─ data/
+      │   └─ students.js       ← Static/mock ডাটা
+      │
+      ├─ components/
+      │   ├─ Header.jsx        ← App header
+      │   ├─ Summary.jsx       ← মোট ছাত্র, গড় মার্কস
+      │   ├─ StudentList.jsx   ← ছাত্রের লিস্ট
+      │   ├─ StudentCard.jsx   ← একজন ছাত্রের কার্ড
+      │   ├─ AddStudentForm.jsx← নতুন ছাত্র যোগ করার ফর্ম
+      │   └─ GradeFilter.jsx   ← গ্রেড ফিল্টার বাটন
+      │
+      ├─ hooks/
+      │   └─ useFetch.js       ← Custom hook: API থেকে ডাটা লোড
+      │
+      └─ context/
+          └─ StudentContext.jsx ← Context API
+```
+
+### এই স্ট্রাকচারের নিয়ম
+
+- **`components/`** — প্রতিটি UI component আলাদা ফাইলে
+- **`data/`** — Static ডাটা বা mock API response
+- **`hooks/`** — Custom React hooks
+- **`context/`** — Global state management
+
+### আমাদের Data Structure
+
+```js
+// src/data/students.js
+export const students = [
+  {
+    id: 1,
+    name: "রাহেলা আক্তার",
+    roll: "2024001",
+    bangla: 85,
+    english: 72,
+    math: 90,
+    science: 88,
+    socialScience: 76,
+  },
+  {
+    id: 2,
+    name: "তানভীর হোসেন",
+    roll: "2024002",
+    bangla: 60,
+    english: 55,
+    math: 70,
+    science: 65,
+    socialScience: 58,
+  },
+  {
+    id: 3,
+    name: "সুমাইয়া বেগম",
+    roll: "2024003",
+    bangla: 95,
+    english: 92,
+    math: 98,
+    science: 96,
+    socialScience: 94,
+  },
+  {
+    id: 4,
+    name: "মাহমুদুল হাসান",
+    roll: "2024004",
+    bangla: 40,
+    english: 35,
+    math: 45,
+    science: 38,
+    socialScience: 42,
+  },
+];
+```
+
+> **💡 Single Source of Truth:** সব ডাটা এক জায়গায় রাখলে — ডাটা consistent থাকে, bug কম হয়, maintain করা সহজ।
+
+---
+
+## 5. JSX — JavaScript-এর ভেতরে HTML
+
+**JSX (JavaScript XML)** হলো JavaScript-এর একটি **syntax extension** — এটা দেখতে HTML-এর মতো কিন্তু আসলে JavaScript। Browser সরাসরি JSX বোঝে না — Vite/Babel এটাকে pure JavaScript-এ রূপান্তরিত করে।
+
+### JSX আসলে কী করে?
+
+```jsx
+// তুমি লিখো:
+const element = <h1 className="title">হ্যালো, React!</h1>;
+
+// Babel রূপান্তরিত করে:
+const element = React.createElement("h1", { className: "title" }, "হ্যালো, React!");
+```
+
+দেখো — JSX মূলত `React.createElement()` এর syntactic sugar।
+
+### JSX-এর নিয়মাবলি
+
+**নিয়ম ১ — একটি Root Element থাকতে হবে:**
+
+```jsx
+// ❌ ভুল — দুটো sibling element
+return (
+  <h1>শিরোনাম</h1>
+  <p>প্যারাগ্রাফ</p>
+);
+
+// ✅ সঠিক — একটি wrapper div বা Fragment
+return (
+  <div>
+    <h1>শিরোনাম</h1>
+    <p>প্যারাগ্রাফ</p>
+  </div>
+);
+
+// ✅ আরও ভালো — Fragment (extra div যোগ হয় না DOM-এ)
+return (
+  <>
+    <h1>শিরোনাম</h1>
+    <p>প্যারাগ্রাফ</p>
+  </>
+);
+```
+
+**নিয়ম ২ — `class` নয়, `className` লিখতে হবে:**
+
+```jsx
+// ❌ ভুল
+<div class="container">...</div>
+
+// ✅ সঠিক (কারণ 'class' JavaScript-এ reserved keyword)
+<div className="container">...</div>
+```
+
+**নিয়ম ৩ — JavaScript Expression `{}` দিয়ে:**
+
+```jsx
+const studentName = "রাহেলা আক্তার";
+const marks = 85;
+
+return (
+  <div>
+    <h2>{studentName}</h2>
+    <p>মার্কস: {marks}</p>
+    <p>পাস/ফেল: {marks >= 33 ? "পাস ✅" : "ফেল ❌"}</p>
+    <p>গ্রেড: {marks >= 80 ? "A+" : "A"}</p>
+  </div>
+);
+```
+
+> `{}` এর ভেতরে **expression** লেখা যায় কিন্তু **statement** (যেমন `if`, `for`) নয়।
+
+**নিয়ম ৪ — Self-closing Tags:**
+
+```jsx
+// ❌ HTML-তে এটা চলে, JSX-এ না
+<input type="text">
+<br>
+<img src="photo.jpg">
+
+// ✅ JSX-এ সবসময় close করতে হবে
+<input type="text" />
+<br />
+<img src="photo.jpg" />
+```
+
+### আমাদের প্রজেক্ট: `Summary.jsx`
+
+```jsx
+// src/components/Summary.jsx
+
+export default function Summary({ totalStudents, averageMarks }) {
+  return (
+    <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-lg shadow">
+      <div className="text-center p-4 bg-blue-50 rounded-lg">
+        <p className="text-sm text-gray-500">মোট ছাত্র-ছাত্রী</p>
+        <p className="text-3xl font-bold text-blue-600">{totalStudents}</p>
+      </div>
+      <div className="text-center p-4 bg-green-50 rounded-lg">
+        <p className="text-sm text-gray-500">গড় নম্বর</p>
+        <p className="text-3xl font-bold text-green-600">
+          {averageMarks.toFixed(1)}
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 6. Component — UI-এর ছোট ছোট ব্লক
+
+**Component** হলো React-এর সবচেয়ে মূল ধারণা। প্রতিটি Component হলো একটি **পুনর্ব্যবহারযোগ্য (reusable) UI ব্লক** — যেটা নিজের data (state) রাখতে পারে এবং বাইরে থেকে data (props) নিতে পারে।
+
+### Functional Component
+
+আজকের React-এ শুধু **Functional Component** ব্যবহার করা হয়। এটি একটি সাধারণ JavaScript function যা JSX return করে।
+
+```jsx
+// একটি সরল Functional Component
+function Greeting() {
+  return <h1>স্বাগতম, React জগতে! 🎉</h1>;
+}
+
+export default Greeting;
+```
+
+**কনভেনশন:**
+- Component-এর নাম সবসময় **PascalCase** (বড় হাতের প্রথম অক্ষর) — যেমন `StudentCard`, `GradeFilter`
+- ফাইলের নামও Component-এর নামের মতো হবে — `StudentCard.jsx`
+
+### Component Tree (কম্পোনেন্ট গাছ)
+
+আমাদের অ্যাপের Component tree এভাবে:
+
+```
+App
+├── Header
+├── Summary
+├── GradeFilter
+├── AddStudentForm
+└── StudentList
+    └── StudentCard (একাধিক)
+```
+
+Parent component তার child-কে data দেয় **props** দিয়ে।
+
+### আমাদের `App.jsx`
+
+```jsx
+// src/App.jsx
+import Header from "./components/Header";
+import Summary from "./components/Summary";
+import GradeFilter from "./components/GradeFilter";
+import AddStudentForm from "./components/AddStudentForm";
+import StudentList from "./components/StudentList";
+import { students as initialStudents } from "./data/students";
+
+function getAverage(marks) {
+  return marks.reduce((sum, m) => sum + m, 0) / marks.length;
+}
+
+export default function App() {
+  const allMarks = initialStudents.map((s) =>
+    getAverage([s.bangla, s.english, s.math, s.science, s.socialScience])
+  );
+  const overallAverage =
+    allMarks.reduce((sum, m) => sum + m, 0) / allMarks.length;
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header />
+      <main className="max-w-4xl mx-auto p-4 flex flex-col gap-6">
+        <Summary
+          totalStudents={initialStudents.length}
+          averageMarks={overallAverage}
+        />
+        <StudentList students={initialStudents} />
+      </main>
+    </div>
+  );
+}
+```
+
+### Class Component (ঐতিহাসিক জ্ঞান)
+
+React-এর পুরনো ভার্সনে **Class Component** ব্যবহার হতো। এখন প্রায় আর দেখা যায় না, তবে পুরনো কোড বুঝতে কাজে আসে।
+
+```jsx
+import { Component } from "react";
+
+export default class Header extends Component {
+  render() {
+    return (
+      <header className="bg-blue-700 text-white p-4">
+        <h1>Student Result Tracker</h1>
+      </header>
+    );
+  }
+}
+```
+
+**Class vs Functional:**
+
+| বিষয় | Class Component | Functional Component |
+|------|----------------|---------------------|
+| Syntax | `class Foo extends Component` | `function Foo()` |
+| State | `this.state` | `useState` Hook |
+| Lifecycle | `componentDidMount` ইত্যাদি | `useEffect` Hook |
+| জনপ্রিয়তা | পুরনো, কমে আসছে | আধুনিক, সবাই ব্যবহার করে |
+
+> ✅ **সিদ্ধান্ত:** সবসময় **Functional Component** লিখো।
+
+---
+
+## 7. Props — Parent থেকে Child-এ ডাটা
+
+**Props (Properties)** হলো Component-এ বাইরে থেকে data পাঠানোর উপায়। Props **read-only** — child component props পরিবর্তন করতে পারে না।
+
+### Props কীভাবে কাজ করে?
+
+```jsx
+// Parent Component (App.jsx) থেকে props পাঠানো হচ্ছে
+<StudentCard
+  name="রাহেলা আক্তার"
+  roll="2024001"
+  averageMarks={86.2}
+/>
+
+// Child Component (StudentCard.jsx) props গ্রহণ করছে
+function StudentCard({ name, roll, averageMarks }) {
+  return (
+    <div>
+      <h3>{name}</h3>
+      <p>রোল: {roll}</p>
+      <p>গড়: {averageMarks}</p>
+    </div>
+  );
+}
+```
+
+### Destructuring Props
+
+```jsx
+// ❌ পুরনো উপায় — verbose
+function StudentCard(props) {
+  return <h3>{props.name}</h3>;
+}
+
+// ✅ আধুনিক উপায় — Destructuring
+function StudentCard({ name, roll, averageMarks }) {
+  return <h3>{name}</h3>;
+}
+```
+
+### Default Props
+
+যদি props না পাঠানো হয়, তাহলে default মান ব্যবহার করা যায়:
+
+```jsx
+function StudentCard({ name = "অজানা ছাত্র", averageMarks = 0 }) {
+  return (
+    <div>
+      <h3>{name}</h3>
+      <p>গড়: {averageMarks}</p>
+    </div>
+  );
+}
+```
+
+### আমাদের `StudentCard.jsx`
+
+```jsx
+// src/components/StudentCard.jsx
+
+function getGrade(average) {
+  if (average >= 80) return { grade: "A+", color: "bg-green-100 text-green-800" };
+  if (average >= 70) return { grade: "A", color: "bg-blue-100 text-blue-800" };
+  if (average >= 60) return { grade: "B", color: "bg-yellow-100 text-yellow-800" };
+  if (average >= 50) return { grade: "C", color: "bg-orange-100 text-orange-800" };
+  if (average >= 33) return { grade: "D", color: "bg-red-100 text-red-800" };
+  return { grade: "F", color: "bg-gray-100 text-gray-800" };
+}
+
+export default function StudentCard({ student }) {
+  const { name, roll, bangla, english, math, science, socialScience } = student;
+
+  const average = (bangla + english + math + science + socialScience) / 5;
+  const { grade, color } = getGrade(average);
+
+  return (
+    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <h3 className="font-semibold text-lg text-gray-800">{name}</h3>
+          <p className="text-sm text-gray-500">রোল: {roll}</p>
+        </div>
+        <span className={`px-3 py-1 rounded-full text-sm font-bold ${color}`}>
+          {grade}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2 text-center text-sm">
+        {[
+          { subject: "বাংলা", marks: bangla },
+          { subject: "ইংরেজি", marks: english },
+          { subject: "গণিত", marks: math },
+          { subject: "বিজ্ঞান", marks: science },
+          { subject: "সামাজিক বিজ্ঞান", marks: socialScience },
+        ].map(({ subject, marks }) => (
+          <div key={subject} className="bg-gray-50 rounded p-1">
+            <p className="text-gray-400 text-xs">{subject}</p>
+            <p className="font-semibold">{marks}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 text-right">
+        <span className="text-gray-600 text-sm">
+          গড় নম্বর:{" "}
+          <strong className="text-blue-600">{average.toFixed(1)}</strong>
+        </span>
+      </div>
+    </div>
+  );
+}
+```
+
+### `StudentList.jsx`
+
+```jsx
+// src/components/StudentList.jsx
+import StudentCard from "./StudentCard";
+
+export default function StudentList({ students }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-xl font-bold text-gray-700">
+        ছাত্র-ছাত্রীর তালিকা ({students.length} জন)
+      </h2>
+      {students.map((student) => (
+        <StudentCard key={student.id} student={student} />
+      ))}
+    </div>
+  );
+}
+```
+
+> **💡 Props একমুখী (Unidirectional):** React-এ data সবসময় Parent → Child দিকে যায়। Child কখনো সরাসরি Parent-এর data পরিবর্তন করতে পারে না।
+
+---
+
+## 8. State ও useState — UI জীবন্ত করা
+
+**State** হলো Component-এর নিজস্ব **মনে রাখার ক্ষমতা**। State পরিবর্তন হলে React স্বয়ংক্রিয়ভাবে UI re-render করে।
+
+### useState Hook
+
+```jsx
+import { useState } from "react";
+
+function Counter() {
+  // Syntax: const [stateValue, setterFunction] = useState(initialValue);
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>কাউন্ট: {count}</p>
+      <button onClick={() => setCount(count + 1)}>বাড়াও ▲</button>
+      <button onClick={() => setCount(count - 1)}>কমাও ▼</button>
+      <button onClick={() => setCount(0)}>রিসেট</button>
+    </div>
+  );
+}
+```
+
+### State-এর গুরুত্বপূর্ণ নিয়মাবলি
+
+**নিয়ম ১ — State directly mutate করবে না:**
+
+```jsx
+// ❌ ভুল — React জানবে না state পরিবর্তন হয়েছে
+const [students, setStudents] = useState([...]);
+students.push(newStudent); // re-render হবে না!
+
+// ✅ সঠিক — নতুন array তৈরি করো
+setStudents([...students, newStudent]); // re-render হবে
+```
+
+**নিয়ম ২ — পুরনো state-এর উপর নির্ভর করলে functional update ব্যবহার করো:**
+
+```jsx
+// ❌ সম্ভাব্য সমস্যা (stale closure)
+setCount(count + 1);
+
+// ✅ নিরাপদ (functional update)
+setCount((prevCount) => prevCount + 1);
+```
+
+**নিয়ম ৩ — Object বা Array state আপডেটে spread operator ব্যবহার করো:**
+
+```jsx
+const [student, setStudent] = useState({ name: "রাহেলা", marks: 85 });
+
+// ❌ ভুল — পুরো object replace হয়
+setStudent({ marks: 90 }); // name হারিয়ে যাবে!
+
+// ✅ সঠিক — spread করে নতুন object তৈরি
+setStudent({ ...student, marks: 90 });
+```
+
+### আমাদের প্রজেক্টে State যোগ করা
+
+এখন `App.jsx` আপডেট করো যাতে ছাত্রের তালিকা state-এ রাখা যায় এবং নতুন ছাত্র যোগ করা যায়:
+
+```jsx
+// src/App.jsx (updated)
+import { useState } from "react";
+import Header from "./components/Header";
+import Summary from "./components/Summary";
+import AddStudentForm from "./components/AddStudentForm";
+import StudentList from "./components/StudentList";
+import GradeFilter from "./components/GradeFilter";
+import { students as initialStudents } from "./data/students";
+
+function getAverage(s) {
+  return (s.bangla + s.english + s.math + s.science + s.socialScience) / 5;
+}
+
+export default function App() {
+  const [students, setStudents] = useState(initialStudents);
+  const [filterGrade, setFilterGrade] = useState("all");
+
+  // গড় নম্বর হিসাব
+  const overallAverage =
+    students.length > 0
+      ? students.reduce((sum, s) => sum + getAverage(s), 0) / students.length
+      : 0;
+
+  // নতুন ছাত্র যোগ করা
+  function handleAddStudent(newStudent) {
+    setStudents([...students, { ...newStudent, id: Date.now() }]);
+  }
+
+  // ছাত্র মুছে ফেলা
+  function handleDeleteStudent(id) {
+    setStudents(students.filter((s) => s.id !== id));
+  }
+
+  // গ্রেড অনুযায়ী ফিল্টার
+  function getGrade(avg) {
+    if (avg >= 80) return "A+";
+    if (avg >= 70) return "A";
+    if (avg >= 60) return "B";
+    if (avg >= 50) return "C";
+    if (avg >= 33) return "D";
+    return "F";
+  }
+
+  const filteredStudents =
+    filterGrade === "all"
+      ? students
+      : students.filter((s) => getGrade(getAverage(s)) === filterGrade);
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header />
+      <main className="max-w-4xl mx-auto p-4 flex flex-col gap-6">
+        <Summary
+          totalStudents={students.length}
+          averageMarks={overallAverage}
+        />
+        <GradeFilter
+          selectedGrade={filterGrade}
+          onSelectGrade={setFilterGrade}
+        />
+        <AddStudentForm onAddStudent={handleAddStudent} />
+        <StudentList
+          students={filteredStudents}
+          onDeleteStudent={handleDeleteStudent}
+        />
+      </main>
+    </div>
+  );
+}
+```
+
+---
+
+## 9. Events — ইউজারের ইন্টারঅ্যাকশন
+
+React-এ event handlers হলো সেই functions যা ইউজার কিছু করলে (click, type, submit) কল হয়।
+
+### Event Handler-এর নিয়ম
+
+```jsx
+function MyButton() {
+  function handleClick() {
+    alert("বাটনে ক্লিক হয়েছে!");
+  }
+
+  // ✅ সঠিক — function reference পাস করা হচ্ছে
+  return <button onClick={handleClick}>ক্লিক করো</button>;
+
+  // ❌ ভুল — render-এর সময়ই function call হয়ে যাবে!
+  return <button onClick={handleClick()}>ক্লিক করো</button>;
+}
+```
+
+### Event Object
+
+প্রতিটি event handler একটি **SyntheticEvent** object পায়:
+
+```jsx
+function handleChange(event) {
+  console.log(event.target.value); // input-এ যা টাইপ হচ্ছে
+  console.log(event.target.name);  // input-এর name attribute
+}
+
+<input onChange={handleChange} />
+```
+
+### আমাদের `StudentCard.jsx` এ Delete বাটন
+
+```jsx
+// Delete বাটন যোগ করা StudentCard-এ
+export default function StudentCard({ student, onDelete }) {
+  const { id, name, roll } = student;
+
+  return (
+    <div className="bg-white rounded-lg shadow p-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="font-semibold">{name}</h3>
+          <p className="text-sm text-gray-500">রোল: {roll}</p>
+        </div>
+        <button
+          onClick={() => onDelete(id)}
+          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition"
+        >
+          মুছে ফেলো 🗑️
+        </button>
+      </div>
+      {/* বাকি কোড... */}
+    </div>
+  );
+}
+```
+
+> **💡 Event Delegation:** React সব events root-এ capture করে, প্রতিটি element-এ আলাদাভাবে নয়। এটা performance-এর জন্য ভালো।
+
+---
+
+## 10. List ও Keys — অ্যারে থেকে UI
+
+React-এ array-এর প্রতিটি item থেকে UI তৈরি করতে JavaScript-এর `Array.map()` ব্যবহার করা হয়।
+
+### `key` কেন দরকার?
+
+React যখন একটি list render করে, প্রতিটি item-কে **unique key** দিয়ে identify করে। State পরিবর্তন হলে React শুধু সেই item-ই আপডেট করে যার data বদলেছে — পুরো list নয়। এটাই **Reconciliation** এর মূল নীতি।
+
+```jsx
+// ❌ key নেই — React সঠিকভাবে track করতে পারবে না
+{students.map((s) => <StudentCard student={s} />)}
+
+// ❌ index key — list reorder হলে সমস্যা
+{students.map((s, index) => <StudentCard key={index} student={s} />)}
+
+// ✅ unique id key — সবচেয়ে ভালো
+{students.map((s) => <StudentCard key={s.id} student={s} />)}
+```
+
+> **⚠️ সতর্কতা:** Array index-কে key হিসেবে ব্যবহার করবে না যদি list-এর items add/remove/reorder হতে পারে। এতে subtle bugs হয়।
+
+### আমাদের `GradeFilter.jsx`
+
+```jsx
+// src/components/GradeFilter.jsx
+const GRADES = ["all", "A+", "A", "B", "C", "D", "F"];
+
+const GRADE_LABELS = {
+  all: "সব দেখাও",
+  "A+": "A+ (৮০+)",
+  A: "A (৭০-৭৯)",
+  B: "B (৬০-৬৯)",
+  C: "C (৫০-৫৯)",
+  D: "D (৩৩-৪৯)",
+  F: "F (ফেল)",
+};
+
+export default function GradeFilter({ selectedGrade, onSelectGrade }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {GRADES.map((grade) => (
+        <button
+          key={grade}
+          onClick={() => onSelectGrade(grade)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+            selectedGrade === grade
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700 border hover:bg-blue-50"
+          }`}
+        >
+          {GRADE_LABELS[grade]}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 11. Conditional Rendering
+
+React-এ শর্ত অনুযায়ী UI দেখানো বা না দেখানোর জন্য বিভিন্ন পদ্ধতি আছে।
+
+### পদ্ধতি ১ — Ternary Operator
+
+```jsx
+// condition ? trueUI : falseUI
+{students.length > 0 ? (
+  <StudentList students={students} />
+) : (
+  <p className="text-center text-gray-400 py-10">কোনো ছাত্র নেই 😕</p>
+)}
+```
+
+### পদ্ধতি ২ — Short-circuit (`&&`)
+
+```jsx
+// condition && UI (condition false হলে কিছু দেখাবে না)
+{isLoading && <p>লোড হচ্ছে...</p>}
+{error && <p className="text-red-500">Error: {error}</p>}
+```
+
+> **⚠️ সতর্কতা:** `0 && <Component />` লিখলে `0` render হবে। তাই `!!length && <Component />` অথবা `length > 0 && <Component />` লিখো।
+
+### পদ্ধতি ৩ — Early Return
+
+```jsx
+function StudentList({ students }) {
+  // Early return — empty state আলাদা render করো
+  if (students.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-4xl mb-2">📭</p>
+        <p className="text-gray-500">এই গ্রেডে কোনো ছাত্র নেই।</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {students.map((s) => <StudentCard key={s.id} student={s} />)}
+    </div>
+  );
+}
+```
+
+### আমাদের প্রজেক্টে Grade Badge
+
+```jsx
+function GradeBadge({ average }) {
+  if (average >= 80) return <span className="badge-green">A+ 🌟</span>;
+  if (average >= 70) return <span className="badge-blue">A</span>;
+  if (average >= 60) return <span className="badge-yellow">B</span>;
+  if (average >= 50) return <span className="badge-orange">C</span>;
+  if (average >= 33) return <span className="badge-red">D</span>;
+  return <span className="badge-gray">F ❌</span>;
+}
+```
+
+---
+
+## 12. Forms ও Controlled Components
+
+React-এ form handling-এর সবচেয়ে নির্ভরযোগ্য পদ্ধতি হলো **Controlled Component** — যেখানে form-এর প্রতিটি input-এর value React state-এ রাখা হয়।
+
+### Controlled vs Uncontrolled
+
+| | Controlled | Uncontrolled |
+|--|------------|--------------|
+| Data রাখে | React state | DOM |
+| Access | `state` value দিয়ে | `ref` দিয়ে |
+| Validation | সহজ, real-time | কঠিন |
+| **ব্যবহার করো** | ✅ সবসময় | শুধু বিশেষ ক্ষেত্রে |
+
+### আমাদের `AddStudentForm.jsx`
+
+```jsx
+// src/components/AddStudentForm.jsx
+import { useState } from "react";
+
+const initialFormData = {
+  name: "",
+  roll: "",
+  bangla: "",
+  english: "",
+  math: "",
+  science: "",
+  socialScience: "",
+};
+
+export default function AddStudentForm({ onAddStudent }) {
+  const [formData, setFormData] = useState(initialFormData);
+  const [errors, setErrors] = useState({});
+  const [isOpen, setIsOpen] = useState(false);
+
+  // একটিমাত্র handler দিয়ে সব input পরিচালনা
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // টাইপ করার সাথে সাথে error সরিয়ে দাও
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  }
+
+  function validate() {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "নাম দিতে হবে";
+    if (!formData.roll.trim()) newErrors.roll = "রোল নম্বর দিতে হবে";
+
+    const markFields = ["bangla", "english", "math", "science", "socialScience"];
+    markFields.forEach((field) => {
+      const val = Number(formData[field]);
+      if (formData[field] === "") {
+        newErrors[field] = "নম্বর দিতে হবে";
+      } else if (isNaN(val) || val < 0 || val > 100) {
+        newErrors[field] = "০ থেকে ১০০ এর মধ্যে হতে হবে";
+      }
+    });
+    return newErrors;
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault(); // page reload বন্ধ করো
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    onAddStudent({
+      ...formData,
+      bangla: Number(formData.bangla),
+      english: Number(formData.english),
+      math: Number(formData.math),
+      science: Number(formData.science),
+      socialScience: Number(formData.socialScience),
+    });
+
+    setFormData(initialFormData); // form reset
+    setIsOpen(false);
+  }
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+      >
+        + নতুন ছাত্র যোগ করুন
+      </button>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-lg shadow p-6 flex flex-col gap-4"
+    >
+      <h2 className="text-lg font-bold text-gray-800">নতুন ছাত্র যোগ করুন</h2>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            পুরো নাম *
+          </label>
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="যেমন: রাহেলা আক্তার"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            রোল নম্বর *
+          </label>
+          <input
+            name="roll"
+            value={formData.roll}
+            onChange={handleChange}
+            placeholder="যেমন: 2024005"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {errors.roll && (
+            <p className="text-red-500 text-xs mt-1">{errors.roll}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2">
+        {[
+          { name: "bangla", label: "বাংলা" },
+          { name: "english", label: "ইংরেজি" },
+          { name: "math", label: "গণিত" },
+          { name: "science", label: "বিজ্ঞান" },
+          { name: "socialScience", label: "সামা. বিজ্ঞান" },
+        ].map(({ name, label }) => (
+          <div key={name}>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              {label}
+            </label>
+            <input
+              type="number"
+              name={name}
+              value={formData[name]}
+              onChange={handleChange}
+              min="0"
+              max="100"
+              placeholder="০-১০০"
+              className="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+            />
+            {errors[name] && (
+              <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-3 justify-end">
+        <button
+          type="button"
+          onClick={() => { setIsOpen(false); setErrors({}); }}
+          className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+        >
+          বাতিল
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          যোগ করুন ✅
+        </button>
+      </div>
+    </form>
+  );
+}
+```
+
+---
+
+## 13. useEffect — Side Effects ও API Call
+
+**`useEffect`** হলো React-এর একটি Hook যা দিয়ে **side effects** পরিচালনা করা হয়। Side effect মানে হলো — এমন কাজ যা Component render করার বাইরে হয়: API call, localStorage, subscription, timer ইত্যাদি।
+
+### useEffect-এর Syntax
+
+```jsx
+useEffect(() => {
+  // ১. এখানে side effect কোড লেখো
+
+  return () => {
+    // ২. Cleanup function (optional)
+    //    Component unmount হওয়ার আগে বা
+    //    effect পুনরায় চলার আগে এটা call হয়
+  };
+}, [dependency1, dependency2]); // ৩. Dependency array
+```
+
+### Dependency Array-এর নিয়ম
+
+| Dependency Array | কখন Effect চলে |
+|-----------------|----------------|
+| না দিলে | প্রতি render-এর পরে |
+| `[]` (খালি) | শুধু প্রথম render-এর পরে (mount) |
+| `[value]` | প্রথম render ও `value` পরিবর্তনে |
+
+### API থেকে ছাত্রের ডাটা লোড করা
+
+```jsx
+import { useState, useEffect } from "react";
+
+function StudentDashboard() {
+  const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // AbortController দিয়ে cleanup — component unmount হলে fetch বাতিল হবে
+    const controller = new AbortController();
+
+    async function fetchStudents() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          "https://api.example.com/students",
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Server Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setStudents(data);
+      } catch (err) {
+        // AbortError ignore করো — এটা cleanup-এর কারণে হয়
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchStudents();
+
+    // Cleanup: component unmount হলে ongoing fetch বাতিল করো
+    return () => controller.abort();
+  }, []); // খালি array — শুধু mount-এ একবার চলবে
+
+  if (isLoading) return <div className="text-center p-10">⏳ লোড হচ্ছে...</div>;
+  if (error) return <div className="text-red-500 p-4">⚠️ {error}</div>;
+
+  return <StudentList students={students} />;
+}
+```
+
+### useEffect-এর সাধারণ ব্যবহার
+
+**LocalStorage-এ ডাটা সেভ করা:**
+
+```jsx
+// App.jsx — students state পরিবর্তন হলে localStorage আপডেট করো
+useEffect(() => {
+  localStorage.setItem("students", JSON.stringify(students));
+}, [students]);
+
+// প্রথমবার localStorage থেকে ডাটা লোড করা
+const [students, setStudents] = useState(() => {
+  const saved = localStorage.getItem("students");
+  return saved ? JSON.parse(saved) : initialStudents;
+});
+```
+
+**Page title আপডেট করা:**
+
+```jsx
+useEffect(() => {
+  document.title = `Student Tracker (${students.length} জন)`;
+}, [students.length]);
+```
+
+---
+
+## 14. Lifting State Up ও Context API
+
+### Lifting State Up
+
+যখন দুটো sibling component একই state শেয়ার করতে হয়, state-কে তাদের common parent-এ নিয়ে যেতে হয় — এটাই **Lifting State Up**।
+
+```
+App (state এখানে)
+├── GradeFilter (onSelectGrade → App)
+└── StudentList (filteredStudents ← App)
+```
+
+আমাদের `App.jsx`-এ আমরা ইতিমধ্যে এটা করেছি। `filterGrade` state App-এ আছে, GradeFilter পরিবর্তন করে, StudentList সেই অনুযায়ী render হয়।
+
+### Context API — Global State
+
+যদি state অনেক deep-এ থাকা কোনো component-কে দিতে হয়, **props drilling** (props বারবার pass করা) সমস্যা হয়। Context API এই সমস্যার সমাধান।
+
+```jsx
+// src/context/StudentContext.jsx
+import { createContext, useContext, useState } from "react";
+import { students as initialStudents } from "../data/students";
+
+// Step 1: Context তৈরি করো
+const StudentContext = createContext(null);
+
+// Step 2: Provider Component তৈরি করো
+export function StudentProvider({ children }) {
+  const [students, setStudents] = useState(initialStudents);
+
+  function addStudent(newStudent) {
+    setStudents((prev) => [...prev, { ...newStudent, id: Date.now() }]);
+  }
+
+  function deleteStudent(id) {
+    setStudents((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  const value = { students, addStudent, deleteStudent };
+
+  return (
+    <StudentContext.Provider value={value}>
+      {children}
+    </StudentContext.Provider>
+  );
+}
+
+// Step 3: Custom hook দিয়ে সহজে ব্যবহার
+export function useStudents() {
+  const context = useContext(StudentContext);
+  if (!context) {
+    throw new Error("useStudents must be used within StudentProvider");
+  }
+  return context;
+}
+```
+
+```jsx
+// src/main.jsx — Provider দিয়ে App wrap করো
+import { StudentProvider } from "./context/StudentContext";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <StudentProvider>
+      <App />
+    </StudentProvider>
+  </React.StrictMode>
+);
+```
+
+```jsx
+// যেকোনো Component-এ Context ব্যবহার
+import { useStudents } from "../context/StudentContext";
+
+function StudentList() {
+  const { students, deleteStudent } = useStudents(); // কোনো props দরকার নেই!
+
+  return (
+    <div>
+      {students.map((s) => (
+        <StudentCard key={s.id} student={s} onDelete={deleteStudent} />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 15. React Router — Multipage Navigation
+
+**React Router** (v6) দিয়ে Single Page Application (SPA)-এ multiple page-এর মতো navigation করা যায়।
+
+```bash
+npm install react-router-dom
+```
+
+### আমাদের অ্যাপে Pages
+
+```
+/                → Home (সব ছাত্রের তালিকা)
+/students/:id   → একজন ছাত্রের বিস্তারিত
+/add            → নতুন ছাত্র যোগ করার ফর্ম
+```
+
+### Setup
+
+```jsx
+// src/main.jsx
+import { BrowserRouter } from "react-router-dom";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <StudentProvider>
+        <App />
+      </StudentProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
+```
+
+```jsx
+// src/App.jsx — Routes define করো
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import StudentDetailPage from "./pages/StudentDetailPage";
+import AddStudentPage from "./pages/AddStudentPage";
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header />
+      <main className="max-w-4xl mx-auto p-4">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/students/:id" element={<StudentDetailPage />} />
+          <Route path="/add" element={<AddStudentPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+```
+
+### Navigation
+
+```jsx
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+// Link — anchor tag-এর মতো (page reload নেই)
+<Link to="/add" className="btn-primary">নতুন ছাত্র যোগ করুন</Link>
+
+// useNavigate — programmatically navigate করো
+function AddStudentPage() {
+  const navigate = useNavigate();
+
+  function handleSubmit(data) {
+    // form submit হলে home-এ redirect করো
+    navigate("/");
+  }
+}
+
+// useParams — URL থেকে parameter নাও
+function StudentDetailPage() {
+  const { id } = useParams(); // /students/123 → id = "123"
+  const { students } = useStudents();
+  const student = students.find((s) => s.id === Number(id));
+
+  if (!student) return <NotFoundPage />;
+  return <StudentCard student={student} detailed />;
+}
+```
+
+---
+
+## 16. Custom Hook — Reusable Logic
+
+**Custom Hook** হলো এমন একটি JavaScript function যার নাম `use` দিয়ে শুরু এবং ভেতরে React Hook ব্যবহার করা হয়। এটা দিয়ে একই logic বারবার লেখা এড়ানো যায়।
+
+### `useFetch` — API থেকে ডাটা লোড
+
+```jsx
+// src/hooks/useFetch.js
+import { useState, useEffect } from "react";
+
+export function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!url) return;
+
+    const controller = new AbortController();
+
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => controller.abort();
+  }, [url]);
+
+  return { data, isLoading, error };
+}
+```
+
+```jsx
+// যেকোনো component-এ সহজে ব্যবহার
+function RemoteStudentList() {
+  const { data: students, isLoading, error } = useFetch(
+    "https://api.example.com/students"
+  );
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
+
+  return <StudentList students={students} />;
+}
+```
+
+### `useLocalStorage` — LocalStorage Sync
+
+```jsx
+// src/hooks/useLocalStorage.js
+import { useState, useEffect } from "react";
+
+export function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+```
+
+```jsx
+// App.jsx-এ ব্যবহার — students এখন localStorage-এ persist হবে
+const [students, setStudents] = useLocalStorage("students", initialStudents);
+```
+
+---
+
+## 17. Performance Optimization
+
+### কখন optimize করবো?
+
+> "Premature optimization is the root of all evil" — Donald Knuth
+
+আগে কোড কাজ করাও, তারপর প্রয়োজন হলে optimize করো।
+
+### `React.memo` — Unnecessary Re-render রোধ
+
+কোনো Component-এর props পরিবর্তন না হলেও parent re-render হলে child-ও re-render হয়। `React.memo` এটা রোধ করে।
+
+```jsx
+// StudentCard props না বদলালে re-render হবে না
+const StudentCard = React.memo(function StudentCard({ student, onDelete }) {
+  console.log("Rendering:", student.name);
+  // ...
+});
+```
+
+### `useCallback` — Function Reference Stable রাখা
+
+```jsx
+// ❌ সমস্যা — প্রতি render-এ নতুন function তৈরি হয়
+//    → React.memo কাজ করে না কারণ props পরিবর্তন হচ্ছে
+function App() {
+  const handleDelete = (id) => { /* ... */ }; // নতুন reference প্রতিবার!
+  return <StudentList onDelete={handleDelete} />;
+}
+
+// ✅ সমাধান — useCallback দিয়ে function memoize করো
+function App() {
+  const handleDelete = useCallback((id) => {
+    setStudents((prev) => prev.filter((s) => s.id !== id));
+  }, []); // dependency নেই, একই function সবসময়
+
+  return <StudentList onDelete={handleDelete} />;
+}
+```
+
+### `useMemo` — Expensive Calculation Cache করা
+
+```jsx
+function App() {
+  const [students, setStudents] = useState(initialStudents);
+  const [filterGrade, setFilterGrade] = useState("all");
+
+  // ✅ filteredStudents শুধু students বা filterGrade পরিবর্তনে recalculate হবে
+  const filteredStudents = useMemo(() => {
+    return filterGrade === "all"
+      ? students
+      : students.filter((s) => getGrade(getAverage(s)) === filterGrade);
+  }, [students, filterGrade]);
+
+  // ✅ statistics শুধু students পরিবর্তনে recalculate হবে
+  const statistics = useMemo(() => {
+    const total = students.length;
+    const averageMarks =
+      total > 0
+        ? students.reduce((sum, s) => sum + getAverage(s), 0) / total
+        : 0;
+    const passRate =
+      total > 0
+        ? (students.filter((s) => getAverage(s) >= 33).length / total) * 100
+        : 0;
+    return { total, averageMarks, passRate };
+  }, [students]);
+
+  return (
+    <>
+      <Summary stats={statistics} />
+      <StudentList students={filteredStudents} />
+    </>
+  );
+}
+```
+
+### Code Splitting — Lazy Loading
+
+বড় অ্যাপে সব কিছু একসাথে load না করে, যখন দরকার তখন load করা:
+
+```jsx
+import { lazy, Suspense } from "react";
+
+// Lazy load — /add page-এ না গেলে এই code load হবে না
+const AddStudentPage = lazy(() => import("./pages/AddStudentPage"));
+
+function App() {
+  return (
+    <Suspense fallback={<div>পেজ লোড হচ্ছে...</div>}>
+      <Routes>
+        <Route path="/add" element={<AddStudentPage />} />
+      </Routes>
+    </Suspense>
+  );
+}
+```
+
+---
+
+## 18. Build ও Deployment
+
+### Production Build তৈরি
+
+```bash
+npm run build
+```
+
+এটা `dist/` ফোল্ডারে optimized static files তৈরি করে:
+- JavaScript minify ও bundle হয়
+- CSS purge হয় (unused styles সরে যায়)
+- Assets hash করা হয় (cache busting)
+
+### Vercel-এ Deploy (সবচেয়ে সহজ)
+
+1. [vercel.com](https://vercel.com)-এ GitHub দিয়ে sign up করো
+2. **"New Project"** → তোমার GitHub repo select করো
+3. **Deploy** বাটনে ক্লিক করো
+4. ৩০ সেকেন্ডে live! 🚀
+
+প্রতিবার `git push` করলে automatically deploy হবে।
+
+### Netlify-তে Deploy
+
+```bash
+# Netlify CLI দিয়ে
+npm install -g netlify-cli
+npm run build
+netlify deploy --prod --dir=dist
+```
+
+---
+
+## 19. প্রজেক্ট আইডিয়া ও পরবর্তী ধাপ
+
+### আমাদের Student Result Tracker উন্নত করতে পারো
+
+- [ ] **Search** — ছাত্রের নাম বা রোল দিয়ে খোঁজা
+- [ ] **Sort** — নাম, মার্কস বা গ্রেড অনুযায়ী সাজানো
+- [ ] **Edit** — ছাত্রের তথ্য সম্পাদনা করা
+- [ ] **Export** — PDF বা CSV হিসেবে রেজাল্ট download করা
+- [ ] **Chart** — গ্রেড distribution bar chart (recharts library)
+- [ ] **Authentication** — Login করে শুধু authorized user access পাবে
+
+### পরবর্তী শেখার রোডম্যাপ
+
+```
+React Basics ✅ (এই টিউটোরিয়াল)
+    ↓
+TypeScript with React
+    ↓
+React Query (TanStack Query) — Server State Management
+    ↓
+Zustand বা Redux Toolkit — Client State Management
+    ↓
+Next.js — Full Stack React Framework (SSR, SSG, API Routes)
+    ↓
+Testing — React Testing Library + Vitest
+```
+
+### উপকারী রিসোর্স
+
+- 📘 [React Official Docs](https://react.dev) — সবচেয়ে ভালো reference
+- 🎮 [React Tic-Tac-Toe Tutorial](https://react.dev/learn/tutorial-tic-tac-toe) — হাতে-কলমে practice
+- 📺 [JavaScript.info](https://javascript.info) — JavaScript দুর্বল হলে
+
+---
+
+## 🎉 তুমি করে ফেলেছো!
+
+একটু পেছনে ফিরে তাকাও — এই একটি টিউটোরিয়ালে তুমি শিখেছো:
+
+✅ Vite দিয়ে React project setup  
+✅ JSX লেখার নিয়ম  
+✅ Functional Component তৈরি  
+✅ Props দিয়ে data pass করা  
+✅ useState দিয়ে dynamic UI  
+✅ Event handling  
+✅ List render ও keys  
+✅ Conditional rendering  
+✅ Controlled form input ও validation  
+✅ useEffect দিয়ে API call ও cleanup  
+✅ Lifting state up ও Context API  
+✅ React Router দিয়ে navigation  
+✅ Custom hooks  
+✅ Performance optimization  
+✅ Production deployment  
+
+এবার শুধু পড়লে হবে না — **নিজে হাতে কোড লিখো।** প্রতিটি অংশ নিজে টাইপ করো, পরিবর্তন করো, ভাঙো, ঠিক করো। এভাবেই শেখা হয়।
+
+> 💬 **পরামর্শ:** এই টিউটোরিয়ালের Student Result Tracker সম্পূর্ণ করার পর, **React-এর অফিশিয়াল Tic-Tac-Toe টিউটোরিয়াল** করো — দেখবে সব concept আরও পরিষ্কার হয়ে গেছে।
+
+---
+
+**শুভকামনা! Happy Coding! 🚀**
