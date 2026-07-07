@@ -3,13 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ContentSkeleton, ListSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  ContentSkeleton,
+  ListSkeleton,
+} from "@/components/ui/loading-skeleton";
 import type { QuestionStats, ReviewQuestion } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import {
@@ -24,6 +27,14 @@ import {
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import "./hide-scrollbar.css";
+
+// Explanation Html Entity ফাইলের top-এ (component-এর বাইরে) যোগ করুন
+function decodeHtml(str: string): string {
+  if (typeof window === "undefined") return str;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  return txt.value;
+}
 
 const OPTION_LABELS = ["ক", "খ", "গ", "ঘ"] as const;
 const OPTION_KEYS = ["A", "B", "C", "D"] as const;
@@ -137,7 +148,8 @@ export default function AnswersPage({
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight > 0) {
         setScrollProgress(Math.round((window.scrollY / scrollHeight) * 100));
       }
@@ -173,7 +185,12 @@ export default function AnswersPage({
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="transition-transform duration-200 hover:scale-110 active:scale-95">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="transition-transform duration-200 hover:scale-110 active:scale-95"
+          >
             <ArrowLeft className="size-5" />
           </Button>
           <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
@@ -241,7 +258,11 @@ export default function AnswersPage({
         {/* Questions - Flat View */}
         <div className="space-y-6">
           {filteredQuestions.map((question, qIdx) => (
-            <div key={question.id} className="question-enter" style={{ animationDelay: `${Math.min(qIdx * 80, 400)}ms` }}>
+            <div
+              key={question.id}
+              className="question-enter"
+              style={{ animationDelay: `${Math.min(qIdx * 80, 400)}ms` }}
+            >
               {/* Question Card */}
               <Card className="transition-all duration-300 hover:shadow-md card-breathe overflow-hidden">
                 <CardContent className="py-5">
@@ -368,7 +389,9 @@ export default function AnswersPage({
                 >
                   <Heart
                     className={`size-4 mr-1 transition-transform duration-300 ${
-                      favorites.has(question.id) ? "fill-rose-500 scale-110 heart-pop" : ""
+                      favorites.has(question.id)
+                        ? "fill-rose-500 scale-110 heart-pop"
+                        : ""
                     }`}
                   />
                   ফেভারিট
@@ -394,7 +417,7 @@ export default function AnswersPage({
             </DialogTitle>
           </DialogHeader>
           <div className="prose prose-sm max-w-none whitespace-pre-wrap page-enter rounded-lg bg-muted/30 p-4">
-            {activeExplanation}
+            {activeExplanation ? decodeHtml(activeExplanation) : null}
           </div>
         </DialogContent>
       </Dialog>

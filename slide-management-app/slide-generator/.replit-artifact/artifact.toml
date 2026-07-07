@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "MCQ Slide Generator"
+version = "1.0.0"
+id = "artifacts/slide-generator"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21689
+
+[services.development]
+run = "pnpm --filter @workspace/slide-generator run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/slide-generator", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/slide-generator/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21689"
+BASE_PATH = "/"

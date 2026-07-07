@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { useId } from "react"; // ← add this
 
 type BrandMarkProps = {
   className?: string;
@@ -15,50 +14,42 @@ type BrandLogoProps = {
   orientation?: "horizontal" | "stacked";
 };
 
-const DEFAULT_SUBTITLE = "সরকারি চাকরিতে সফল হওয়ার সবচেয়ে স্মার্ট উপায়";
+const DEFAULT_SUBTITLE = "সঠিক প্রস্তুতি, নিশ্চিত চাকরি";
 
 export function BrandMark({ className }: BrandMarkProps) {
-  const gradientId = useId(); // ← unique ID per instance
-
   return (
     <svg
-      viewBox="0 0 64 64"
-      fill="none"
-      aria-hidden="true"
-      className={cn("size-10 shrink-0", className)}
+      width="80"
+      height="80"
+      viewBox="0 0 80 80"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
-      <rect
-        x="6"
-        y="6"
-        width="52"
-        height="52"
-        rx="15"
-        fill={`url(#${gradientId})`} // ← reference the unique ID
-      />
+      {/* background */}
+      <rect width="80" height="80" rx="20" fill="#0a0a0a" />
+
+      {/* stylized "F" (left bar + top bar) */}
       <path
-        fill="#F8FAFC"
-        d="M20 18.5C20 16.567 21.567 15 23.5 15H40.5C42.433 15 44 16.567 44 18.5C44 20.433 42.433 22 40.5 22H27V28H36.5C38.433 28 40 29.567 40 31.5C40 33.433 38.433 35 36.5 35H27V45.5C27 47.433 25.433 49 23.5 49C21.567 49 20 47.433 20 45.5V18.5Z"
+        d="M26 20 H52
+           M26 20 V60
+           M26 40 H44"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
       />
+
+      {/* MCQ / success check circle */}
+      <circle cx="56" cy="46" r="10" fill="white" />
+
+      {/* check mark */}
       <path
-        d="M37 39.5L42 44.5L51 33.5"
-        stroke="#F59E0B"
-        strokeWidth="5"
+        d="M51 46 L55 50 L62 40"
+        stroke="#0a0a0a"
+        strokeWidth="2.8"
+        fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <defs>
-        <linearGradient
-          id={gradientId} // ← unique per instance, no collision
-          x1="11"
-          y1="10"
-          x2="53"
-          y2="54"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#0F172A" />
-          <stop offset="1" stopColor="#1E293B" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }
