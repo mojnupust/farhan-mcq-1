@@ -73,6 +73,21 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 export const apiClient = {
   get: <T>(endpoint: string) => request<T>(endpoint),
 
+  // For binary responses (e.g. downloading a slide PNG or zip) that need the Bearer token —
+  // plain <img src="..."> / <a href="..."> can't attach auth headers, so callers turn this
+  // into an object URL via URL.createObjectURL().
+  async getBlob(endpoint: string): Promise<Blob> {
+    const token = getToken();
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
+    if (!res.ok) {
+      throw new ApiError(res.status, `Failed to fetch ${endpoint}: ${res.status}`);
+    }
+    return res.blob();
+  },
+
   post: <T>(endpoint: string, body: unknown) =>
     request<T>(endpoint, {
       method: "POST",

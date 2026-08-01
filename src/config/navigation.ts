@@ -10,6 +10,7 @@ import {
   FolderOpen,
   HelpCircle,
   Home,
+  ImageIcon,
   LayoutDashboard,
   Megaphone,
   Package,
@@ -29,6 +30,7 @@ export interface NavItem {
 export const memberNav: NavItem[] = [
   { label: "হোম", href: ROUTES.dashboard, icon: Home },
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
+  { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
   { label: "সাবস্ক্রিপশন", href: ROUTES.subscriptions, icon: Receipt },
