@@ -3,12 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/features/auth/components/auth-provider";
 import { SlidePreviewCard } from "@/features/slides/components/slide-preview-card";
 import { slideService, type QuestionSetSlidesResult } from "@/features/slides";
 import { apiClient } from "@/lib/api-client";
 import { downloadBlob } from "@/lib/download-blob";
 import { toastSuccessAfterCommit, toastErrorAfterCommit } from "@/lib/safe-toast";
-import { ArrowLeft, Download, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -19,9 +20,11 @@ export default function ImagesPreviewPage({
   params: Promise<{ questionSetId: string }>;
 }) {
   const { questionSetId } = use(params);
+  const { isAdmin } = useAuth();
   const [data, setData] = useState<QuestionSetSlidesResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloadingZip, setDownloadingZip] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [imageVersions, setImageVersions] = useState<Record<string, number>>({});
 
   const loadSlides = useCallback(async () => {
@@ -46,6 +49,27 @@ export default function ImagesPreviewPage({
       ...prev,
       [slideId]: version,
     }));
+  }
+
+  async function deleteAllSlides() {
+    if (
+      !confirm(
+        "এই প্রশ্নসেটের সব স্লাইড মুছে ফেলতে চান? আবার তৈরি করতে হলে নতুন করে জেনারেট করতে হবে।",
+      )
+    ) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const result = await slideService.deleteByQuestionSetId(questionSetId);
+      setData(null);
+      setImageVersions({});
+      toastSuccessAfterCommit(`${result.deletedCount}টি স্লাইড মুছে ফেলা হয়েছে`);
+    } catch {
+      toastErrorAfterCommit("স্লাইড মুছে ফেলা যায়নি");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function downloadZip() {
@@ -92,6 +116,26 @@ export default function ImagesPreviewPage({
             <RefreshCw className="mr-2 size-4" />
             রিফ্রেশ
           </Button>
+          {isAdmin && data && data.slides.length > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={deleteAllSlides}
+              disabled={deleting || downloadingZip}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  মুছছি...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 size-4" />
+                  সব স্লাইড মুছুন
+                </>
+              )}
+            </Button>
+          )}
           {data && data.slides.length > 0 && (
             <Button onClick={downloadZip} disabled={downloadingZip} className="flex-1 sm:flex-none">
               {downloadingZip ? (
@@ -125,7 +169,7 @@ export default function ImagesPreviewPage({
             <SlidePreviewCard
               key={slide.id}
               slide={slide}
-                imageVersion={imageVersions[slide.id] ?? slide.updatedAt}
+              imageVersion={imageVersions[slide.id] ?? slide.updatedAt}
               onSlideUpdated={handleSlideUpdated}
             />
           ))}

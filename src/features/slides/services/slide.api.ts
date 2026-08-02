@@ -55,4 +55,11 @@ export const apiSlideService: SlideService = {
     const query = styleConfigId ? `?styleConfigId=${styleConfigId}` : "";
     return `/v1/slides/${questionSetId}/zip${query}`;
   },
+
+  async deleteByQuestionSetId(questionSetId: string) {
+    const res = await apiClient.delete<{ data: { deletedCount: number } }>(
+      `/v1/slides/${questionSetId}`,
+    );
+    return res.data;
+  },
 };

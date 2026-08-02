@@ -92,4 +92,8 @@ export const mockSlideService: SlideService = {
   zipPath() {
     return "/mock/placeholder.zip";
   },
+
+  async deleteByQuestionSetId() {
+    return { deletedCount: 0 };
+  },
 };

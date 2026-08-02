@@ -20,4 +20,7 @@ export interface SlideService {
   reRender(slideId: string): Promise<void>;
   downloadPath(slideId: string): string;
   zipPath(questionSetId: string, styleConfigId?: string): string;
+  deleteByQuestionSetId(
+    questionSetId: string,
+  ): Promise<{ deletedCount: number }>;
 }
