@@ -75,6 +75,12 @@ export const mockSlideService: SlideService = {
     // no-op in mock mode
   },
 
+  async saveAndReRender(slideId: string, sceneJson: unknown) {
+    void slideId;
+    void sceneJson;
+    return { ...mockSlide, updatedAt: new Date().toISOString() };
+  },
+
   async reRender() {
     // no-op in mock mode
   },

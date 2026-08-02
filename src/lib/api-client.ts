@@ -76,12 +76,21 @@ export const apiClient = {
   // For binary responses (e.g. downloading a slide PNG or zip) that need the Bearer token —
   // plain <img src="..."> / <a href="..."> can't attach auth headers, so callers turn this
   // into an object URL via URL.createObjectURL().
-  async getBlob(endpoint: string): Promise<Blob> {
+  async getBlob(endpoint: string, cacheBust?: string | number): Promise<Blob> {
     const token = getToken();
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
+    const sep = endpoint.includes("?") ? "&" : "?";
+    const url =
+      cacheBust !== undefined
+        ? `${API_BASE_URL}${endpoint}${sep}v=${encodeURIComponent(String(cacheBust))}`
+        : `${API_BASE_URL}${endpoint}`;
+
+    const res = await fetch(url, { headers, cache: "no-store" });
     if (!res.ok) {
       throw new ApiError(res.status, `Failed to fetch ${endpoint}: ${res.status}`);
     }

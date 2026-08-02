@@ -5,6 +5,7 @@ import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { AuthProvider, useAuth } from "@/features/auth";
 import { SubscriptionProvider } from "@/features/subscriptions";
 import { usePrefetchRoutes } from "@/hooks/use-prefetch-routes";
+import { Toaster } from "sonner";
 
 const MEMBER_ROUTES = [
   "/dashboard",
@@ -46,6 +47,7 @@ export default function MemberLayout({
 }) {
   return (
     <AuthProvider>
+      <Toaster richColors position="top-center" closeButton />
       <MemberLayoutInner>{children}</MemberLayoutInner>
     </AuthProvider>
   );

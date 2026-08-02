@@ -484,3 +484,9 @@ html {
 .heart-pop {
   animation: heartPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Slide text: Bengali (Hind Siliguri) + Latin/symbols (system fallback for ✓ ✗ etc.) */
+.font-slide-mixed {
+  font-family: var(--font-hind-siliguri), "Noto Sans Bengali", "Noto Sans", system-ui,
+    sans-serif;
+}

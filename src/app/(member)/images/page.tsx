@@ -9,11 +9,13 @@ import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { Progress } from "@/components/ui/progress";
 import { ROUTES } from "@/config/routes";
 import { examCategoryService, type ExamCategory } from "@/features/exam-categories";
+import { StylePanel } from "@/features/slides/components/style-panel";
 import {
-  DEFAULT_STYLE_CONFIG,
+  buildDefaultStyleConfig,
   slideService,
   type JobStatusResult,
   type QuestionSetSlidesResult,
+  type StyleConfigInput,
 } from "@/features/slides";
 import {
   subExamCategoryService,
@@ -27,8 +29,9 @@ import { AlertTriangle, CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-const POLL_INTERVAL_MS = 1500;
-const MAX_POLL_ATTEMPTS = 120; // 3 minutes
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 90;
+const STUCK_QUEUED_MS = 45_000;
 
 function formatQuestionSetLabel(set: QuestionSet): string {
   const date = new Date(set.date).toLocaleDateString("bn-BD", {
@@ -56,13 +59,14 @@ export default function ImagesPage() {
   const [checkingCache, setCheckingCache] = useState(false);
 
   const [cached, setCached] = useState<QuestionSetSlidesResult | null>(null);
+  const [styleConfig, setStyleConfig] = useState<StyleConfigInput>(buildDefaultStyleConfig);
   const [generating, setGenerating] = useState(false);
   const [job, setJob] = useState<JobStatusResult | null>(null);
   const [generateError, setGenerateError] = useState<string | null>(null);
 
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollStartedAt = useRef<number | null>(null);
 
-  // Step 1: load exam categories once
   useEffect(() => {
     examCategoryService
       .getAll()
@@ -71,12 +75,8 @@ export default function ImagesPage() {
       .finally(() => setLoadingExams(false));
   }, []);
 
-  // Step 2: load sub-exam categories when an exam is chosen (selection reset + loading flag
-  // are set by the combobox's onChange, not here — a synchronous setState at the top of an
-  // effect body causes cascading renders)
   useEffect(() => {
     if (!examSlug) return;
-
     subExamCategoryService
       .getByCategorySlug(examSlug)
       .then(setSubExamCategories)
@@ -84,11 +84,8 @@ export default function ImagesPage() {
       .finally(() => setLoadingSubExams(false));
   }, [examSlug]);
 
-  // Step 3: load question sets when a sub-exam is chosen. `getAllBySubCategorySlug` is
-  // admin-only — members can only see the live set + the archive, so combine those two.
   useEffect(() => {
     if (!subExamSlug) return;
-
     Promise.all([
       questionSetService.getLiveBySubCategorySlug(subExamSlug),
       questionSetService.getArchiveBySubCategorySlug(subExamSlug),
@@ -100,10 +97,8 @@ export default function ImagesPage() {
       .finally(() => setLoadingQuestionSets(false));
   }, [subExamSlug]);
 
-  // On question-set select: immediately check cache
   useEffect(() => {
     if (!questionSetId) return;
-
     slideService
       .getByQuestionSetId(questionSetId)
       .then(setCached)
@@ -111,7 +106,6 @@ export default function ImagesPage() {
       .finally(() => setCheckingCache(false));
   }, [questionSetId]);
 
-  // Clean up any in-flight poll timer on unmount
   useEffect(() => {
     return () => {
       if (pollTimer.current) clearTimeout(pollTimer.current);
@@ -121,7 +115,9 @@ export default function ImagesPage() {
   function pollJob(jobId: string, attempt: number) {
     if (attempt > MAX_POLL_ATTEMPTS) {
       setGenerating(false);
-      setGenerateError("স্লাইড তৈরি হতে অনেক সময় লাগছে। পরে আবার চেষ্টা করুন।");
+      setGenerateError(
+        "স্লাইড তৈরি হতে অনেক সময় লাগছে। Redis ও MinIO চালু আছে কিনা দেখুন, তারপর আবার চেষ্টা করুন।",
+      );
       return;
     }
 
@@ -129,6 +125,21 @@ export default function ImagesPage() {
       .getJobStatus(jobId)
       .then((status) => {
         setJob(status);
+
+        const queuedTooLong =
+          pollStartedAt.current !== null &&
+          Date.now() - pollStartedAt.current > STUCK_QUEUED_MS &&
+          status.status === "QUEUED" &&
+          status.progress === 0;
+
+        if (queuedTooLong) {
+          setGenerating(false);
+          setGenerateError(
+            "স্লাইড ওয়ার্কার চালু নেই। backend-এ `docker compose up -d redis minio` চালান, তারপর `npm run dev` রিস্টার্ট করুন।",
+          );
+          return;
+        }
+
         if (status.status === "DONE") {
           setGenerating(false);
           router.push(ROUTES.imagesPreview(questionSetId!));
@@ -151,13 +162,14 @@ export default function ImagesPage() {
     setGenerateError(null);
 
     try {
-      const result = await slideService.generate(questionSetId, DEFAULT_STYLE_CONFIG);
+      const result = await slideService.generate(questionSetId, styleConfig);
       if (result.cached) {
         setGenerating(false);
         router.push(ROUTES.imagesPreview(questionSetId));
         return;
       }
       if (result.jobId) {
+        pollStartedAt.current = Date.now();
         pollJob(result.jobId, 0);
       } else {
         setGenerating(false);
@@ -182,6 +194,13 @@ export default function ImagesPage() {
     label: formatQuestionSetLabel(s),
   }));
 
+  const progressLabel =
+    job?.status === "PROCESSING" && job.progress > 0
+      ? `স্লাইড তৈরি হচ্ছে... ${job.progress}%`
+      : job?.status === "QUEUED"
+        ? "কিউতে আছে — ওয়ার্কার শুরু করছে..."
+        : "শুরু হচ্ছে...";
+
   if (loadingExams) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
@@ -191,7 +210,7 @@ export default function ImagesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="mx-auto max-w-2xl px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter">
       <AnimateIn variant="fade-up" duration={400}>
         <div className="mb-6 flex items-center gap-3">
           <ImageIcon className="size-7 text-primary" />
@@ -254,6 +273,7 @@ export default function ImagesPage() {
                     setCached(null);
                     setJob(null);
                     setGenerateError(null);
+                    setStyleConfig(buildDefaultStyleConfig());
                     setCheckingCache(true);
                   }}
                   placeholder={
@@ -281,29 +301,30 @@ export default function ImagesPage() {
         {questionSetId && !checkingCache && cached && cached.slides.length > 0 && (
           <Alert className="mt-6">
             <CheckCircle2 className="size-4" />
-            <AlertTitle>আগেই তৈরি হয়েছে</AlertTitle>
+            <AlertTitle>আগের স্টাইলে তৈরি আছে</AlertTitle>
             <AlertDescription className="flex flex-col gap-3">
-              <span>সংরক্ষিত স্লাইড দেখানো হচ্ছে। আপনি চাইলে এখনো এডিট করতে পারবেন।</span>
+              <span>
+                {cached.slides.length}টি স্লাইড সংরক্ষিত আছে। নিচে স্টাইল বদলে নতুন ভ্যারিয়েন্ট
+                তৈরি করতে পারেন।
+              </span>
               <Button
                 onClick={() => router.push(ROUTES.imagesPreview(questionSetId))}
+                variant="outline"
                 className="w-fit"
               >
-                স্লাইড দেখুন
+                বিদ্যমান স্লাইড দেখুন
               </Button>
             </AlertDescription>
           </Alert>
         )}
 
-        {questionSetId && !checkingCache && (!cached || cached.slides.length === 0) && (
+        {questionSetId && !checkingCache && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-base">৪. স্টাইল ও তৈরি করুন</CardTitle>
+              <CardTitle className="text-base">৪. স্টাইল কাস্টমাইজ করুন</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                ডিফল্ট স্টাইল (সাদা ব্যাকগ্রাউন্ড, প্রতি স্লাইডে ৫টি প্রশ্ন, অপশন ও ব্যাখ্যাসহ)
-                ব্যবহার হবে। স্টাইল কাস্টমাইজেশন শীঘ্রই যুক্ত হবে।
-              </p>
+              <StylePanel value={styleConfig} onChange={setStyleConfig} />
 
               {generateError && (
                 <Alert variant="destructive">
@@ -314,16 +335,12 @@ export default function ImagesPage() {
               )}
 
               {generating ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Progress value={job?.progress ?? 0} />
-                  <p className="text-center text-sm text-muted-foreground">
-                    {job?.progress
-                      ? `স্লাইড তৈরি হচ্ছে... ${job.progress}%`
-                      : "শুরু হচ্ছে..."}
-                  </p>
+                  <p className="text-center text-sm text-muted-foreground">{progressLabel}</p>
                 </div>
               ) : (
-                <Button onClick={handleGenerate} className="w-full">
+                <Button onClick={handleGenerate} className="hidden w-full md:flex">
                   স্লাইড তৈরি করুন
                 </Button>
               )}
@@ -331,6 +348,21 @@ export default function ImagesPage() {
           </Card>
         )}
       </AnimateIn>
+
+      {/* Mobile sticky generate */}
+      {questionSetId && !checkingCache && !generating && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur md:hidden">
+          <Button onClick={handleGenerate} className="w-full">
+            স্লাইড তৈরি করুন
+          </Button>
+        </div>
+      )}
+      {questionSetId && generating && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur md:hidden">
+          <Progress value={job?.progress ?? 0} className="mb-2" />
+          <p className="text-center text-xs text-muted-foreground">{progressLabel}</p>
+        </div>
+      )}
     </div>
   );
 }

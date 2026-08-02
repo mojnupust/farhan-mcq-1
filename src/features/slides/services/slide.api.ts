@@ -3,6 +3,7 @@ import type {
   GenerateSlidesResult,
   JobStatusResult,
   QuestionSetSlidesResult,
+  Slide,
   StyleConfigInput,
 } from "../types";
 import type { SlideService } from "./slide.service";
@@ -32,6 +33,14 @@ export const apiSlideService: SlideService = {
 
   async patchScene(slideId: string, sceneJson: unknown) {
     await apiClient.patch(`/v1/slides/${slideId}`, { sceneJson });
+  },
+
+  async saveAndReRender(slideId: string, sceneJson: unknown) {
+    const res = await apiClient.post<{ data: Slide }>(
+      `/v1/slides/${slideId}/render`,
+      { sceneJson },
+    );
+    return res.data;
   },
 
   async reRender(slideId: string) {
