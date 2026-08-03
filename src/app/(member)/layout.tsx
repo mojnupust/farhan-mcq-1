@@ -14,6 +14,7 @@ const MEMBER_ROUTES = [
   "/exams/bcs-preparation",
   "/profile",
   "/notifications",
+  "/videos",
 ];
 
 function MemberLayoutInner({ children }: { children: React.ReactNode }) {

@@ -40,7 +40,7 @@ const securityHeaders = {
     "img-src 'self' data: https: blob:",
     "font-src 'self' https://fonts.gstatic.com",
     `connect-src 'self' ${API_ORIGIN} https://generativelanguage.googleapis.com`,
-    "frame-src 'self' https://www.youtube.com https://youtube.com",
+    "frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -50,7 +50,8 @@ const securityHeaders = {
   // Prevent cross-origin information leakage
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
-  "Cross-Origin-Embedder-Policy": "credentialless",
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Resource-Policy": "same-origin",
 };
 
 export function middleware(request: NextRequest) {

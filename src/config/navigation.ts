@@ -18,6 +18,7 @@ import {
   Settings,
   Star,
   User,
+  Video,
 } from "lucide-react";
 
 export interface NavItem {
@@ -31,6 +32,7 @@ export const memberNav: NavItem[] = [
   { label: "হোম", href: ROUTES.dashboard, icon: Home },
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
   { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
+  { label: "ভিডিও লাইব্রেরি", href: ROUTES.videos, icon: Video },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
   { label: "সাবস্ক্রিপশন", href: ROUTES.subscriptions, icon: Receipt },
@@ -44,6 +46,7 @@ export const adminNav: NavItem[] = [
   { label: "রুটিন", href: ROUTES.adminRoutines, icon: Calendar },
   { label: "সিলেবাস", href: ROUTES.adminSyllabus, icon: FileText },
   { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.adminJobCircular, icon: Briefcase },
+  { label: "ভিডিও লাইব্রেরি", href: ROUTES.adminVideos, icon: Video },
   { label: "প্রশ্নসেট", href: ROUTES.adminQuestionSets, icon: ClipboardList },
   {
     label: "প্রশ্নসেট অটোমোশন",

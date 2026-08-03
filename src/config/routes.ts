@@ -47,6 +47,8 @@ export const ROUTES = {
   images: "/images",
   imagesPreview: (questionSetId: string) =>
     `/images/preview/${questionSetId}` as const,
+  videos: "/videos",
+  videoDetail: (id: string) => `/videos/${id}` as const,
 
   // Admin
   admin: "/admin",
@@ -55,6 +57,7 @@ export const ROUTES = {
   adminRoutines: "/admin/routines",
   adminSyllabus: "/admin/syllabus",
   adminJobCircular: "/admin/job-circular",
+  adminVideos: "/admin/videos",
   adminNotifications: "/admin/notifications",
   adminQuestions: "/admin/questions",
   adminQuestionSets: "/admin/question-sets",

@@ -98,67 +98,80 @@ export function SlideEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[min(90vh,720px)] flex-col gap-0 overflow-hidden p-0 font-slide-mixed sm:max-w-lg">
-        <DialogHeader className="shrink-0 space-y-1 border-b px-5 py-4 text-left">
-          <DialogTitle>স্লাইড #{slide?.order ?? ""} এডিট করুন</DialogTitle>
-          <DialogDescription>
-            টেক্সট পরিবর্তন করুন — সংরক্ষণ করলে ছবি আবার তৈরি হবে।
-          </DialogDescription>
-        </DialogHeader>
+      {/*
+        IMPORTANT — scroll fix, do not remove:
+        DialogContent's own className merge order can end up putting
+        `grid` (from the base component) after our `flex`, which silently
+        breaks the header/scroll-area/footer split below. To make this
+        robust regardless of how dialog.tsx merges classes, DialogContent
+        here ONLY handles max-height + overflow-hidden + p-0 (properties
+        that work no matter what `display` it resolves to). The actual
+        flex layout is owned by the inner wrapper div, which always has
+        its own guaranteed flex context.
+      */}
+      <DialogContent className="max-h-[min(90vh,720px)] gap-0 overflow-hidden p-0 font-slide-mixed sm:max-w-lg">
+        <div className="flex h-full max-h-[inherit] min-h-0 flex-col">
+          <DialogHeader className="shrink-0 space-y-1 border-b px-5 py-4 text-left">
+            <DialogTitle>স্লাইড #{slide?.order ?? ""} এডিট করুন</DialogTitle>
+            <DialogDescription>
+              টেক্সট পরিবর্তন করুন — সংরক্ষণ করলে ছবি আবার তৈরি হবে।
+            </DialogDescription>
+          </DialogHeader>
 
-        <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4"
-          aria-label="স্লাইড টেক্সট সম্পাদনা"
-        >
-          {editableNodes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              এডিটযোগ্য টেক্সট পাওয়া যায়নি।
-            </p>
-          ) : (
-            <div className="space-y-5">
-              {editableNodes.map((node) => (
-                <div key={node.id} className="space-y-2">
-                  <Label htmlFor={node.id}>{nodeLabel(node)}</Label>
-                  <Textarea
-                    id={node.id}
-                    value={node.text ?? ""}
-                    onChange={(e) => updateNodeText(node.id, e.target.value)}
-                    rows={Math.min(
-                      8,
-                      Math.max(3, node.text?.split("\n").length ?? 3),
-                    )}
-                    className="max-h-48 min-h-[4.5rem] resize-y font-slide-mixed text-sm leading-relaxed"
-                    lang="bn"
-                    spellCheck={false}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <DialogFooter className="shrink-0 gap-2 border-t bg-background px-5 py-4 sm:flex-row sm:justify-end">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
+          <div
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+            aria-label="স্লাইড টেক্সট সম্পাদনা"
           >
-            বাতিল
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving || !draft || editableNodes.length === 0}
-          >
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                সংরক্ষণ ও রেন্ডার...
-              </>
+            {editableNodes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                এডিটযোগ্য টেক্সট পাওয়া যায়নি।
+              </p>
             ) : (
-              "সংরক্ষণ ও পুনরায় তৈরি"
+              <div className="space-y-5">
+                {editableNodes.map((node) => (
+                  <div key={node.id} className="space-y-2">
+                    <Label htmlFor={node.id}>{nodeLabel(node)}</Label>
+                    <Textarea
+                      id={node.id}
+                      value={node.text ?? ""}
+                      onChange={(e) => updateNodeText(node.id, e.target.value)}
+                      rows={Math.min(
+                        8,
+                        Math.max(3, node.text?.split("\n").length ?? 3),
+                      )}
+                      className="max-h-48 min-h-[4.5rem] resize-y font-slide-mixed text-sm leading-relaxed"
+                      lang="bn"
+                      spellCheck={false}
+                    />
+                  </div>
+                ))}
+              </div>
             )}
-          </Button>
-        </DialogFooter>
+          </div>
+
+          <DialogFooter className="shrink-0 gap-2 border-t bg-background px-5 py-4 sm:flex-row sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={saving}
+            >
+              বাতিল
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving || !draft || editableNodes.length === 0}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  সংরক্ষণ ও রেন্ডার...
+                </>
+              ) : (
+                "সংরক্ষণ ও পুনরায় তৈরি"
+              )}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
