@@ -1,15 +1,18 @@
 "use client";
 
-import { AnimateIn } from "@/components/ui/animate-in";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { Progress } from "@/components/ui/progress";
 import { ROUTES } from "@/config/routes";
-import { examCategoryService, type ExamCategory } from "@/features/exam-categories";
-import { StylePanel } from "@/features/slides/components/style-panel";
+import {
+  examCategoryService,
+  type ExamCategory,
+} from "@/features/exam-categories";
+import { questionSetService, type QuestionSet } from "@/features/question-sets";
 import {
   buildDefaultStyleConfig,
   slideService,
@@ -17,14 +20,11 @@ import {
   type QuestionSetSlidesResult,
   type StyleConfigInput,
 } from "@/features/slides";
+import { StylePanel } from "@/features/slides/components/style-panel";
 import {
   subExamCategoryService,
   type SubExamCategory,
 } from "@/features/sub-exam-categories";
-import {
-  questionSetService,
-  type QuestionSet,
-} from "@/features/question-sets";
 import { AlertTriangle, CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -46,7 +46,9 @@ export default function ImagesPage() {
   const router = useRouter();
 
   const [examCategories, setExamCategories] = useState<ExamCategory[]>([]);
-  const [subExamCategories, setSubExamCategories] = useState<SubExamCategory[]>([]);
+  const [subExamCategories, setSubExamCategories] = useState<SubExamCategory[]>(
+    [],
+  );
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
 
   const [examSlug, setExamSlug] = useState<string | null>(null);
@@ -59,13 +61,22 @@ export default function ImagesPage() {
   const [checkingCache, setCheckingCache] = useState(false);
 
   const [cached, setCached] = useState<QuestionSetSlidesResult | null>(null);
-  const [styleConfig, setStyleConfig] = useState<StyleConfigInput>(buildDefaultStyleConfig);
+  const [styleConfig, setStyleConfig] = useState<StyleConfigInput>(
+    buildDefaultStyleConfig,
+  );
   const [generating, setGenerating] = useState(false);
   const [job, setJob] = useState<JobStatusResult | null>(null);
   const [generateError, setGenerateError] = useState<string | null>(null);
 
+  // Cached slides already exist for the selected question set — user must
+  // explicitly opt in to see the style/generate flow again.
+  const [forceRegenerate, setForceRegenerate] = useState(false);
+
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollStartedAt = useRef<number | null>(null);
+
+  const hasCachedSlides = !!cached && cached.slides.length > 0;
+  const showGenerateFlow = !hasCachedSlides || forceRegenerate;
 
   useEffect(() => {
     examCategoryService
@@ -147,7 +158,10 @@ export default function ImagesPage() {
           setGenerating(false);
           setGenerateError(status.errorMessage || "স্লাইড তৈরি ব্যর্থ হয়েছে।");
         } else {
-          pollTimer.current = setTimeout(() => pollJob(jobId, attempt + 1), POLL_INTERVAL_MS);
+          pollTimer.current = setTimeout(
+            () => pollJob(jobId, attempt + 1),
+            POLL_INTERVAL_MS,
+          );
         }
       })
       .catch(() => {
@@ -215,7 +229,9 @@ export default function ImagesPage() {
         <div className="mb-6 flex items-center gap-3">
           <ImageIcon className="size-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">ছবি স্লাইড তৈরি করুন</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              ছবি স্লাইড তৈরি করুন
+            </h1>
             <p className="text-sm text-muted-foreground">
               প্রশ্নসেট নির্বাচন করে ফেসবুক/ইনস্টাগ্রামের জন্য স্লাইড তৈরি করুন
             </p>
@@ -255,7 +271,9 @@ export default function ImagesPage() {
                     setLoadingQuestionSets(true);
                   }}
                   placeholder={
-                    loadingSubExams ? "লোড হচ্ছে..." : "সাব-ক্যাটাগরি নির্বাচন করুন"
+                    loadingSubExams
+                      ? "লোড হচ্ছে..."
+                      : "সাব-ক্যাটাগরি নির্বাচন করুন"
                   }
                   disabled={loadingSubExams || subExamOptions.length === 0}
                 />
@@ -274,12 +292,17 @@ export default function ImagesPage() {
                     setJob(null);
                     setGenerateError(null);
                     setStyleConfig(buildDefaultStyleConfig());
+                    setForceRegenerate(false);
                     setCheckingCache(true);
                   }}
                   placeholder={
-                    loadingQuestionSets ? "লোড হচ্ছে..." : "প্রশ্নসেট নির্বাচন করুন"
+                    loadingQuestionSets
+                      ? "লোড হচ্ছে..."
+                      : "প্রশ্নসেট নির্বাচন করুন"
                   }
-                  disabled={loadingQuestionSets || questionSetOptions.length === 0}
+                  disabled={
+                    loadingQuestionSets || questionSetOptions.length === 0
+                  }
                 />
                 {!loadingQuestionSets && questionSetOptions.length === 0 && (
                   <p className="text-sm text-muted-foreground">
@@ -298,30 +321,46 @@ export default function ImagesPage() {
           </div>
         )}
 
-        {questionSetId && !checkingCache && cached && cached.slides.length > 0 && (
+        {questionSetId && !checkingCache && hasCachedSlides && (
           <Alert className="mt-6">
             <CheckCircle2 className="size-4" />
             <AlertTitle>আগের স্টাইলে তৈরি আছে</AlertTitle>
             <AlertDescription className="flex flex-col gap-3">
               <span>
-                {cached.slides.length}টি স্লাইড সংরক্ষিত আছে। নিচে স্টাইল বদলে নতুন ভ্যারিয়েন্ট
-                তৈরি করতে পারেন।
+                {cached!.slides.length}টি স্লাইড সংরক্ষিত আছে।
+                {forceRegenerate
+                  ? " নিচে স্টাইল বদলে নতুন ভ্যারিয়েন্ট তৈরি করতে পারেন।"
+                  : ""}
               </span>
-              <Button
-                onClick={() => router.push(ROUTES.imagesPreview(questionSetId))}
-                variant="outline"
-                className="w-fit"
-              >
-                বিদ্যমান স্লাইড দেখুন
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() =>
+                    router.push(ROUTES.imagesPreview(questionSetId))
+                  }
+                  className="w-fit"
+                >
+                  বিদ্যমান স্লাইড দেখুন
+                </Button>
+                {!forceRegenerate && (
+                  <Button
+                    onClick={() => setForceRegenerate(true)}
+                    variant="outline"
+                    className="w-fit"
+                  >
+                    নতুন স্টাইলে regenerate করুন
+                  </Button>
+                )}
+              </div>
             </AlertDescription>
           </Alert>
         )}
 
-        {questionSetId && !checkingCache && (
+        {questionSetId && !checkingCache && showGenerateFlow && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-base">৪. স্টাইল কাস্টমাইজ করুন</CardTitle>
+              <CardTitle className="text-base">
+                ৪. স্টাইল কাস্টমাইজ করুন
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <StylePanel value={styleConfig} onChange={setStyleConfig} />
@@ -337,10 +376,15 @@ export default function ImagesPage() {
               {generating ? (
                 <div className="space-y-3">
                   <Progress value={job?.progress ?? 0} />
-                  <p className="text-center text-sm text-muted-foreground">{progressLabel}</p>
+                  <p className="text-center text-sm text-muted-foreground">
+                    {progressLabel}
+                  </p>
                 </div>
               ) : (
-                <Button onClick={handleGenerate} className="hidden w-full md:flex">
+                <Button
+                  onClick={handleGenerate}
+                  className="hidden w-full md:flex"
+                >
                   স্লাইড তৈরি করুন
                 </Button>
               )}
@@ -350,7 +394,7 @@ export default function ImagesPage() {
       </AnimateIn>
 
       {/* Mobile sticky generate */}
-      {questionSetId && !checkingCache && !generating && (
+      {questionSetId && !checkingCache && !generating && showGenerateFlow && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur md:hidden">
           <Button onClick={handleGenerate} className="w-full">
             স্লাইড তৈরি করুন
@@ -360,7 +404,9 @@ export default function ImagesPage() {
       {questionSetId && generating && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur md:hidden">
           <Progress value={job?.progress ?? 0} className="mb-2" />
-          <p className="text-center text-xs text-muted-foreground">{progressLabel}</p>
+          <p className="text-center text-xs text-muted-foreground">
+            {progressLabel}
+          </p>
         </div>
       )}
     </div>

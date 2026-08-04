@@ -18,7 +18,7 @@ import {
   type Slide,
 } from "@/features/slides";
 import { normalizeSceneFonts } from "@/features/slides/normalize-scene";
-import { decodeSceneTextForDisplay } from "@/features/slides/utils/slide-text";
+import { decodeSceneTextForDisplay, isSlideChromeNodeId } from "@/features/slides/utils/slide-text";
 import {
   toastErrorAfterCommit,
   toastSuccessAfterCommit,
@@ -30,20 +30,25 @@ interface SlideEditDialogProps {
   slide: Slide | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSaved: (slideId: string, version: number) => void;
+  onSaved: (slide: Slide) => void;
 }
 
 function isEditableTextNode(node: SceneNode): boolean {
   if (node.type !== "text" || !node.text?.trim()) return false;
-  if (node.id.startsWith("header") || node.id.startsWith("footer"))
-    return false;
+  if (isSlideChromeNodeId(node.id)) return false;
   return true;
 }
 
 function nodeLabel(node: SceneNode): string {
-  if (node.id.startsWith("q-")) return "প্রশ্ন";
-  if (node.id.includes("option") || node.id.startsWith("opt-")) return "অপশন";
-  if (node.id.startsWith("exp-text")) return "ব্যাখ্যা";
+  if (node.id === "question-text" || node.id.startsWith("q-")) return "প্রশ্ন";
+  if (
+    node.id.includes("option") ||
+    node.id.startsWith("opt-") ||
+    node.id.startsWith("single-opt-")
+  ) {
+    return "অপশন";
+  }
+  if (node.id.startsWith("exp-text") || node.id === "single-exp-text") return "ব্যাখ্যা";
   return node.id;
 }
 
@@ -85,8 +90,7 @@ export function SlideEditDialog({
     try {
       const normalized = normalizeSceneFonts(draft);
       const updated = await slideService.saveAndReRender(slide.id, normalized);
-      const version = new Date(updated.updatedAt).getTime();
-      onSaved(slide.id, version);
+      onSaved(updated);
       onOpenChange(false);
       toastSuccessAfterCommit(`স্লাইড #${slide.order} আপডেট হয়েছে`);
     } catch {

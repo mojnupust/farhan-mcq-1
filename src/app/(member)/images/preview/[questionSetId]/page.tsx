@@ -5,7 +5,8 @@ import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/features/auth/components/auth-provider";
 import { SlidePreviewCard } from "@/features/slides/components/slide-preview-card";
-import { slideService, type QuestionSetSlidesResult } from "@/features/slides";
+import { slideService, type QuestionSetSlidesResult, type Slide } from "@/features/slides";
+import { slideImageVersionKey } from "@/features/slides/utils/slide-text";
 import { apiClient } from "@/lib/api-client";
 import { downloadBlob } from "@/lib/download-blob";
 import { toastSuccessAfterCommit, toastErrorAfterCommit } from "@/lib/safe-toast";
@@ -44,11 +45,18 @@ export default function ImagesPreviewPage({
     loadSlides();
   }, [loadSlides]);
 
-  function handleSlideUpdated(slideId: string, version: number) {
+  function handleSlideUpdated(updated: Slide) {
     setImageVersions((prev) => ({
       ...prev,
-      [slideId]: version,
+      [updated.id]: slideImageVersionKey(updated.updatedAt),
     }));
+    setData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        slides: prev.slides.map((s) => (s.id === updated.id ? updated : s)),
+      };
+    });
   }
 
   async function deleteAllSlides() {
@@ -79,6 +87,9 @@ export default function ImagesPreviewPage({
       const blob = await apiClient.getBlob(
         slideService.zipPath(questionSetId, data?.styleConfig.id),
       );
+      if (blob.type === "application/json" || blob.size < 64) {
+        throw new Error("Invalid ZIP response");
+      }
       downloadBlob(blob, `${questionSetId}-slides.zip`);
       ok = true;
     } catch {
@@ -169,7 +180,9 @@ export default function ImagesPreviewPage({
             <SlidePreviewCard
               key={slide.id}
               slide={slide}
-              imageVersion={imageVersions[slide.id] ?? slide.updatedAt}
+              imageVersion={
+                imageVersions[slide.id] ?? slideImageVersionKey(slide.updatedAt)
+              }
               onSlideUpdated={handleSlideUpdated}
             />
           ))}

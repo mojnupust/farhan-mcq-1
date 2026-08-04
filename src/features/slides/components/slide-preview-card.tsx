@@ -11,17 +11,17 @@ import { downloadBlob } from "@/lib/download-blob";
 import { shareOrDownloadImage } from "@/lib/share-image";
 import { toastSuccessAfterCommit, toastErrorAfterCommit } from "@/lib/safe-toast";
 import { cn } from "@/lib/utils";
-import { Download, Loader2, Pencil, Share2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Download, Loader2, Pencil, RefreshCw, Share2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { SlideEditDialog } from "./slide-edit-dialog";
 import { SlideTextPreview } from "./slide-text-preview";
-import { getSlidePreviewSnippet } from "../utils/slide-text";
+import { getSlidePreviewSnippet } from "@/features/slides/utils/slide-text";
 
 interface SlidePreviewCardProps {
   slide: Slide;
-  imageVersion: number | string;
-  onSlideUpdated: (slideId: string, version: number) => void;
+  imageVersion: number;
+  onSlideUpdated: (slide: Slide) => void;
 }
 
 export function SlidePreviewCard({
@@ -34,15 +34,29 @@ export function SlidePreviewCard({
   const [editOpen, setEditOpen] = useState(false);
   const [imageStatus, setImageStatus] = useState<AuthorizedImageStatus>("loading");
 
-  const refreshKey = `${slide.id}-${imageVersion}`;
+  const refreshKey = imageVersion;
   const snippet = useMemo(
     () => getSlidePreviewSnippet(slide.sceneJson),
     [slide.sceneJson],
   );
-  const showTextPreview = imageStatus !== "loaded";
+  const showTextPreview = imageStatus === "loading";
+  const showImageError = imageStatus === "error";
+
+  const [imageRetry, setImageRetry] = useState(0);
+
+  useEffect(() => {
+    setImageStatus("loading");
+  }, [refreshKey, imageRetry]);
 
   async function fetchSlideBlob() {
-    return apiClient.getBlob(slideService.downloadPath(slide.id), refreshKey);
+    const blob = await apiClient.getBlob(
+      slideService.downloadPath(slide.id),
+      `${imageVersion}-${imageRetry}`,
+    );
+    if (blob.type === "application/json" || blob.size < 32) {
+      throw new Error("Invalid slide image response");
+    }
+    return blob;
   }
 
   async function downloadSlide() {
@@ -97,18 +111,32 @@ export function SlidePreviewCard({
               scene={slide.sceneJson}
               className={cn(
                 "absolute inset-0 h-full w-full",
-                !showTextPreview && "pointer-events-none opacity-0",
+                imageStatus === "loaded" && "pointer-events-none opacity-0",
               )}
             />
+            {showImageError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/80 p-4 text-center">
+                <p className="text-sm text-muted-foreground">ছবি লোড হয়নি</p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 font-slide-mixed"
+                  onClick={() => setImageRetry((n) => n + 1)}
+                >
+                  <RefreshCw className="mr-1 size-3.5" />
+                  আবার চেষ্টা
+                </Button>
+              </div>
+            ) : null}
             <AuthorizedImage
               src={slideService.downloadPath(slide.id)}
               alt={`স্লাইড ${slide.order}`}
-              refreshKey={refreshKey}
+              refreshKey={`${refreshKey}-${imageRetry}`}
               hideErrorPlaceholder
               onStatusChange={setImageStatus}
               className={cn(
                 "absolute inset-0 h-full w-full object-contain transition-opacity duration-200",
-                showTextPreview ? "opacity-0" : "opacity-100",
+                showTextPreview || showImageError ? "opacity-0" : "opacity-100",
               )}
             />
           </div>
@@ -181,7 +209,7 @@ export function SlidePreviewCard({
         slide={slide}
         open={editOpen}
         onOpenChange={setEditOpen}
-        onSaved={onSlideUpdated}
+        onSaved={(updated) => onSlideUpdated(updated)}
       />
     </>
   );

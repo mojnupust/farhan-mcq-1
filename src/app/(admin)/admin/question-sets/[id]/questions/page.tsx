@@ -232,10 +232,7 @@ export default function AdminQuestionSetQuestionsPage({
                 বাল্ক এডিট
               </Link>
             </Button>
-            <Dialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-            >
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   size="sm"
@@ -248,249 +245,247 @@ export default function AdminQuestionSetQuestionsPage({
                   প্রশ্ন যোগ করুন
                 </Button>
               </DialogTrigger>
-          <DialogContent
-            className="max-w-2xl max-h-[90vh] overflow-y-auto"
-            onCloseAutoFocus={(e) => {
-              // 1. Prevent the default jump to the "Add" button
-              e.preventDefault();
+              <DialogContent
+                className="max-w-2xl max-h-[90vh] overflow-y-auto"
+                onCloseAutoFocus={(e) => {
+                  // 1. Prevent the default jump to the "Add" button
+                  e.preventDefault();
 
-              // 2. If we were editing, scroll back to that question
-              if (editingId) {
-                const element = document.getElementById(
-                  `question-${editingId}`,
-                );
-                element?.scrollIntoView({
-                  behavior: "instant",
-                  block: "center",
-                });
-
-                // 3. NOW reset the form after the scroll logic is done
-                resetForm();
-              } else {
-                resetForm();
-              }
-            }}
-          >
-            <DialogHeader>
-              <DialogTitle>
-                {editingId ? "প্রশ্ন সম্পাদনা" : "নতুন প্রশ্ন"}
-              </DialogTitle>
-            </DialogHeader>
-
-            {!previewMode ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <Label>প্রশ্ন *</Label>
-                    <Textarea
-                      required
-                      rows={3}
-                      value={form.questionText}
-                      onChange={(e) =>
-                        setForm({ ...form, questionText: e.target.value })
-                      }
-                      placeholder="প্রশ্নের বিষয়বস্তু লিখুন..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label>ক) অপশন A *</Label>
-                    <Input
-                      required
-                      value={form.optionA}
-                      onChange={(e) =>
-                        setForm({ ...form, optionA: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>খ) অপশন B *</Label>
-                    <Input
-                      required
-                      value={form.optionB}
-                      onChange={(e) =>
-                        setForm({ ...form, optionB: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>গ) অপশন C *</Label>
-                    <Input
-                      required
-                      value={form.optionC}
-                      onChange={(e) =>
-                        setForm({ ...form, optionC: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label>ঘ) অপশন D *</Label>
-                    <Input
-                      required
-                      value={form.optionD}
-                      onChange={(e) =>
-                        setForm({ ...form, optionD: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <Label>সঠিক উত্তর *</Label>
-                    <Select
-                      value={form.correctAnswer}
-                      onValueChange={(v) =>
-                        setForm({ ...form, correctAnswer: v })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="A">ক) A</SelectItem>
-                        <SelectItem value="B">খ) B</SelectItem>
-                        <SelectItem value="C">গ) C</SelectItem>
-                        <SelectItem value="D">ঘ) D</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>বিষয়</Label>
-                    <Input
-                      value={form.subject}
-                      onChange={(e) =>
-                        setForm({ ...form, subject: e.target.value })
-                      }
-                      placeholder="বাংলা, ইংরেজি, গণিত..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label>ক্রম নম্বর</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={form.sortOrder}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          sortOrder: parseInt(e.target.value) || 0,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <Label>ব্যাখ্যা</Label>
-                    <Textarea
-                      rows={4}
-                      value={form.explanation}
-                      onChange={(e) =>
-                        setForm({ ...form, explanation: e.target.value })
-                      }
-                      placeholder="উত্তরের ব্যাখ্যা লিখুন..."
-                    />
-                  </div>
-                </div>
-
-                <DialogFooter className="gap-2 sm:gap-0">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setPreviewMode(true)}
-                  >
-                    প্রিভিউ
-                  </Button>
-                  <Button type="submit" disabled={saving}>
-                    {saving
-                      ? "সংরক্ষণ হচ্ছে..."
-                      : editingId
-                        ? "আপডেট করুন"
-                        : "সংরক্ষণ করুন"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            ) : (
-              /* Preview Mode */
-              <div className="space-y-4">
-                <Card>
-                  <CardContent className="py-4">
-                    <p className="text-lg whitespace-pre-wrap">
-                      {form.questionText}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <div className="space-y-2">
-                  {(["A", "B", "C", "D"] as const).map((key, i) => {
-                    const optionText =
-                      form[`option${key}` as keyof typeof form]?.toString() ??
-                      "";
-                    const isCorrect = form.correctAnswer === key;
-                    return (
-                      <div
-                        key={key}
-                        className={`flex items-center gap-3 rounded-lg border-2 p-3 ${
-                          isCorrect
-                            ? "border-green-400 bg-green-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <span
-                          className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                            isCorrect
-                              ? "bg-green-500 text-white"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {OPTION_LABELS[i]}
-                        </span>
-                        <span>{optionText}</span>
-                        {isCorrect && (
-                          <CheckCircle2 className="size-4 text-green-500 ml-auto" />
-                        )}
-                      </div>
+                  // 2. If we were editing, scroll back to that question
+                  if (editingId) {
+                    const element = document.getElementById(
+                      `question-${editingId}`,
                     );
-                  })}
-                </div>
+                    element?.scrollIntoView({
+                      behavior: "instant",
+                      block: "center",
+                    });
 
-                {form.explanation && (
-                  <Card className="bg-blue-50 border-blue-200">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-blue-700">
-                        ব্যাখ্যা
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="py-2">
-                      <p className="text-sm whitespace-pre-wrap">
-                        {form.explanation}
-                      </p>
-                    </CardContent>
-                  </Card>
+                    // 3. NOW reset the form after the scroll logic is done
+                    resetForm();
+                  } else {
+                    resetForm();
+                  }
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingId ? "প্রশ্ন সম্পাদনা" : "নতুন প্রশ্ন"}
+                  </DialogTitle>
+                </DialogHeader>
+
+                {!previewMode ? (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="sm:col-span-2">
+                        <Label>প্রশ্ন *</Label>
+                        <Textarea
+                          required
+                          rows={3}
+                          value={form.questionText}
+                          onChange={(e) =>
+                            setForm({ ...form, questionText: e.target.value })
+                          }
+                          placeholder="প্রশ্নের বিষয়বস্তু লিখুন..."
+                        />
+                      </div>
+
+                      <div>
+                        <Label>ক) অপশন A *</Label>
+                        <Input
+                          required
+                          value={form.optionA}
+                          onChange={(e) =>
+                            setForm({ ...form, optionA: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>খ) অপশন B *</Label>
+                        <Input
+                          required
+                          value={form.optionB}
+                          onChange={(e) =>
+                            setForm({ ...form, optionB: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>গ) অপশন C *</Label>
+                        <Input
+                          required
+                          value={form.optionC}
+                          onChange={(e) =>
+                            setForm({ ...form, optionC: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>ঘ) অপশন D *</Label>
+                        <Input
+                          required
+                          value={form.optionD}
+                          onChange={(e) =>
+                            setForm({ ...form, optionD: e.target.value })
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <Label>সঠিক উত্তর *</Label>
+                        <Select
+                          value={form.correctAnswer}
+                          onValueChange={(v) =>
+                            setForm({ ...form, correctAnswer: v })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="A">ক) A</SelectItem>
+                            <SelectItem value="B">খ) B</SelectItem>
+                            <SelectItem value="C">গ) C</SelectItem>
+                            <SelectItem value="D">ঘ) D</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>বিষয়</Label>
+                        <Input
+                          value={form.subject}
+                          onChange={(e) =>
+                            setForm({ ...form, subject: e.target.value })
+                          }
+                          placeholder="বাংলা, ইংরেজি, গণিত..."
+                        />
+                      </div>
+
+                      <div>
+                        <Label>ক্রম নম্বর</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={form.sortOrder}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              sortOrder: parseInt(e.target.value) || 0,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <Label>ব্যাখ্যা</Label>
+                        <Textarea
+                          rows={4}
+                          value={form.explanation}
+                          onChange={(e) =>
+                            setForm({ ...form, explanation: e.target.value })
+                          }
+                          placeholder="উত্তরের ব্যাখ্যা লিখুন..."
+                        />
+                      </div>
+                    </div>
+
+                    <DialogFooter className="gap-2 sm:gap-0">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setPreviewMode(true)}
+                      >
+                        প্রিভিউ
+                      </Button>
+                      <Button type="submit" disabled={saving}>
+                        {saving
+                          ? "সংরক্ষণ হচ্ছে..."
+                          : editingId
+                            ? "আপডেট করুন"
+                            : "সংরক্ষণ করুন"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                ) : (
+                  /* Preview Mode */
+                  <div className="space-y-4">
+                    <Card>
+                      <CardContent className="py-4">
+                        <p className="text-lg whitespace-pre-wrap">
+                          {form.questionText}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <div className="space-y-2">
+                      {(["A", "B", "C", "D"] as const).map((key, i) => {
+                        const optionText =
+                          form[
+                            `option${key}` as keyof typeof form
+                          ]?.toString() ?? "";
+                        const isCorrect = form.correctAnswer === key;
+                        return (
+                          <div
+                            key={key}
+                            className={`flex items-center gap-3 rounded-lg border-2 p-3 ${
+                              isCorrect
+                                ? "border-green-400 bg-green-50"
+                                : "border-gray-200"
+                            }`}
+                          >
+                            <span
+                              className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                                isCorrect
+                                  ? "bg-green-500 text-white"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {OPTION_LABELS[i]}
+                            </span>
+                            <span>{optionText}</span>
+                            {isCorrect && (
+                              <CheckCircle2 className="size-4 text-green-500 ml-auto" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {form.explanation && (
+                      <Card className="bg-blue-50 border-blue-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm text-blue-700">
+                            ব্যাখ্যা
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="py-2">
+                          <p className="text-sm whitespace-pre-wrap">
+                            {form.explanation}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <DialogFooter className="gap-2 sm:gap-0">
+                      <Button
+                        variant="outline"
+                        onClick={() => setPreviewMode(false)}
+                      >
+                        সম্পাদনায় ফিরুন
+                      </Button>
+                    </DialogFooter>
+                  </div>
                 )}
-
-                <DialogFooter className="gap-2 sm:gap-0">
-                  <Button
-                    variant="outline"
-                    onClick={() => setPreviewMode(false)}
-                  >
-                    সম্পাদনায় ফিরুন
-                  </Button>
-                </DialogFooter>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+              </DialogContent>
+            </Dialog>
           </AdminPageHeader>
         </div>
       </div>
 
       {/* Stats */}
       {questions.length > 0 && (
-        <AdminStatsBar
-          stats={stats}
-          className="grid-cols-3 sm:grid-cols-3"
-        />
+        <AdminStatsBar stats={stats} className="grid-cols-3 sm:grid-cols-3" />
       )}
 
       {/* Question List */}

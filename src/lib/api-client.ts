@@ -1,6 +1,6 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
-
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" ? "/api" : "http://localhost:3002/api");
 /** Default request timeout in milliseconds */
 const REQUEST_TIMEOUT = 15_000;
 
@@ -78,10 +78,7 @@ export const apiClient = {
   // into an object URL via URL.createObjectURL().
   async getBlob(endpoint: string, cacheBust?: string | number): Promise<Blob> {
     const token = getToken();
-    const headers: Record<string, string> = {
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-    };
+    const headers: Record<string, string> = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const sep = endpoint.includes("?") ? "&" : "?";
@@ -90,11 +87,36 @@ export const apiClient = {
         ? `${API_BASE_URL}${endpoint}${sep}v=${encodeURIComponent(String(cacheBust))}`
         : `${API_BASE_URL}${endpoint}`;
 
-    const res = await fetch(url, { headers, cache: "no-store" });
-    if (!res.ok) {
-      throw new ApiError(res.status, `Failed to fetch ${endpoint}: ${res.status}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT * 4);
+
+    try {
+      const res = await fetch(url, {
+        headers,
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        let message = `Failed to fetch ${endpoint}: ${res.status}`;
+        try {
+          const json = JSON.parse(body) as { error?: { message?: string } };
+          if (json.error?.message) message = json.error.message;
+        } catch {
+          /* not JSON */
+        }
+        throw new ApiError(res.status, message);
+      }
+      return res.blob();
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+      if (err instanceof DOMException && err.name === "AbortError") {
+        throw new ApiError(408, "Request timeout — please try again");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
-    return res.blob();
   },
 
   post: <T>(endpoint: string, body: unknown) =>

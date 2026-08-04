@@ -15,7 +15,7 @@ import {
 import type { QuestionSet } from "@/features/question-sets";
 import { routineService } from "@/features/routines";
 import { AlertCircle, CheckCircle, Loader } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("bn-BD", {
@@ -31,9 +31,12 @@ export default function ManageQuestionSetAutoMotion() {
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const hasChecked = useRef(false);
 
   // Auto-check on mount
   useEffect(() => {
+    if (hasChecked.current) return;
+    hasChecked.current = true;
     const checkAndCreate = async () => {
       setLoading(true);
       setError(null);

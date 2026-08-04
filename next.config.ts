@@ -1,8 +1,22 @@
 import type { NextConfig } from "next";
 
+const API_PROXY_TARGET =
+  process.env.API_PROXY_TARGET || "http://localhost:3002";
+
 const nextConfig: NextConfig = {
   // Enable gzip/brotli compression for smaller payloads
   compress: true,
+
+  // Dev: proxy /api/v1/* to Express backend so login works even when env is missing.
+  // App Router handlers under /api/ai/* still take precedence over this rewrite.
+  async rewrites() {
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: `${API_PROXY_TARGET}/api/v1/:path*`,
+      },
+    ];
+  },
 
   // Optimize images for faster loading
   images: {

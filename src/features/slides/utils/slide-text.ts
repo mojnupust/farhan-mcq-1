@@ -7,9 +7,19 @@ export function decodeSlideText(text: string): string {
   return decodeHtmlEntities(text);
 }
 
+/** Branding chrome (header bar, footer) — not editable by members. */
+export function isSlideChromeNodeId(id: string): boolean {
+  return (
+    id.startsWith("header") ||
+    id.startsWith("footer") ||
+    id.startsWith("brand") ||
+    id === "question-panel"
+  );
+}
+
 export function isEditableSlideTextNode(node: SceneNode): boolean {
   if (node.type !== "text" || !node.text?.trim()) return false;
-  if (node.id.startsWith("header") || node.id.startsWith("footer")) return false;
+  if (isSlideChromeNodeId(node.id)) return false;
   return true;
 }
 
@@ -18,6 +28,49 @@ export interface SlidePreviewLine {
   text: string;
   bold: boolean;
   color: string;
+}
+
+export interface SlideChromePreview {
+  headerTitle: string;
+  headerCount: string;
+  footerText: string;
+  headerHeight: number;
+  footerHeight: number;
+}
+
+function findTextNode(scene: Scene, ids: string[]): string {
+  for (const id of ids) {
+    const node = scene.nodes.find((n) => n.id === id && n.type === "text");
+    if (node?.text?.trim()) return decodeSlideText(node.text);
+  }
+  return "";
+}
+
+function findRectHeight(scene: Scene, ids: string[], fallback: number): number {
+  for (const id of ids) {
+    const node = scene.nodes.find((n) => n.id === id && n.type === "rect");
+    if (node?.height) return node.height;
+  }
+  return fallback;
+}
+
+/** Extract header/footer labels from scene JSON for browser fallback preview. */
+export function extractSlideChrome(scene: Scene): SlideChromePreview | null {
+  const hasHeader = scene.nodes.some(
+    (n) => n.id === "header-bg" || n.id === "brand-bar",
+  );
+  const hasFooter = scene.nodes.some((n) => n.id === "footer-bg");
+  if (!hasHeader && !hasFooter) return null;
+
+  return {
+    headerTitle: findTextNode(scene, ["header-title", "brand-title"]) || "Farhan MCQ",
+    headerCount: findTextNode(scene, ["header-slide-count", "brand-count"]),
+    footerText:
+      findTextNode(scene, ["footer-text"]) ||
+      "সরকারি চাকরি প্রস্তুতি — Farhan MCQ",
+    headerHeight: findRectHeight(scene, ["header-bg", "brand-bar"], 54),
+    footerHeight: findRectHeight(scene, ["footer-bg"], 40),
+  };
 }
 
 /** Text nodes sorted top-to-bottom for readable card preview (Bangla + English). */
@@ -48,4 +101,11 @@ export function decodeSceneTextForDisplay(scene: Scene): Scene {
       return { ...node, text: decodeSlideText(node.text) };
     }),
   };
+}
+
+/** Normalize updatedAt to a numeric cache-bust key. */
+export function slideImageVersionKey(updatedAt: string | number): number {
+  if (typeof updatedAt === "number") return updatedAt;
+  const ms = Date.parse(updatedAt);
+  return Number.isNaN(ms) ? Date.now() : ms;
 }

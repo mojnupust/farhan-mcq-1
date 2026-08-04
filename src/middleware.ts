@@ -50,8 +50,6 @@ const securityHeaders = {
   // Prevent cross-origin information leakage
   "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
-  "Cross-Origin-Opener-Policy": "same-origin",
-  "Cross-Origin-Resource-Policy": "same-origin",
 };
 
 export function middleware(request: NextRequest) {
