@@ -1,5 +1,7 @@
 "use client";
 
+import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,17 +14,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
-import type {
-  BulkUpsertQuestionItem,
-  QuestionSet,
-} from "@/features/question-sets";
-import { questionSetService } from "@/features/question-sets";
+import type { BulkUpsertRoutineItem, Routine } from "@/features/routines";
+import { routineService } from "@/features/routines";
+import type { SubExamCategory } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
+import type { Syllabus } from "@/features/syllabus";
+import { syllabusService } from "@/features/syllabus";
 import {
   AlertCircle,
   ArrowLeft,
+  BookOpen,
   Bot,
+  CalendarDays,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -33,16 +38,15 @@ import {
   Save,
   Server,
   Sparkles,
-  Star,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-// "mistral"/"anthropic"/"gemini" call their own official API directly.
+// "mistral"/"anthropic"/"gemini"/"openai" call their own official API directly.
 // "omniroute" is a self-hosted local gateway used only for ITS OWN
 // free/local models — never as a proxy for the official integrations above.
-type AiProvider = "mistral" | "omniroute" | "anthropic" | "gemini";
+type AiProvider = "mistral" | "omniroute" | "anthropic" | "gemini" | "openai";
 
 interface ModelOption {
   id: string;
@@ -52,51 +56,83 @@ interface ModelOption {
   subModels?: string[]; // only populated for the "omniroute" entry
 }
 
-interface ParsedQuestion {
-  questionText: string;
-  optionA: string;
-  optionB: string;
-  optionC: string;
-  optionD: string;
-  correctAnswer: string;
-  explanation: string;
-  examName: string;
+interface GeneratedDay {
+  dayNumber: number;
+  date: string; // YYYY-MM-DD
+  title: string;
   subject: string;
-  topic: string;
-  subTopic: string;
-  frequencyTag: string;
-  sortOrder: number;
+  topics: string;
+  sourceMaterial: string;
+  description: string;
+  totalMarks: number;
+  duration: number;
 }
 
-const ANSWER_LABELS: Record<string, string> = {
-  A: "ক",
-  B: "খ",
-  C: "গ",
-  D: "ঘ",
-};
+const WEEKDAY_OPTIONS: { value: string; label: string }[] = [
+  { value: "none", label: "কোনো ছুটির দিন নেই — প্রতিদিন রুটিন" },
+  { value: "5", label: "শুক্রবার ছুটি" },
+  { value: "6", label: "শনিবার ছুটি" },
+  { value: "0", label: "রবিবার ছুটি" },
+  { value: "1", label: "সোমবার ছুটি" },
+  { value: "2", label: "মঙ্গলবার ছুটি" },
+  { value: "3", label: "বুধবার ছুটি" },
+  { value: "4", label: "বৃহস্পতিবার ছুটি" },
+];
 
-// Used only when a set has already hit (or exceeded) its mark-based target
-// but the user still wants to generate a few more questions manually.
-const FALLBACK_BATCH_COUNT = 10;
+function todayInputDate(): string {
+  return new Date().toISOString().split("T")[0]!;
+}
 
-export default function AiImportPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id: questionSetId } = use(params);
+function addDaysToDateString(dateStr: string, days: number): string {
+  const d = new Date(dateStr + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().split("T")[0]!;
+}
 
-  // ── Question set context (auto-loaded — replaces the old manual subject field) ──
-  const [questionSet, setQuestionSet] = useState<QuestionSet | null>(null);
-  const [examCategoryName, setExamCategoryName] = useState("");
-  const [subExamCategoryName, setSubExamCategoryName] = useState("");
-  const [existingCount, setExistingCount] = useState(0);
-  const [loadingContext, setLoadingContext] = useState(true);
-  const [contextError, setContextError] = useState<string | null>(null);
+function formatDateBn(dateStr: string): string {
+  return new Date(dateStr + "T00:00:00Z").toLocaleDateString("bn-BD", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+  });
+}
 
-  // ── AI model choice — loaded from the model catalog (Mistral, Claude
-  // Opus/Sonnet, Gemini Pro, Local OmniRoute), each flagged available/
-  // unavailable depending on which API keys are configured server-side.
+function stripTagsPreview(content: string, contentType: string): string {
+  const text =
+    contentType === "html" ? content.replace(/<[^>]+>/g, " ") : content;
+  const collapsed = text
+    .replace(/[#*_>\-`]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return collapsed.length > 220 ? collapsed.slice(0, 220) + "…" : collapsed;
+}
+
+export default function RoutineAiImportPage() {
+  // ── Category / sub-category / syllabus selection ──
+  const [categories, setCategories] = useState<ExamCategory[]>([]);
+  const [selectedCatId, setSelectedCatId] = useState("");
+  const [subCategories, setSubCategories] = useState<SubExamCategory[]>([]);
+  const [selectedSubSlug, setSelectedSubSlug] = useState("");
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  const [syllabuses, setSyllabuses] = useState<Syllabus[]>([]);
+  const [selectedSyllabusId, setSelectedSyllabusId] = useState("");
+  const [loadingSyllabuses, setLoadingSyllabuses] = useState(false);
+
+  const [existingRoutines, setExistingRoutines] = useState<Routine[]>([]);
+
+  // ── Schedule config ──
+  const [startDate, setStartDate] = useState(todayInputDate());
+  const [totalDays, setTotalDays] = useState(90);
+  const [offWeekday, setOffWeekday] = useState("none");
+  const [defaultTotalMarks, setDefaultTotalMarks] = useState(20);
+  const [defaultDuration, setDefaultDuration] = useState(10);
+
+  // ── AI model choice — loaded from the same model catalog used for
+  // question generation (Mistral, Claude Opus/Sonnet, Gemini Pro, GPT,
+  // Local OmniRoute), each flagged available/unavailable depending on
+  // which API keys are configured server-side. ──
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [modelOptionsLoading, setModelOptionsLoading] = useState(true);
   const [modelOptionsError, setModelOptionsError] = useState<string | null>(
@@ -106,69 +142,101 @@ export default function AiImportPage({
     useState<string>("mistral-large");
   const [omniModel, setOmniModel] = useState("auto");
 
-  const [rawText, setRawText] = useState("");
-  const [startSortOrder, setStartSortOrder] = useState(1);
-  const [parsing, setParsing] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<ParsedQuestion[] | null>(null);
+  const [days, setDays] = useState<GeneratedDay[] | null>(null);
   const [expandedSet, setExpandedSet] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const [savedCount, setSavedCount] = useState<number | null>(null);
 
-  // Load the question set + its exam/sub-exam category names + how many
-  // questions already exist, so subject/topics/source/target-count are all
-  // known automatically instead of being typed in by hand.
+  // ── Load exam categories ──
   useEffect(() => {
-    let cancelled = false;
-
     (async () => {
-      setLoadingContext(true);
-      setContextError(null);
+      setLoadingCategories(true);
       try {
-        const [qs, existingQuestions, categories] = await Promise.all([
-          questionSetService.getById(questionSetId),
-          questionSetService.getQuestions(questionSetId),
-          examCategoryService.getAll(),
-        ]);
-        if (cancelled) return;
-
-        setQuestionSet(qs);
-        setExistingCount(existingQuestions.length);
-        setStartSortOrder(existingQuestions.length + 1);
-
-        for (const cat of categories) {
-          const subs = await subExamCategoryService.getByCategorySlug(cat.slug);
-          const match = subs.find((s) => s.id === qs.subExamCategoryId);
-          if (match) {
-            if (!cancelled) {
-              setExamCategoryName(cat.name);
-              setSubExamCategoryName(match.name);
-            }
-            break;
-          }
-        }
+        const cats = await examCategoryService.getAll();
+        setCategories(cats);
+        if (cats.length > 0) setSelectedCatId(cats[0].id);
       } catch (err) {
-        if (!cancelled) {
-          setContextError(
-            err instanceof Error
-              ? err.message
-              : "প্রশ্নসেটের তথ্য লোড করতে ব্যর্থ হয়েছে",
-          );
-        }
+        console.error(err);
       } finally {
-        if (!cancelled) setLoadingContext(false);
+        setLoadingCategories(false);
       }
     })();
+  }, []);
 
+  // ── Load sub-categories when category changes ──
+  useEffect(() => {
+    if (!selectedCatId) return;
+    const cat = categories.find((c) => c.id === selectedCatId);
+    if (!cat) return;
+    (async () => {
+      try {
+        const subs = await subExamCategoryService.getByCategorySlug(cat.slug);
+        setSubCategories(subs);
+        setSelectedSubSlug(subs.length > 0 ? subs[0]!.slug : "");
+      } catch (err) {
+        console.error(err);
+        setSubCategories([]);
+        setSelectedSubSlug("");
+      }
+    })();
+  }, [selectedCatId, categories]);
+
+  const selectedSub = subCategories.find((s) => s.slug === selectedSubSlug);
+
+  // ── Load syllabuses + existing routines for the chosen sub-category ──
+  useEffect(() => {
+    if (!selectedSubSlug) {
+      setSyllabuses([]);
+      setSelectedSyllabusId("");
+      setExistingRoutines([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setLoadingSyllabuses(true);
+      try {
+        const [syls, routines] = await Promise.all([
+          syllabusService.getBySubCategorySlug(selectedSubSlug),
+          routineService.getBySubCategorySlug(selectedSubSlug),
+        ]);
+        if (cancelled) return;
+        const activeSyls = syls.filter((s) => s.isActive);
+        setSyllabuses(activeSyls);
+        setSelectedSyllabusId(activeSyls[0]?.id ?? "");
+        setExistingRoutines(routines);
+
+        // Default start date = the day after the latest existing routine
+        // for this sub-category, so a re-run continues the plan instead of
+        // overlapping it — unless the admin has already typed a date.
+        if (routines.length > 0) {
+          const maxDate = routines
+            .map((r) => r.date.split("T")[0]!)
+            .sort()
+            .at(-1)!;
+          setStartDate(addDaysToDateString(maxDate, 1));
+        } else {
+          setStartDate(todayInputDate());
+        }
+      } catch (err) {
+        console.error(err);
+        if (!cancelled) {
+          setSyllabuses([]);
+          setSelectedSyllabusId("");
+          setExistingRoutines([]);
+        }
+      } finally {
+        if (!cancelled) setLoadingSyllabuses(false);
+      }
+    })();
     return () => {
       cancelled = true;
     };
-  }, [questionSetId]);
+  }, [selectedSubSlug]);
 
-  // Load the full model catalog once — Mistral, Claude Opus/Sonnet, Gemini
-  // Pro (shown even before their keys are configured, greyed out until they
-  // are) plus OmniRoute's own live sub-model list.
+  // ── Load the full AI model catalog once ──
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -185,8 +253,6 @@ export default function AiImportPage({
           throw new Error(data.error ?? "মডেল তালিকা লোড ব্যর্থ হয়েছে");
         const options = data.options ?? [];
         setModelOptions(options);
-        // Default to the first available model rather than whatever
-        // happens to be first in the list (e.g. skip an unconfigured one).
         const firstAvailable = options.find((o) => o.available);
         if (firstAvailable) setSelectedModelId(firstAvailable.id);
       } catch (err) {
@@ -206,66 +272,84 @@ export default function AiImportPage({
     };
   }, []);
 
-  const totalNeeded = questionSet
-    ? Math.max(
-        1,
-        Math.round(questionSet.totalMarks / questionSet.markPerQuestion),
-      )
-    : 0;
-  const targetCount = questionSet
-    ? Math.max(0, totalNeeded - existingCount)
-    : 0;
-
   const selectedModel =
     modelOptions.find((o) => o.id === selectedModelId) ?? null;
+  const selectedSyllabus = syllabuses.find((s) => s.id === selectedSyllabusId);
+  const examCategoryName = categories.find((c) => c.id === selectedCatId)?.name;
 
-  const handleParse = async () => {
-    if (!rawText.trim() || !questionSet || !selectedModel) return;
-    setParsing(true);
+  const existingDates = useMemo(
+    () => new Set(existingRoutines.map((r) => r.date.split("T")[0])),
+    [existingRoutines],
+  );
+
+  const overlapCount = useMemo(
+    () => (days ?? []).filter((d) => existingDates.has(d.date)).length,
+    [days, existingDates],
+  );
+
+  const canGenerate =
+    !generating &&
+    !!selectedSub &&
+    !!selectedSyllabus &&
+    !!selectedModel &&
+    totalDays >= 1;
+
+  const handleGenerate = async () => {
+    if (!selectedSub || !selectedSyllabus || !selectedModel) return;
+    setGenerating(true);
     setError(null);
     setWarning(null);
-    setQuestions(null);
+    setDays(null);
     setSavedCount(null);
     try {
-      const res = await fetch("/api/ai/parse-questions", {
+      const res = await fetch("/api/ai/generate-routine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          rawText,
-          startSortOrder,
-          expectedCount: targetCount > 0 ? targetCount : FALLBACK_BATCH_COUNT,
+          syllabus: {
+            title: selectedSyllabus.title,
+            content: selectedSyllabus.content,
+            contentType: selectedSyllabus.contentType,
+          },
+          examCategoryName: examCategoryName || undefined,
+          subExamCategoryName: selectedSub.name,
+          totalDays,
+          startDate,
+          offWeekday: offWeekday === "none" ? null : Number(offWeekday),
+          defaultTotalMarks,
+          defaultDuration,
           provider: selectedModel.provider,
           model:
             selectedModel.provider === "omniroute"
               ? omniModel
               : selectedModel.id,
-          questionSet: {
-            subject: questionSet.subject,
-            topics: questionSet.topics,
-            sourceMaterial: questionSet.sourceMaterial,
-            title: questionSet.title,
-            examCategoryName: examCategoryName || undefined,
-            subExamCategoryName: subExamCategoryName || undefined,
-          },
         }),
       });
       const data = (await res.json()) as {
-        questions?: ParsedQuestion[];
+        routines?: GeneratedDay[];
         error?: string;
         warning?: string;
       };
       if (!res.ok) throw new Error(data.error ?? "Unknown error");
-      setQuestions(data.questions ?? []);
+      setDays(data.routines ?? []);
       if (data.warning) setWarning(data.warning);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "পার্স করতে ব্যর্থ হয়েছে");
+      setError(
+        err instanceof Error ? err.message : "রুটিন তৈরি করতে ব্যর্থ হয়েছে",
+      );
     } finally {
-      setParsing(false);
+      setGenerating(false);
     }
   };
 
-  const removeQuestion = (idx: number) => {
-    setQuestions((prev) => prev?.filter((_, i) => i !== idx) ?? null);
+  const updateDay = (idx: number, patch: Partial<GeneratedDay>) => {
+    setDays((prev) =>
+      prev ? prev.map((d, i) => (i === idx ? { ...d, ...patch } : d)) : null,
+    );
+  };
+
+  const removeDay = (idx: number) => {
+    setDays((prev) => prev?.filter((_, i) => i !== idx) ?? null);
     setExpandedSet((prev) => {
       const next = new Set<number>();
       prev.forEach((i) => {
@@ -286,31 +370,25 @@ export default function AiImportPage({
   };
 
   const handleSave = async () => {
-    if (!questions?.length) return;
+    if (!days?.length || !selectedSub) return;
     setSaving(true);
     setError(null);
     try {
-      const payload: BulkUpsertQuestionItem[] = questions.map((q) => ({
-        questionSetId,
-        questionText: q.questionText,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        correctAnswer: q.correctAnswer,
-        explanation: q.explanation || undefined,
-        examName: q.examName || undefined,
-        subject: q.subject || undefined,
-        topic: q.topic || undefined,
-        subTopic: q.subTopic || undefined,
-        frequencyTag: q.frequencyTag || undefined,
-        sortOrder: q.sortOrder,
+      const payload: BulkUpsertRoutineItem[] = days.map((d) => ({
+        subExamCategoryId: selectedSub.id,
+        date: d.date,
+        title: d.title,
+        totalMarks: d.totalMarks,
+        duration: d.duration,
+        subject: d.subject,
+        topics: d.topics || undefined,
+        sourceMaterial: d.sourceMaterial || undefined,
+        description: d.description || undefined,
       }));
-      await questionSetService.bulkUpsertQuestions(payload);
+      console.log("payload", JSON.stringify(payload, null, 2));
+      await routineService.bulkUpsert(payload);
       setSavedCount(payload.length);
-      setQuestions(null);
-      setRawText("");
-      setWarning(null);
+      setDays(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "সংরক্ষণ ব্যর্থ হয়েছে");
     } finally {
@@ -318,7 +396,7 @@ export default function AiImportPage({
     }
   };
 
-  const inPreview = questions !== null && savedCount === null;
+  const inPreview = days !== null && savedCount === null;
   const inSuccess = savedCount !== null;
 
   return (
@@ -326,26 +404,17 @@ export default function AiImportPage({
       {/* ── Header ── */}
       <div className="mb-6 flex items-start gap-3">
         <Button variant="ghost" size="icon" asChild className="mt-0.5 shrink-0">
-          <Link
-            href={`/admin/question-sets/${questionSetId}/questions`}
-            aria-label="ফিরে যান"
-          >
+          <Link href="/admin/routines" aria-label="ফিরে যান">
             <ArrowLeft className="size-5" />
           </Link>
         </Button>
-        <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-            <Bot className="size-5 text-primary" />
-            AI দিয়ে প্রশ্ন তৈরি করুন
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            অগোছালো টেক্সট বা রেফারেন্স বই থেকে টপিক পেস্ট করুন — AI এই সেটের
-            বিষয়/টপিক/উৎস অনুযায়ী প্রশ্ন তৈরি করবে
-          </p>
-        </div>
+        <AdminPageHeader
+          title="AI দিয়ে রুটিন তৈরি করুন"
+          subtitle="সিলেবাস বেছে নিন, দিন সংখ্যা দিন — AI পুরো সিলেবাস কভার করে একটি ধারাবাহিক রুটিন বানাবে"
+          icon={<Bot className="size-5" />}
+        />
       </div>
 
-      {/* ── Error Banner ── */}
       {error && (
         <div className="mb-4 flex gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -353,7 +422,6 @@ export default function AiImportPage({
         </div>
       )}
 
-      {/* ── Warning Banner ── */}
       {warning && (
         <div className="mb-4 flex gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -361,18 +429,17 @@ export default function AiImportPage({
         </div>
       )}
 
-      {/* ── Success Banner ── */}
       {inSuccess && (
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300">
           <CheckCircle className="size-4 shrink-0" />
           <span>
-            <strong>{savedCount}</strong> টি প্রশ্ন সফলভাবে সংরক্ষিত হয়েছে!
+            <strong>{savedCount}</strong> দিনের রুটিন সফলভাবে সংরক্ষিত হয়েছে!
           </span>
           <Link
-            href={`/admin/question-sets/${questionSetId}/questions`}
+            href="/admin/routines"
             className="ml-auto font-medium underline underline-offset-2"
           >
-            প্রশ্ন দেখুন →
+            রুটিন দেখুন →
           </Link>
         </div>
       )}
@@ -380,87 +447,195 @@ export default function AiImportPage({
       {/* ── Input Phase ── */}
       {!inPreview && (
         <div className="space-y-4">
-          {/* ── Question set context card (auto-loaded, read-only) ── */}
-          {loadingContext ? (
-            <div className="flex items-center gap-2 rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              প্রশ্নসেটের তথ্য লোড হচ্ছে…
-            </div>
-          ) : contextError ? (
-            <div className="flex gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-              <AlertCircle className="mt-0.5 size-4 shrink-0" />
-              <span>{contextError}</span>
-            </div>
-          ) : questionSet ? (
-            <div className="rounded-xl border bg-muted/30 p-4 text-sm space-y-2">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <Info className="size-3.5 text-muted-foreground" />
-                {examCategoryName && <Badge>{examCategoryName}</Badge>}
-                {subExamCategoryName && (
-                  <Badge variant="secondary">{subExamCategoryName}</Badge>
-                )}
-                <Badge variant="outline">{questionSet.subject}</Badge>
+          <AdminFilterBar
+            filters={[
+              {
+                id: "exam-category",
+                label: "পরীক্ষার ক্যাটাগরি",
+                placeholder: "নির্বাচন করুন",
+                value: selectedCatId,
+                onChange: setSelectedCatId,
+                options: categories.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                })),
+              },
+              {
+                id: "sub-exam-category",
+                label: "সাব-ক্যাটাগরি",
+                placeholder: "নির্বাচন করুন",
+                value: selectedSubSlug,
+                onChange: setSelectedSubSlug,
+                options: subCategories.map((s) => ({
+                  value: s.slug,
+                  label: s.name,
+                })),
+              },
+            ]}
+          />
+
+          {/* ── Syllabus picker ── */}
+          <div>
+            <Label className="mb-1.5 block font-medium">
+              সিলেবাস
+              {loadingSyllabuses && (
+                <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                  লোড হচ্ছে…
+                </span>
+              )}
+            </Label>
+            {loadingCategories ? (
+              <div className="flex items-center gap-2 rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" />
+                ক্যাটাগরি লোড হচ্ছে…
               </div>
-              {questionSet.topics && (
-                <p className="text-muted-foreground">
-                  <span className="font-medium text-foreground">টপিক: </span>
-                  {questionSet.topics}
-                </p>
-              )}
-              {questionSet.sourceMaterial && (
-                <p className="text-muted-foreground">
-                  <span className="font-medium text-foreground">উৎস: </span>
-                  {questionSet.sourceMaterial}
-                </p>
-              )}
-              <p className="text-muted-foreground">
-                <span className="font-medium text-foreground">প্রয়োজন: </span>
-                মোট {totalNeeded} টি প্রশ্ন ({questionSet.totalMarks} মার্ক ÷{" "}
-                {questionSet.markPerQuestion} মার্ক/প্রশ্ন)
-                {existingCount > 0 &&
-                  ` — ইতিমধ্যে ${existingCount} টি আছে, বাকি ${targetCount} টি`}
-                {targetCount === 0 &&
-                  existingCount > 0 &&
-                  " — সেট সম্পূর্ণ, চাইলে আরও যোগ করতে পারেন"}
+            ) : syllabuses.length === 0 && !loadingSyllabuses ? (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+                <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  এই সাব-ক্যাটাগরির জন্য কোনো সক্রিয় সিলেবাস পাওয়া যায়নি।{" "}
+                  <Link
+                    href="/admin/syllabus"
+                    className="font-medium underline"
+                  >
+                    আগে সিলেবাস যোগ করুন →
+                  </Link>
+                </span>
+              </div>
+            ) : (
+              <Select
+                value={selectedSyllabusId}
+                onValueChange={setSelectedSyllabusId}
+              >
+                <SelectTrigger className="h-9 w-full">
+                  <SelectValue placeholder="সিলেবাস নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {syllabuses.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {selectedSyllabus && (
+              <div className="mt-2 flex items-start gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                <BookOpen className="mt-0.5 size-3.5 shrink-0" />
+                <span>
+                  {stripTagsPreview(
+                    selectedSyllabus.content,
+                    selectedSyllabus.contentType,
+                  )}
+                </span>
+              </div>
+            )}
+            {existingRoutines.length > 0 && (
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                এই সাব-ক্যাটাগরিতে ইতিমধ্যে {existingRoutines.length}টি রুটিন
+                আছে — শেষ তারিখের পরের দিন থেকে ডিফল্ট শুরুর তারিখ বসানো হয়েছে।
+              </p>
+            )}
+          </div>
+
+          {/* ── Schedule config ── */}
+          <div className="rounded-xl border p-4">
+            <Label className="mb-3 flex items-center gap-1.5 font-medium">
+              <CalendarDays className="size-4" />
+              সময়সূচি
+            </Label>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div>
+                <Label htmlFor="start-date" className="mb-1.5 block text-xs">
+                  শুরুর তারিখ
+                </Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="total-days" className="mb-1.5 block text-xs">
+                  মোট দিন সংখ্যা
+                </Label>
+                <Input
+                  id="total-days"
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={totalDays}
+                  onChange={(e) =>
+                    setTotalDays(
+                      Math.min(365, Math.max(1, parseInt(e.target.value) || 1)),
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="default-marks" className="mb-1.5 block text-xs">
+                  দৈনিক মোট নম্বর
+                </Label>
+                <Input
+                  id="default-marks"
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={defaultTotalMarks}
+                  onChange={(e) =>
+                    setDefaultTotalMarks(
+                      Math.max(1, parseInt(e.target.value) || 1),
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="default-duration"
+                  className="mb-1.5 block text-xs"
+                >
+                  দৈনিক সময় (মিনিট)
+                </Label>
+                <Input
+                  id="default-duration"
+                  type="number"
+                  min={1}
+                  max={300}
+                  value={defaultDuration}
+                  onChange={(e) =>
+                    setDefaultDuration(
+                      Math.max(1, parseInt(e.target.value) || 1),
+                    )
+                  }
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Label htmlFor="off-weekday" className="mb-1.5 block text-xs">
+                সাপ্তাহিক ছুটি
+              </Label>
+              <Select value={offWeekday} onValueChange={setOffWeekday}>
+                <SelectTrigger id="off-weekday" className="h-9 w-full sm:w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {WEEKDAY_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                ছুটির দিন গোনায় ধরা হবে না — অর্থাৎ {totalDays} দিনের রুটিন
+                পেতে ছুটি বাদে {totalDays} কার্যদিবস লাগবে, ক্যালেন্ডারে তার
+                চেয়ে বেশি সময় লাগতে পারে।
               </p>
             </div>
-          ) : null}
-
-          <div>
-            <Label htmlFor="raw-text" className="mb-1.5 block font-medium">
-              অগোছালো টেক্সট / রেফারেন্স কনটেন্ট
-              <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-                OCR, PDF কপি, স্ক্যান, তৈরি প্রশ্ন, অথবা শুধু ব্যাখ্যামূলক
-                টেক্সট — যেকোনো ফরম্যাট
-              </span>
-            </Label>
-            <Textarea
-              id="raw-text"
-              rows={18}
-              value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
-              className="resize-y font-mono text-xs"
-              placeholder={`যেকোনো ফরম্যাটে টেক্সট পেস্ট করুন — তৈরি প্রশ্ন হলে AI বের করে নেবে, শুধু ব্যাখ্যা/নিয়ম হলে AI নতুন প্রশ্ন তৈরি করবে।`}
-            />
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <div className="max-w-xs">
-              <Label htmlFor="start-order" className="mb-1.5 block">
-                শুরুর ক্রম নম্বর
-              </Label>
-              <Input
-                id="start-order"
-                type="number"
-                min={1}
-                value={startSortOrder}
-                onChange={(e) =>
-                  setStartSortOrder(Math.max(1, parseInt(e.target.value) || 1))
-                }
-              />
-            </div>
-          </div>
-
+          {/* ── AI model picker ── */}
           <div>
             <Label className="mb-1.5 block">
               AI মডেল
@@ -533,36 +708,24 @@ export default function AiImportPage({
             </div>
           )}
 
-          {selectedModel?.provider === "omniroute" && (
-            <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-              <Info className="mt-0.5 size-3.5 shrink-0" />
-              Local (OmniRoute) ফ্রি ও নতুন মডেল দ্রুত যোগ করা যায়, কিন্তু
-              আউটপুট মানের নিশ্চয়তা ততটা নয় — এবং এই সার্ভারটি যেখানে চলছে
-              সেখান থেকে OmniRoute পৌঁছানো সম্ভব হতে হবে (লোকাল ডেভে ঠিক আছে;
-              Vercel-এ deploy করা থাকলে OmniRoute Remote Mode লাগবে)।
-            </p>
-          )}
-
           <div className="flex items-center gap-3">
             <Button
-              onClick={handleParse}
-              disabled={
-                parsing || !rawText.trim() || !questionSet || !selectedModel
-              }
+              onClick={handleGenerate}
+              disabled={!canGenerate}
               className="gap-2"
             >
-              {parsing ? (
+              {generating ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <Sparkles className="size-4" />
               )}
-              {parsing
-                ? "AI প্রশ্ন তৈরি করছে…"
-                : `AI দিয়ে ${targetCount > 0 ? targetCount : FALLBACK_BATCH_COUNT} টি প্রশ্ন তৈরি করুন`}
+              {generating
+                ? "AI রুটিন তৈরি করছে…"
+                : `AI দিয়ে ${totalDays} দিনের রুটিন তৈরি করুন`}
             </Button>
-            {parsing && (
+            {generating && (
               <p className="text-sm text-muted-foreground">
-                বেশি প্রশ্ন হলে একাধিক ব্যাচে সময় নিতে পারে…
+                দিন সংখ্যা বেশি হলে একাধিক ব্যাচে সময় নিতে পারে…
               </p>
             )}
           </div>
@@ -570,28 +733,27 @@ export default function AiImportPage({
           <div className="rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground space-y-1.5">
             <p className="text-sm font-medium text-foreground">💡 টিপস</p>
             <p>
-              • বিষয়, টপিক, উৎস ও কতটি প্রশ্ন লাগবে — সবকিছু এই প্রশ্নসেট থেকেই
-              স্বয়ংক্রিয়ভাবে নেওয়া হয়, আলাদা করে লেখার দরকার নেই
+              • পুরো সিলেবাসের কনটেন্ট AI-কে দেওয়া হয় — সে পুরো সময়সীমার
+              মধ্যে সিলেবাসের সবকিছু যৌক্তিকভাবে ভাগ করে দেবে
             </p>
-            <p>• তৈরি প্রশ্ন পেস্ট করলে AI সেগুলো চিনে বের করে নেবে</p>
             <p>
-              • শুধু নিয়ম/সংজ্ঞা/ব্যাখ্যা পেস্ট করলেও AI সেখান থেকে নতুন
-              মানসম্মত প্রশ্ন তৈরি করবে
+              • সম্পর্কিত টপিকগুলো কাছাকাছি দিনে রাখা হয়, একদিনে একাধিক টপিক
+              থাকতে পারে
             </p>
-            <p>• &ldquo;উ. ক/খ/গ/ঘ&rdquo; মার্কার থেকে সঠিক উত্তর সনাক্ত হবে</p>
-            <p>• ব্যাখ্যা না থাকলেও AI বিস্তারিত ব্যাখ্যা তৈরি করবে</p>
+            <p>• শেষের প্রায় ১০% দিন স্বয়ংক্রিয়ভাবে রিভিশন/মডেল টেস্ট হবে</p>
+            <p>• সংরক্ষণের আগে প্রতিটি দিন সম্পাদনা বা বাদ দেওয়া যাবে</p>
           </div>
         </div>
       )}
 
       {/* ── Preview Phase ── */}
-      {inPreview && questions && (
+      {inPreview && days && (
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <CheckCircle className="size-4 text-green-500" />
               <span className="font-medium">
-                {questions.length} টি প্রশ্ন তৈরি হয়েছে
+                {days.length}টি দিনের রুটিন তৈরি হয়েছে
               </span>
               <span className="text-sm text-muted-foreground">
                 — সংরক্ষণের আগে যাচাই করুন
@@ -601,16 +763,16 @@ export default function AiImportPage({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setQuestions(null)}
+                onClick={() => setDays(null)}
                 className="gap-1.5"
               >
                 <RefreshCw className="size-3.5" />
-                পুনরায় পার্স
+                পুনরায় তৈরি
               </Button>
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={saving || questions.length === 0}
+                disabled={saving || days.length === 0}
                 className="gap-1.5"
               >
                 {saving ? (
@@ -618,137 +780,186 @@ export default function AiImportPage({
                 ) : (
                   <Save className="size-3.5" />
                 )}
-                {saving
-                  ? "সংরক্ষণ হচ্ছে…"
-                  : `সংরক্ষণ করুন (${questions.length})`}
+                {saving ? "সংরক্ষণ হচ্ছে…" : `সংরক্ষণ করুন (${days.length})`}
               </Button>
             </div>
           </div>
 
+          {overlapCount > 0 && (
+            <div className="mb-4 flex gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span>
+                {overlapCount}টি দিনের তারিখে এই সাব-ক্যাটাগরিতে আগে থেকেই রুটিন
+                আছে — সংরক্ষণ করলে সেগুলো ডুপ্লিকেট হিসেবে যোগ হবে (আপডেট হবে
+                না)।
+              </span>
+            </div>
+          )}
+
           <div className="space-y-2">
-            {questions.map((q, idx) => (
-              <div
-                key={idx}
-                className="overflow-hidden rounded-xl border border-border bg-card"
-              >
-                <div className="flex items-start gap-3 px-4 py-3">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                    {q.sortOrder}
-                  </span>
+            {days.map((d, idx) => {
+              const hasOverlap = existingDates.has(d.date);
+              return (
+                <div
+                  key={idx}
+                  className="overflow-hidden rounded-xl border border-border bg-card"
+                >
+                  <div className="flex items-start gap-3 px-4 py-3">
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {d.dayNumber}
+                    </span>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium leading-snug">
-                      {q.questionText}
-                    </p>
-
-                    <div className="mt-2 grid grid-cols-2 gap-1">
-                      {(["A", "B", "C", "D"] as const).map((key) => {
-                        const optKey = `option${key}` as keyof ParsedQuestion;
-                        const text = q[optKey] as string;
-                        const isCorrect = q.correctAnswer === key;
-                        return (
-                          <div
-                            key={key}
-                            className={`flex items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-xs ${
-                              isCorrect
-                                ? "bg-green-50 font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-200"
-                                : "bg-muted/50 text-muted-foreground"
-                            }`}
-                          >
-                            <span
-                              className={`shrink-0 font-bold ${
-                                isCorrect
-                                  ? "text-green-600 dark:text-green-400"
-                                  : ""
-                              }`}
-                            >
-                              {ANSWER_LABELS[key]})
-                            </span>
-                            <span className="wrap-break-word">{text}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {(q.examName || q.subject || q.topic || q.frequencyTag) && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {q.examName && (
-                          <Badge className="text-xs">{q.examName}</Badge>
-                        )}
-                        {q.subject && (
-                          <Badge variant="secondary" className="text-xs">
-                            {q.subject}
-                          </Badge>
-                        )}
-                        {q.topic && (
-                          <Badge variant="outline" className="text-xs">
-                            {q.topic}
-                          </Badge>
-                        )}
-                        {q.frequencyTag && (
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge
+                          variant="outline"
+                          className="text-xs font-normal"
+                        >
+                          {formatDateBn(d.date)}
+                        </Badge>
+                        {hasOverlap && (
                           <Badge
                             variant="outline"
-                            className="gap-1 border-amber-300 text-xs text-amber-700 dark:text-amber-400"
+                            className="border-amber-300 text-xs text-amber-700 dark:text-amber-400"
                           >
-                            <Star className="size-3" />
-                            {q.frequencyTag}
+                            আগে থেকে আছে
                           </Badge>
                         )}
                       </div>
-                    )}
+
+                      <Input
+                        value={d.title}
+                        onChange={(e) =>
+                          updateDay(idx, { title: e.target.value })
+                        }
+                        className="text-sm font-medium"
+                        placeholder="শিরোনাম"
+                      />
+
+                      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                        <Input
+                          value={d.subject}
+                          onChange={(e) =>
+                            updateDay(idx, { subject: e.target.value })
+                          }
+                          className="text-xs"
+                          placeholder="বিষয়"
+                        />
+                        <Input
+                          value={d.topics}
+                          onChange={(e) =>
+                            updateDay(idx, { topics: e.target.value })
+                          }
+                          className="text-xs"
+                          placeholder="টপিক"
+                        />
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-1.5">
+                          <Label className="text-xs text-muted-foreground">
+                            নম্বর
+                          </Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={d.totalMarks}
+                            onChange={(e) =>
+                              updateDay(idx, {
+                                totalMarks: Math.max(
+                                  1,
+                                  parseInt(e.target.value) || 1,
+                                ),
+                              })
+                            }
+                            className="h-7 w-20 text-xs"
+                          />
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Label className="text-xs text-muted-foreground">
+                            সময় (মি.)
+                          </Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={d.duration}
+                            onChange={(e) =>
+                              updateDay(idx, {
+                                duration: Math.max(
+                                  1,
+                                  parseInt(e.target.value) || 1,
+                                ),
+                              })
+                            }
+                            className="h-7 w-20 text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      <button
+                        onClick={() => toggleExpand(idx)}
+                        className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        title={
+                          expandedSet.has(idx) ? "বর্ণনা লুকান" : "বর্ণনা দেখুন"
+                        }
+                      >
+                        {expandedSet.has(idx) ? (
+                          <ChevronUp className="size-4" />
+                        ) : (
+                          <ChevronDown className="size-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => removeDay(idx)}
+                        className="rounded p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                        title="এই দিন বাদ দিন"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-0.5">
-                    <button
-                      onClick={() => toggleExpand(idx)}
-                      className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                      title={
-                        expandedSet.has(idx)
-                          ? "ব্যাখ্যা লুকান"
-                          : "ব্যাখ্যা দেখুন"
-                      }
-                    >
-                      {expandedSet.has(idx) ? (
-                        <ChevronUp className="size-4" />
-                      ) : (
-                        <ChevronDown className="size-4" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => removeQuestion(idx)}
-                      className="rounded p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
-                      title="এই প্রশ্ন বাদ দিন"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
-                  </div>
+                  {expandedSet.has(idx) && (
+                    <div className="space-y-2 border-t border-border bg-muted/20 px-4 py-3">
+                      <div>
+                        <p className="mb-1 text-xs font-medium text-muted-foreground">
+                          বর্ণনা
+                        </p>
+                        <Textarea
+                          value={d.description}
+                          onChange={(e) =>
+                            updateDay(idx, { description: e.target.value })
+                          }
+                          rows={2}
+                          className="text-xs"
+                        />
+                      </div>
+                      <div>
+                        <p className="mb-1 text-xs font-medium text-muted-foreground">
+                          উৎস
+                        </p>
+                        <Input
+                          value={d.sourceMaterial}
+                          onChange={(e) =>
+                            updateDay(idx, { sourceMaterial: e.target.value })
+                          }
+                          className="text-xs"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {expandedSet.has(idx) && (
-                  <div className="border-t border-border bg-muted/20 px-4 py-3">
-                    <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                      ব্যাখ্যা
-                    </p>
-                    <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-card-foreground">
-                      {q.explanation || "(কোনো ব্যাখ্যা নেই)"}
-                    </pre>
-                    {q.subTopic && (
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        সাব-টপিক:{" "}
-                        <span className="font-medium">{q.subTopic}</span>
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {questions.length > 0 && (
+          {days.length > 0 && (
             <div className="sticky bottom-4 mt-6 flex justify-end">
               <div className="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 shadow-lg">
                 <span className="text-sm text-muted-foreground">
-                  {questions.length} টি প্রশ্ন প্রস্তুত
+                  {days.length}টি দিন প্রস্তুত
                 </span>
                 <Button
                   onClick={handleSave}
@@ -765,6 +976,13 @@ export default function AiImportPage({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {!selectedSub && !loadingCategories && (
+        <div className="mt-4 flex items-start gap-2 rounded-lg border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+          <Info className="mt-0.5 size-4 shrink-0" />
+          <span>শুরু করতে উপরে একটি পরীক্ষার সাব-ক্যাটাগরি নির্বাচন করুন।</span>
         </div>
       )}
     </div>

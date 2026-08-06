@@ -34,6 +34,7 @@ import type { SubExamCategory } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
 import {
   BookOpen,
+  Bot,
   Calendar,
   CheckCircle2,
   Clock,
@@ -252,6 +253,12 @@ export default function AdminRoutinesPage() {
         count={routines.length}
         countLabel="টি রুটিন"
       >
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin/routines/ai-import">
+            <Bot className="size-4 mr-1.5" />
+            AI দিয়ে তৈরি
+          </Link>
+        </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href="/admin/routines/bulk-edit">
             <Table2 className="size-4 mr-1.5" />
