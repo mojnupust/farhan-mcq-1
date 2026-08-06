@@ -42,7 +42,7 @@ import { use, useEffect, useState } from "react";
 // "mistral"/"anthropic"/"gemini" call their own official API directly.
 // "omniroute" is a self-hosted local gateway used only for ITS OWN
 // free/local models — never as a proxy for the official integrations above.
-type AiProvider = "mistral" | "omniroute" | "anthropic" | "gemini" | "openai";
+type AiProvider = "mistral" | "omniroute" | "anthropic" | "gemini";
 
 interface ModelOption {
   id: string;

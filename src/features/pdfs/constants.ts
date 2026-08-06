@@ -1,0 +1,99 @@
+import type { PdfDocType, PdfFilter, SubExamCategoryOption } from "./types";
+
+export const PDF_DOC_TYPES: {
+  value: PdfDocType;
+  label: string;
+  emoji: string;
+}[] = [
+  { value: "SYLLABUS", label: "সিলেবাস", emoji: "📘" },
+  { value: "ROUTINE", label: "রুটিন", emoji: "🗓️" },
+  { value: "QUESTION_BANK", label: "প্রশ্নব্যাংক", emoji: "📝" },
+  { value: "PREVIOUS_QUESTIONS", label: "বিগত প্রশ্ন সমাধান", emoji: "📚" },
+  { value: "BOOK_GUIDE", label: "বই / গাইড", emoji: "📖" },
+  { value: "NOTES", label: "রিভিশন নোট", emoji: "🗒️" },
+  { value: "MODEL_TEST", label: "মডেল টেস্ট", emoji: "✅" },
+  { value: "OTHER", label: "অন্যান্য", emoji: "📄" },
+];
+
+export const PDF_SORT_OPTIONS: {
+  value: NonNullable<PdfFilter["sort"]>;
+  label: string;
+}[] = [
+  { value: "newest", label: "নতুন আগে" },
+  { value: "popular", label: "জনপ্রিয়" },
+  { value: "most_downloaded", label: "সর্বাধিক ডাউনলোড" },
+  { value: "most_viewed", label: "সর্বাধিক দেখা" },
+];
+
+export function docTypeLabel(value: PdfDocType): string {
+  return PDF_DOC_TYPES.find((c) => c.value === value)?.label ?? value;
+}
+
+// Pulled from sub_exam_categories_rows.json + one extra id spotted as a
+// foreign key inside syllabuses_rows.json (DSS) that wasn't in that sample.
+// Once the API is wired up, fetch this list from the sub_exam_categories
+// table instead of hardcoding it here.
+export const SUB_EXAM_CATEGORIES: SubExamCategoryOption[] = [
+  { id: "cmnv745290005uxikq56hsyxc", name: "বিসিএস প্রিলিমিনারি জব সল্যুশন" },
+  {
+    id: "cmnv7455y0007uxikovownw5m",
+    name: "বেসরকারি শিক্ষক নিয়োগ (NTRCA) জব সল্যুশন",
+  },
+  {
+    id: "cmnv745hc000huxikxavri5d3",
+    name: "19th (NTRCA) বেসরকারি শিক্ষক নিয়োগ প্রস্তুতি",
+  },
+  { id: "cmopm6c5u0001uxzgaig4s2gf", name: "Only ICT" },
+  {
+    id: "cmpyvd9m70001uxgcoxb7tx5f",
+    name: "সমাজসেবা অধিদপ্তর (DSS) নিয়োগ পরীক্ষা",
+  },
+];
+
+export function subExamCategoryLabel(id?: string | null): string {
+  if (!id) return "সাধারণ (কোনো নির্দিষ্ট বিভাগ নয়)";
+  return SUB_EXAM_CATEGORIES.find((c) => c.id === id)?.name ?? "অজানা বিভাগ";
+}
+
+export function formatFileSize(kb?: number): string {
+  if (!kb) return "—";
+  if (kb < 1024) return `${kb} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
+export function formatCount(n: number): string {
+  if (n >= 100000) return `${(n / 1000).toFixed(0)}k`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return `${n}`;
+}
+
+export function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffMin < 1) return "এইমাত্র";
+  if (diffMin < 60) return `${diffMin} মিনিট আগে`;
+  if (diffHour < 24) return `${diffHour} ঘণ্টা আগে`;
+  if (diffDay < 30) return `${diffDay} দিন আগে`;
+  return date.toLocaleDateString("bn-BD", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+// Very small client-side sanity check — this is not a real link
+// verification call (no backend yet), just enough to catch obvious typos
+// before saving.
+export function looksLikeFileUrl(value: string): boolean {
+  if (!value.trim()) return false;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}

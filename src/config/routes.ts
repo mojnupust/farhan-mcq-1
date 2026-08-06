@@ -49,6 +49,8 @@ export const ROUTES = {
     `/images/preview/${questionSetId}` as const,
   videos: "/videos",
   videoDetail: (id: string) => `/videos/${id}` as const,
+  pdf: "/pdf-library",
+  pdfDetail: (id: string) => `/pdf-library/${id}` as const,
 
   // Admin
   admin: "/admin",
@@ -62,6 +64,7 @@ export const ROUTES = {
   adminQuestions: "/admin/questions",
   adminQuestionSets: "/admin/question-sets",
   adminQuestionSetsAutomotion: "/admin/question-sets-automotion",
+  adminPdfManagement: "/admin/pdf-management",
   adminSubscriptions: "/admin/subscriptions",
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",
