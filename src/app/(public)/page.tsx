@@ -1,10 +1,6 @@
 import { BrandLogo } from "@/components/brand-logo";
 
-import {
-  FinalCTAButton,
-  HeroCTA,
-  PricingCTAButton,
-} from "@/components/landing-auth-cta";
+import { FinalCTAButton, HeroCTA } from "@/components/landing-auth-cta";
 import { LandingHeader } from "@/components/landing-header";
 import {
   Accordion,
@@ -22,7 +18,6 @@ import {
 } from "@/components/ui/card";
 import {
   BookOpen,
-  ChevronRight,
   Clock,
   Lock,
   MessageCircle,
@@ -36,6 +31,7 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Pricing from "./Pricing";
 
 export const metadata: Metadata = {
   title: "Farhan MCQ — সঠিক প্রস্তুতি, নিশ্চিত চাকরি",
@@ -402,58 +398,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── Pricing ── */}
-        <section className="border-b bg-muted/40">
-          <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <AnimateIn variant="scale-up" duration={600}>
-              <div className="mx-auto max-w-md text-center">
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  সহজ ও সাশ্রয়ী মূল্য
-                </h2>
-                <p className="mt-2 text-muted-foreground">
-                  একটি মেম্বারশিপ — সব কিছু অন্তর্ভুক্ত।
-                </p>
-                <Card className="mt-8 border-primary/30 shadow-lg card-hover-lift">
-                  <CardHeader className="text-center pb-2">
-                    <div className="mx-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary w-fit">
-                      সবচেয়ে জনপ্রিয়
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      bKash বা Nagad-এ পেমেন্ট
-                    </p>
-                    <CardTitle className="text-4xl font-bold mt-1">
-                      ৳৩৯
-                      <span className="text-lg font-normal text-muted-foreground">
-                        {" "}
-                        / মাস
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 text-left text-sm">
-                      {[
-                        "সকল MCQ ও ভিডিও কন্টেন্ট",
-                        "সাপ্তাহিক লাইভ সেশন",
-                        "প্রাইভেট ফেসবুক কমিউনিটি",
-                        "সব পরীক্ষার মডেল টেস্ট",
-                        "পার্সোনালাইজড প্রগ্রেস ট্র্যাকিং",
-                        "তাৎক্ষণিক ফলাফল ও ব্যাখ্যা",
-                      ].map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <ChevronRight className="mt-0.5 size-4 shrink-0 text-primary" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-4 text-xs text-muted-foreground text-center">
-                      কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
-                    </p>
-                    <PricingCTAButton />
-                  </CardContent>
-                </Card>
-              </div>
-            </AnimateIn>
-          </div>
-        </section>
+        <Pricing />
 
         {/* ── About ── */}
         <section className="border-b">
