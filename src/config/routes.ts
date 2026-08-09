@@ -68,5 +68,5 @@ export const ROUTES = {
   adminSubscriptions: "/admin/subscriptions",
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",
-  adminSettings: "#",
+  adminSettings: "/admin/settings",
 } as const;

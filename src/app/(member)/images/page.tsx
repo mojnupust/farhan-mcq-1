@@ -25,13 +25,22 @@ import {
   subExamCategoryService,
   type SubExamCategory,
 } from "@/features/sub-exam-categories";
-import { AlertTriangle, CheckCircle2, ImageIcon, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Construction,
+  ImageIcon,
+  Loader2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 90;
 const STUCK_QUEUED_MS = 45_000;
+
+// TODO: Auto Image → Auto PDF / AI Reel Video ফ্লো রেডি হলে true করে দাও।
+const FEATURE_ENABLED = false;
 
 function formatQuestionSetLabel(set: QuestionSet): string {
   const date = new Date(set.date).toLocaleDateString("bn-BD", {
@@ -79,6 +88,7 @@ export default function ImagesPage() {
   const showGenerateFlow = !hasCachedSlides || forceRegenerate;
 
   useEffect(() => {
+    if (!FEATURE_ENABLED) return;
     examCategoryService
       .getAll()
       .then(setExamCategories)
@@ -214,6 +224,52 @@ export default function ImagesPage() {
       : job?.status === "QUEUED"
         ? "কিউতে আছে — ওয়ার্কার শুরু করছে..."
         : "শুরু হচ্ছে...";
+
+  if (!FEATURE_ENABLED) {
+    return (
+      <div className="p-15">
+        <AnimateIn>
+          <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-5">
+            <div className="flex gap-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+                <Construction className="size-5" />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-amber-950">
+                  এই ফিচারটি সাময়িকভাবে বন্ধ আছে
+                </h3>
+
+                <p className="mt-1.5 text-sm leading-6 text-amber-900/75">
+                  নতুন ও আরও শক্তিশালী ভার্সন নিয়ে শীঘ্রই ফিরছে। আমরা ফিচারটি
+                  আরও সহজ ও স্বয়ংক্রিয় করার জন্য কাজ করছি।
+                </p>
+
+                <div className="mt-4 rounded-lg border border-amber-200/80 bg-white/70 p-4">
+                  <p className="mb-2 text-sm font-medium text-slate-800">
+                    নতুন ফ্লো হবে:
+                  </p>
+
+                  <ol className="ml-5 list-decimal space-y-1.5 text-sm text-slate-600">
+                    <li>প্রশ্নসেট নির্বাচন করুন</li>
+                    <li>প্রশ্নসেট থেকে অটোমেটিক স্লাইড তৈরি হবে</li>
+                    <li>
+                      স্লাইড থেকে অটোমেটিক PDF অথবা AI-জেনারেটেড প্রোমোশনাল রিল
+                      ভিডিও তৈরি হবে
+                    </li>
+                  </ol>
+                </div>
+
+                <p className="mt-3 text-xs text-amber-800/70">
+                  কাজ চলমান — ফিচারটি প্রস্তুত হলে এখানেই জানিয়ে দেওয়া হবে।
+                </p>
+              </div>
+            </div>
+          </div>
+        </AnimateIn>
+      </div>
+    );
+  }
 
   if (loadingExams) {
     return (

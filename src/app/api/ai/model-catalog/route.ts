@@ -1,5 +1,10 @@
-import { isProviderConfigured, listCatalog } from "@/lib/ai-model-catalog";
-import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-guard";
+import {
+  getFirstAvailableKey,
+  isProviderConfigured,
+  listCatalog,
+} from "@/lib/ai-model-catalog";
+import { type NextRequest, NextResponse } from "next/server";
 
 // Everything the AI-import model picker needs in one call: the static
 // catalog of officially-integrated models (shown even if not configured
@@ -16,7 +21,7 @@ const CACHE_TTL_MS = 5 * 60_000;
 let omniModelsCache: { models: string[]; fetchedAt: number } | null = null;
 
 async function fetchOmniRouteModels(): Promise<string[]> {
-  if (!isProviderConfigured("omniroute")) return [];
+  if (!(await isProviderConfigured("omniroute"))) return [];
   if (
     omniModelsCache &&
     Date.now() - omniModelsCache.fetchedAt < CACHE_TTL_MS
@@ -24,15 +29,8 @@ async function fetchOmniRouteModels(): Promise<string[]> {
     return omniModelsCache.models;
   }
 
-  const rawKeys =
-    process.env.OMNIROUTE_API_KEYS ??
-    process.env.OMNIROUTE_API_KEY ??
-    "omniroute-local-key";
   const key =
-    rawKeys
-      .split(",")
-      .map((k) => k.trim())
-      .filter(Boolean)[0] || "omniroute-local-key";
+    (await getFirstAvailableKey("omniroute")) || "omniroute-local-key";
 
   try {
     const res = await fetch(`${OMNIROUTE_BASE_URL}/models`, {
@@ -54,17 +52,20 @@ async function fetchOmniRouteModels(): Promise<string[]> {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = requireAdmin(req);
+  if (authError) return authError;
+
   const omniModels = await fetchOmniRouteModels();
 
   return NextResponse.json({
     options: [
-      ...listCatalog(),
+      ...(await listCatalog()),
       {
         id: "omniroute",
         provider: "omniroute" as const,
         label: "Local (OmniRoute)",
-        available: isProviderConfigured("omniroute"),
+        available: await isProviderConfigured("omniroute"),
         subModels: omniModels,
       },
     ],

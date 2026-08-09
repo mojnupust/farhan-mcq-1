@@ -18,14 +18,14 @@ export function PdfCard({ pdf, variant = "default" }: PdfCardProps) {
       href={`/pdf-library/${pdf.id}`}
       className={cn(
         "group flex flex-col overflow-hidden rounded-xl border bg-card transition-all hover:border-primary/30 hover:shadow-md",
-        variant === "featured" && "sm:flex-row",
+        variant === "featured" && "sm:flex-col",
       )}
     >
       <div
         className={cn(
-          "relative flex shrink-0 items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5",
+          "w-full h-[200px] relative flex shrink-0 items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5",
           variant === "featured"
-            ? "aspect-[4/3] sm:aspect-auto sm:w-40"
+            ? "aspect-[4/3] sm:aspect-auto sm:w-full"
             : "aspect-[4/3]",
         )}
       >

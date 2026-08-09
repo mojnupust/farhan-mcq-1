@@ -12,6 +12,8 @@
 // Adding a new officially-supported model later (e.g. a new Claude or GPT
 // release) means adding one entry to CATALOG below — no route/UI rewiring.
 
+import { getDbKeysForProvider } from "./ai-key-store";
+
 export type AiProviderId =
   | "mistral"
   | "omniroute"
@@ -31,48 +33,83 @@ export interface CallResult {
 interface KeySlot {
   key: string;
   lastUsedAt: number;
-  rateLimitedUntil: number; // epoch ms; 0 = not currently rate-limited
+  rateLimitedUntil: number;
 }
 
-const keyPools: Partial<Record<AiProviderId, KeySlot[]>> = {};
+// Key-string ধরে metadata persist করে রাখি, যাতে DB/env থেকে key list refresh
+// হলেও rate-limit cooldown আর round-robin fairness হারিয়ে না যায়।
+const slotMetaByKey = new Map<string, KeySlot>();
 
-function buildPool(raw: string): KeySlot[] {
+function toSlots(keys: string[]): KeySlot[] {
+  return keys.map((key) => {
+    const existing = slotMetaByKey.get(key);
+    if (existing) return existing;
+    const fresh: KeySlot = { key, lastUsedAt: 0, rateLimitedUntil: 0 };
+    slotMetaByKey.set(key, fresh);
+    return fresh;
+  });
+}
+
+const DB_PROVIDER_NAME: Record<
+  AiProviderId,
+  "MISTRAL" | "ANTHROPIC" | "GEMINI" | "OPENAI" | "OMNIROUTE"
+> = {
+  mistral: "MISTRAL",
+  anthropic: "ANTHROPIC",
+  gemini: "GEMINI",
+  openai: "OPENAI",
+  omniroute: "OMNIROUTE",
+};
+
+function envKeysFor(provider: AiProviderId): string[] {
+  const raw = (() => {
+    switch (provider) {
+      case "mistral":
+        return (
+          process.env.MISTRAL_API_KEYS ?? process.env.MISTRAL_API_KEY ?? ""
+        );
+      case "omniroute":
+        return process.env.OMNIROUTE_API_KEY || "";
+      case "anthropic":
+        return (
+          process.env.ANTHROPIC_API_KEYS ?? process.env.ANTHROPIC_API_KEY ?? ""
+        );
+      case "gemini":
+        return process.env.GEMINI_API_KEYS ?? process.env.GEMINI_API_KEY ?? "";
+      case "openai":
+        return process.env.OPENAI_API_KEYS ?? process.env.OPENAI_API_KEY ?? "";
+    }
+  })();
   return raw
     .split(",")
     .map((k) => k.trim())
-    .filter(Boolean)
-    .map((key) => ({ key, lastUsedAt: 0, rateLimitedUntil: 0 }));
+    .filter(Boolean);
 }
 
-function envKeysFor(provider: AiProviderId): string {
-  switch (provider) {
-    case "mistral":
-      return process.env.MISTRAL_API_KEYS ?? process.env.MISTRAL_API_KEY ?? "";
-    case "omniroute":
-      return process.env.OMNIROUTE_API_KEY || "omniroute";
-
-    case "anthropic":
-      return (
-        process.env.ANTHROPIC_API_KEYS ?? process.env.ANTHROPIC_API_KEY ?? ""
-      );
-    case "gemini":
-      return process.env.GEMINI_API_KEYS ?? process.env.GEMINI_API_KEY ?? "";
-
-    case "openai":
-      return process.env.OPENAI_API_KEYS ?? process.env.OPENAI_API_KEY ?? "";
-  }
+async function getKeyPool(provider: AiProviderId): Promise<KeySlot[]> {
+  const [envKeys, dbKeys] = await Promise.all([
+    Promise.resolve(envKeysFor(provider)),
+    getDbKeysForProvider(DB_PROVIDER_NAME[provider]),
+  ]);
+  // .env.local আর admin panel দুই জায়গাতেই একই key থাকলে dedupe করো
+  let merged = Array.from(new Set([...dbKeys, ...envKeys]));
+  // OmniRoute self-hosted local gateway — key ছাড়াও চলে, তাই আগের মতোই fallback রাখলাম
+  if (provider === "omniroute" && merged.length === 0) merged = ["omniroute"];
+  return toSlots(merged);
 }
 
-function getKeyPool(provider: AiProviderId): KeySlot[] {
-  const existing = keyPools[provider];
-  if (existing) return existing;
-  const pool = buildPool(envKeysFor(provider));
-  keyPools[provider] = pool;
-  return pool;
+export async function isProviderConfigured(
+  provider: AiProviderId,
+): Promise<boolean> {
+  return (await getKeyPool(provider)).length > 0;
 }
 
-export function isProviderConfigured(provider: AiProviderId): boolean {
-  return getKeyPool(provider).length > 0;
+/** model-catalog route এ OmniRoute /models list করার জন্য ব্যবহার হয়। */
+export async function getFirstAvailableKey(
+  provider: AiProviderId,
+): Promise<string | null> {
+  const pool = await getKeyPool(provider);
+  return pool[0]?.key ?? null;
 }
 
 function pickAvailableKey(pool: KeySlot[]): KeySlot | null {
@@ -83,8 +120,10 @@ function pickAvailableKey(pool: KeySlot[]): KeySlot | null {
   return available[0];
 }
 
-export function getEarliestRetryAfterSeconds(provider: AiProviderId): number {
-  const pool = getKeyPool(provider);
+export async function getEarliestRetryAfterSeconds(
+  provider: AiProviderId,
+): Promise<number> {
+  const pool = await getKeyPool(provider);
   const now = Date.now();
   const soonest =
     pool.length > 0
@@ -176,18 +215,17 @@ const CATALOG: ModelCatalogEntry[] = [
   },
 ];
 
-export function listCatalog(): {
-  id: string;
-  provider: AiProviderId;
-  label: string;
-  available: boolean;
-}[] {
-  return CATALOG.map((entry) => ({
-    id: entry.id,
-    provider: entry.provider,
-    label: entry.label,
-    available: isProviderConfigured(entry.provider),
-  }));
+export async function listCatalog(): Promise<
+  { id: string; provider: AiProviderId; label: string; available: boolean }[]
+> {
+  return Promise.all(
+    CATALOG.map(async (entry) => ({
+      id: entry.id,
+      provider: entry.provider,
+      label: entry.label,
+      available: await isProviderConfigured(entry.provider),
+    })),
+  );
 }
 
 function findCatalogEntry(id: string): ModelCatalogEntry | undefined {
@@ -406,7 +444,7 @@ export async function callModelWithRotation(
   prompt: string,
   maxOutputTokens: number,
 ): Promise<CallResult> {
-  const pool = getKeyPool(provider);
+  const pool = await getKeyPool(provider);
   if (pool.length === 0) throw new ProviderConfigError(provider);
 
   let lastError: unknown = null;

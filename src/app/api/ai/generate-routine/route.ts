@@ -1,5 +1,5 @@
+import { requireAdmin } from "@/lib/admin-guard";
 import {
-  type AiProviderId,
   callModelWithRotation,
   getEarliestRetryAfterSeconds,
   isProviderConfigured,
@@ -362,6 +362,9 @@ function toCoverageLine(day: ScheduleDay, content: AiRoutineDay): string {
 }
 
 export async function POST(req: NextRequest) {
+  const authError = requireAdmin(req);
+  if (authError) return authError;
+
   // ─── Per-IP Rate Limiting ──────────────────────────────────────────────
   const clientIp = getClientIp(req.headers);
   const rateLimitResult = rateLimit(clientIp, RATE_LIMIT_CONFIG);
@@ -440,19 +443,10 @@ export async function POST(req: NextRequest) {
   } = body;
 
   // ─── Provider / Key Config Check ──────────────────────────────────────
-  if (!isProviderConfigured(provider)) {
-    const envHint: Record<AiProviderId, string> = {
-      mistral:
-        "MISTRAL_API_KEYS=key1,key2,key3 (কমা দিয়ে একাধিক key দিতে পারবেন)",
-      omniroute:
-        "OMNIROUTE_API_KEY=your-key (OmniRoute dashboard → Endpoints থেকে key কপি করুন)",
-      anthropic: "ANTHROPIC_API_KEY=your-key (Anthropic console থেকে key নিন)",
-      gemini: "GEMINI_API_KEY=your-key (Google AI Studio থেকে key নিন)",
-      openai: "OPENAI_API_KEY=your-key (OpenAI platform থেকে key নিন)",
-    };
+  if (!(await isProviderConfigured(provider))) {
     return NextResponse.json(
       {
-        error: `"${provider}" এর জন্য API key সেট করা নেই। frontend/.env.local এ ${envHint[provider]} যোগ করুন।`,
+        error: `"${provider}" এর জন্য কোনো API key যোগ করা নেই। Admin → Settings → API Key Management থেকে একটি key যোগ করুন।`,
       },
       { status: 503 },
     );
@@ -583,7 +577,7 @@ export async function POST(req: NextRequest) {
       );
     }
     if (fatalError instanceof ProviderRateLimitError) {
-      const retryAfterSec = getEarliestRetryAfterSeconds(provider);
+      const retryAfterSec = await getEarliestRetryAfterSeconds(provider);
       return NextResponse.json(
         {
           error: `${resolved.label} এর সব API key বর্তমানে rate-limited (429)। কিছুক্ষণ পর আবার চেষ্টা করুন।`,

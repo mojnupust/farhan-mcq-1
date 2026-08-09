@@ -22,6 +22,7 @@ import type { SubExamCategory } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
 import type { Syllabus } from "@/features/syllabus";
 import { syllabusService } from "@/features/syllabus";
+import { authHeader } from "@/lib/auth-header";
 import {
   AlertCircle,
   ArrowLeft,
@@ -243,7 +244,9 @@ export default function RoutineAiImportPage() {
       setModelOptionsLoading(true);
       setModelOptionsError(null);
       try {
-        const res = await fetch("/api/ai/model-catalog");
+        const res = await fetch("/api/ai/model-catalog", {
+          headers: authHeader(),
+        });
         const data = (await res.json()) as {
           options?: ModelOption[];
           error?: string;
@@ -304,7 +307,7 @@ export default function RoutineAiImportPage() {
     try {
       const res = await fetch("/api/ai/generate-routine", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeader() },
         body: JSON.stringify({
           syllabus: {
             title: selectedSyllabus.title,

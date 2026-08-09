@@ -19,6 +19,7 @@ import type {
 } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
+import { authHeader } from "@/lib/auth-header";
 import {
   AlertCircle,
   ArrowLeft,
@@ -175,7 +176,9 @@ export default function AiImportPage({
       setModelOptionsLoading(true);
       setModelOptionsError(null);
       try {
-        const res = await fetch("/api/ai/model-catalog");
+        const res = await fetch("/api/ai/model-catalog", {
+          headers: authHeader(),
+        });
         const data = (await res.json()) as {
           options?: ModelOption[];
           error?: string;
@@ -229,7 +232,7 @@ export default function AiImportPage({
     try {
       const res = await fetch("/api/ai/parse-questions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeader() },
         body: JSON.stringify({
           rawText,
           startSortOrder,
