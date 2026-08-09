@@ -95,6 +95,7 @@ export default function AdminPdfsPage() {
   const [tagsInput, setTagsInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -163,6 +164,7 @@ export default function AdminPdfsPage() {
     }
 
     setSaving(true);
+    setUploadProgress(selectedFile ? 0 : null);
     try {
       const payload = {
         ...form,
@@ -176,19 +178,21 @@ export default function AdminPdfsPage() {
           editing.id,
           payload,
           selectedFile ?? undefined,
+          selectedFile ? setUploadProgress : undefined,
         );
         toast.success("পিডিএফ আপডেট হয়েছে");
       } else {
-        await pdfService.adminCreate(payload, selectedFile!);
+        await pdfService.adminCreate(payload, selectedFile!, setUploadProgress);
         toast.success("পিডিএফ যোগ হয়েছে");
       }
       setDialogOpen(false);
       setSelectedFile(null);
       load();
-    } catch {
-      toast.error("সংরক্ষণ করা যায়নি");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "সংরক্ষণ করা যায়নি");
     } finally {
       setSaving(false);
+      setUploadProgress(null);
     }
   }
 
@@ -441,6 +445,7 @@ export default function AdminPdfsPage() {
               <Input
                 type="file"
                 accept="application/pdf"
+                disabled={saving}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f && f.size > 20 * 1024 * 1024) {
@@ -460,6 +465,21 @@ export default function AdminPdfsPage() {
                 <p className="text-xs text-muted-foreground">
                   বর্তমান ফাইল: {editing.fileName}
                 </p>
+              )}
+              {saving && uploadProgress !== null && (
+                <div className="space-y-1">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-150"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {uploadProgress < 100
+                      ? `আপলোড হচ্ছে... ${uploadProgress}%`
+                      : "প্রসেস করা হচ্ছে..."}
+                  </p>
+                </div>
               )}
             </div>
 
@@ -614,11 +634,21 @@ export default function AdminPdfsPage() {
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+                disabled={saving}
+              >
                 বাতিল
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                সংরক্ষণ
+                {saving
+                  ? uploadProgress !== null
+                    ? uploadProgress < 100
+                      ? `আপলোড হচ্ছে... ${uploadProgress}%`
+                      : "প্রসেস করা হচ্ছে..."
+                    : "সংরক্ষণ করা হচ্ছে..."
+                  : "সংরক্ষণ"}
               </Button>
             </div>
           </div>

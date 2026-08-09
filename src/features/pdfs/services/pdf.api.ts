@@ -95,18 +95,22 @@ export const apiPdfService: PdfService = {
     );
   },
 
-  async adminCreate(input, file) {
-    const res = await apiClient.postForm<{ data: PdfDocument }>(
+  async adminCreate(input, file, onProgress) {
+    const res = await apiClient.uploadForm<{ data: PdfDocument }>(
       "/v1/pdfs/admin",
+      "POST",
       buildFormData(input, file),
+      onProgress,
     );
     return res.data;
   },
 
-  async adminUpdate(id, input, file) {
-    const res = await apiClient.patchForm<{ data: PdfDocument }>(
+  async adminUpdate(id, input, file, onProgress) {
+    const res = await apiClient.uploadForm<{ data: PdfDocument }>(
       `/v1/pdfs/admin/${id}`,
+      "PATCH",
       buildFormData(input, file),
+      onProgress,
     );
     return res.data;
   },

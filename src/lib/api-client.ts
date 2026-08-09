@@ -143,49 +143,74 @@ export const apiClient = {
       ...(body !== undefined && { body: JSON.stringify(body) }),
     }),
 
-  // Multipart/form-data uploads (PDF admin create/update). Do NOT set Content-Type —
-  // the browser needs to add its own multipart boundary automatically.
-  postForm: <T>(endpoint: string, formData: FormData) =>
-    requestForm<T>(endpoint, "POST", formData),
-
-  patchForm: <T>(endpoint: string, formData: FormData) =>
-    requestForm<T>(endpoint, "PATCH", formData),
+  // Multipart/form-data upload WITH real progress (needs XMLHttpRequest — fetch()
+  // has no upload-progress event). Used for PDF admin create/update.
+  uploadForm: <T>(
+    endpoint: string,
+    method: "POST" | "PATCH",
+    formData: FormData,
+    onProgress?: (percent: number) => void,
+  ) => uploadForm<T>(endpoint, method, formData, onProgress),
 };
 
-async function requestForm<T>(
+/** Generous — large PDFs on a slow connection can legitimately take a while; the
+ *  progress bar (not a timeout) is what tells the admin something is happening. */
+const UPLOAD_TIMEOUT = 120_000;
+
+function uploadForm<T>(
   endpoint: string,
   method: string,
   formData: FormData,
+  onProgress?: (percent: number) => void,
 ): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  const token = getToken();
-  const headers: Record<string, string> = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const token = getToken();
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT * 4); // uploads ধীর হতে পারে
+    xhr.open(method, `${API_BASE_URL}${endpoint}`);
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.timeout = UPLOAD_TIMEOUT;
 
-  try {
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: formData,
-      signal: controller.signal,
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      const message = body?.error?.message || `API error: ${res.status}`;
-      throw new ApiError(res.status, message, body?.error?.details);
-    }
-    if (res.status === 204) return undefined as T;
-    return res.json();
-  } catch (err) {
-    if (err instanceof ApiError) throw err;
-    if (err instanceof DOMException && err.name === "AbortError") {
-      throw new ApiError(408, "Request timeout — please try again");
-    }
-    throw err;
-  } finally {
-    clearTimeout(timeoutId);
-  }
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable)
+        onProgress?.(Math.round((e.loaded / e.total) * 100));
+    };
+
+    xhr.onload = () => {
+      let body: unknown = null;
+      try {
+        body = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+      } catch {
+        /* response wasn't JSON */
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(100);
+        resolve((xhr.status === 204 ? undefined : body) as T);
+      } else {
+        const errBody = body as {
+          error?: { message?: string; details?: unknown };
+        } | null;
+        const message = errBody?.error?.message || `API error: ${xhr.status}`;
+        reject(
+          new ApiError(
+            xhr.status,
+            message,
+            errBody?.error?.details as
+              | { field: string; message: string }[]
+              | undefined,
+          ),
+        );
+      }
+    };
+
+    xhr.onerror = () =>
+      reject(
+        new ApiError(0, "নেটওয়ার্ক সমস্যা — সার্ভারে পৌঁছানো যাচ্ছে না"),
+      );
+    xhr.ontimeout = () =>
+      reject(new ApiError(408, "আপলোড টাইমআউট — আবার চেষ্টা করুন"));
+    xhr.onabort = () => reject(new ApiError(0, "আপলোড বাতিল করা হয়েছে"));
+
+    xhr.send(formData);
+  });
 }

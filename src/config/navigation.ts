@@ -9,7 +9,6 @@ import {
   FileText,
   FileTextIcon,
   FolderOpen,
-  HelpCircle,
   Home,
   ImageIcon,
   LayoutDashboard,
@@ -33,7 +32,7 @@ export interface NavItem {
 export const memberNav: NavItem[] = [
   { label: "হোম", href: ROUTES.dashboard, icon: Home },
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
-  { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
+
   { label: "ভিডিও লাইব্রেরি", href: ROUTES.videos, icon: Video },
   { label: "পিডিএফ লাইব্রেরি", href: ROUTES.pdf, icon: LucideFileText },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
@@ -48,6 +47,13 @@ export const adminNav: NavItem[] = [
   { label: "সাব-ক্যাটাগরি", href: ROUTES.adminSubCategories, icon: BookOpen },
   { label: "রুটিন", href: ROUTES.adminRoutines, icon: Calendar },
   { label: "সিলেবাস", href: ROUTES.adminSyllabus, icon: FileText },
+
+  { label: "প্রশ্নসেট", href: ROUTES.adminQuestionSets, icon: ClipboardList },
+  {
+    label: "প্রশ্নসেট অটোমোশন",
+    href: ROUTES.adminQuestionSetsAutomotion,
+    icon: ClipboardList,
+  },
   { label: "চাকরির বিজ্ঞপ্তি", href: ROUTES.adminJobCircular, icon: Briefcase },
   { label: "ভিডিও ব্যবস্থপনা", href: ROUTES.adminVideos, icon: Video },
   {
@@ -55,14 +61,9 @@ export const adminNav: NavItem[] = [
     href: ROUTES.adminPdfManagement,
     icon: FileTextIcon,
   },
-  { label: "প্রশ্নসেট", href: ROUTES.adminQuestionSets, icon: ClipboardList },
-  {
-    label: "প্রশ্নসেট অটোমোশন",
-    href: ROUTES.adminQuestionSetsAutomotion,
-    icon: ClipboardList,
-  },
+  { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
   { label: "নোটিফিকেশন", href: ROUTES.adminNotifications, icon: Megaphone },
-  { label: "প্রশ্ন ব্যাংক", href: ROUTES.adminQuestions, icon: HelpCircle },
+
   { label: "প্যাকেজ", href: ROUTES.adminPackages, icon: Package },
   { label: "ট্রানজাকশন", href: ROUTES.adminTransactions, icon: CreditCard },
   { label: "সেটিংস", href: ROUTES.adminSettings, icon: Settings },

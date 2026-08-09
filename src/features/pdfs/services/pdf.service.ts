@@ -30,11 +30,16 @@ export interface PdfService {
   addComment(id: string, content: string): Promise<PdfComment>;
   deleteComment(pdfId: string, commentId: string): Promise<void>;
   adminGetAll(filter?: PdfFilter): Promise<PaginatedPdfs>;
-  adminCreate(input: CreatePdfInput, file: File): Promise<PdfDocument>;
+  adminCreate(
+    input: CreatePdfInput,
+    file: File,
+    onProgress?: (percent: number) => void,
+  ): Promise<PdfDocument>;
   adminUpdate(
     id: string,
     input: Partial<CreatePdfInput>,
     file?: File,
+    onProgress?: (percent: number) => void,
   ): Promise<PdfDocument>;
   adminDelete(id: string): Promise<void>;
   adminStats(): Promise<PdfStats>;
