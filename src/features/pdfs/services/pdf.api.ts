@@ -5,6 +5,7 @@ import type {
   PdfComment,
   PdfDocument,
   PdfFilter,
+  PdfStats,
 } from "../types";
 import type { PaginatedPdfs, PdfService } from "./pdf.service";
 
@@ -23,7 +24,7 @@ function buildFormData(input: Partial<CreatePdfInput>, file?: File): FormData {
   if (input.title !== undefined) fd.set("title", input.title);
   if (input.description !== undefined) fd.set("description", input.description);
   if (input.docType !== undefined) fd.set("docType", input.docType);
-  if (input.subExamCategoryId !== undefined)
+  if (input.subExamCategoryId)
     fd.set("subExamCategoryId", input.subExamCategoryId);
   if (input.subject !== undefined) fd.set("subject", input.subject);
   if (input.examName !== undefined) fd.set("examName", input.examName);
@@ -115,9 +116,7 @@ export const apiPdfService: PdfService = {
   },
 
   async adminStats() {
-    const res = await apiClient.get<{ data: { total: number } }>(
-      "/v1/pdfs/admin/stats",
-    );
+    const res = await apiClient.get<{ data: PdfStats }>("/v1/pdfs/admin/stats");
     return res.data;
   },
 };

@@ -79,3 +79,18 @@ export interface PdfComment {
   content: string;
   createdAt: string;
 }
+
+export interface PaginatedPdfComments {
+  data: PdfComment[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PdfStats {
+  total: number;
+  free: number;
+  featured: number;
+  downloads: number;
+}

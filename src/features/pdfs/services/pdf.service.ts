@@ -4,6 +4,7 @@ import type {
   PdfComment,
   PdfDocument,
   PdfFilter,
+  PdfStats,
 } from "../types";
 
 export interface PaginatedPdfs {
@@ -36,5 +37,5 @@ export interface PdfService {
     file?: File,
   ): Promise<PdfDocument>;
   adminDelete(id: string): Promise<void>;
-  adminStats(): Promise<{ total: number }>;
+  adminStats(): Promise<PdfStats>;
 }
