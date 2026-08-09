@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/features/auth";
+import { pdfService } from "@/features/pdfs";
 import { PdfHeroPreview } from "@/features/pdfs/components/pdf-hero-preview";
 import {
   docTypeLabel,
@@ -12,8 +13,9 @@ import {
   formatRelativeDate,
   subExamCategoryLabel,
 } from "@/features/pdfs/constants";
-import { pdfService } from "@/features/pdfs/services/pdf.mock";
 import type { PdfComment, PdfDocument } from "@/features/pdfs/types";
+import { apiClient } from "@/lib/api-client";
+import { downloadBlob } from "@/lib/download-blob";
 import {
   ArrowLeft,
   Download,
@@ -74,11 +76,17 @@ export default function PdfDetailPage({
 
   async function handleDownload() {
     if (!pdf) return;
+    if (pdf.canDownload === false) {
+      toast.error("এই পিডিএফ ডাউনলোড করতে সাবস্ক্রিপশন প্রয়োজন");
+      return;
+    }
     setDownloading(true);
     try {
-      await pdfService.recordDownload(id);
+      const blob = await apiClient.getBlob(pdfService.downloadPath(id));
+      downloadBlob(blob, pdf.fileName || `${pdf.title}.pdf`);
       setPdf((p) => (p ? { ...p, downloadCount: p.downloadCount + 1 } : p));
-      window.open(pdf.fileUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      toast.error("ডাউনলোড ব্যর্থ হয়েছে — সাবস্ক্রিপশন লাগতে পারে");
     } finally {
       setDownloading(false);
     }
@@ -171,6 +179,7 @@ export default function PdfDetailPage({
         pageCount={pdf.pageCount}
         onDownload={handleDownload}
         downloading={downloading}
+        locked={pdf.canDownload === false}
       />
 
       <div className="mt-5 space-y-4">

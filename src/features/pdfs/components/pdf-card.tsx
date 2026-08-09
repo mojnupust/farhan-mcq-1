@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Download, FileText, Sparkles } from "lucide-react";
+import { Download, FileText, Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { docTypeLabel, formatCount, formatFileSize } from "../constants";
 import type { PdfDocument } from "../types";
@@ -33,6 +33,12 @@ export function PdfCard({ pdf, variant = "default" }: PdfCardProps) {
         <div className="absolute left-2 top-2 flex gap-1">
           {pdf.isFree && (
             <Badge className="bg-emerald-600 hover:bg-emerald-600">ফ্রি</Badge>
+          )}
+          {!pdf.isFree && (
+            <Badge variant="secondary" className="gap-1">
+              <Lock className="size-3" />
+              প্রিমিয়াম
+            </Badge>
           )}
         </div>
         {pdf.isFeatured && (

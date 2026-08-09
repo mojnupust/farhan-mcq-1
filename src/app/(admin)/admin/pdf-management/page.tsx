@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -41,52 +42,49 @@ import {
   Trash2,
   UploadCloud,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { PdfPreview } from "@/features/pdfs/components/pdf-preview";
+import { pdfService } from "@/features/pdfs";
 import {
   PDF_DOC_TYPES,
   SUB_EXAM_CATEGORIES,
   docTypeLabel,
   formatCount,
   formatFileSize,
-  looksLikeFileUrl,
   subExamCategoryLabel,
 } from "@/features/pdfs/constants";
-import { INITIAL_PDFS } from "@/features/pdfs/mock-data";
 import type {
   CreatePdfInput,
   PdfDocType,
   PdfDocument,
 } from "@/features/pdfs/types";
 
-// NOTE: everything on this page runs against INITIAL_PDFS in local state.
-// There is no `pdfService` yet — once /api/admin/pdfs exists, replace the
-// state mutations in handleSave/handleDelete with real calls (see TODOs
-// below) the same way features/videos/index.ts wraps the video endpoints.
-
 const EMPTY: CreatePdfInput = {
   title: "",
   description: "",
-  fileUrl: "",
   docType: "OTHER",
   subExamCategoryId: undefined,
   subject: "",
   examName: "",
   tags: [],
-  fileSizeKb: undefined,
   pageCount: undefined,
   isFeatured: false,
   isActive: true,
   isFree: false,
 };
 
+const EMPTY_STATS = { total: 0, free: 0, featured: 0, downloads: 0 };
+
 const PAGE_SIZE = 8;
 
 export default function AdminPdfsPage() {
-  const [pdfs, setPdfs] = useState<PdfDocument[]>(INITIAL_PDFS);
+  const [pdfs, setPdfs] = useState<PdfDocument[]>([]);
+  const [stats, setStats] = useState(EMPTY_STATS);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [search, setSearch] = useState("");
   const [docTypeFilter, setDocTypeFilter] = useState<PdfDocType | "ALL">("ALL");
   const [subExamFilter, setSubExamFilter] = useState<string>("ALL");
@@ -95,41 +93,42 @@ export default function AdminPdfsPage() {
   const [editing, setEditing] = useState<PdfDocument | null>(null);
   const [form, setForm] = useState<CreatePdfInput>(EMPTY);
   const [tagsInput, setTagsInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return pdfs.filter((p) => {
-      const matchesSearch =
-        !q ||
-        p.title.toLowerCase().includes(q) ||
-        p.subject?.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q));
-      const matchesType =
-        docTypeFilter === "ALL" || p.docType === docTypeFilter;
-      const matchesSubExam =
-        subExamFilter === "ALL" || p.subExamCategoryId === subExamFilter;
-      return matchesSearch && matchesType && matchesSubExam;
-    });
-  }, [pdfs, search, docTypeFilter, subExamFilter]);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [list, statsResult] = await Promise.all([
+        pdfService.adminGetAll({
+          page,
+          limit: PAGE_SIZE,
+          search: search || undefined,
+          docType: docTypeFilter === "ALL" ? undefined : docTypeFilter,
+          subExamCategoryId:
+            subExamFilter === "ALL" ? undefined : subExamFilter,
+        }),
+        pdfService.adminStats(),
+      ]);
+      setPdfs(list.data);
+      setTotalPages(list.totalPages);
+      setStats(statsResult);
+    } catch {
+      toast.error("পিডিএফ লোড করা যায়নি");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, docTypeFilter, subExamFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const stats = useMemo(
-    () => ({
-      total: pdfs.length,
-      free: pdfs.filter((p) => p.isFree).length,
-      featured: pdfs.filter((p) => p.isFeatured).length,
-      downloads: pdfs.reduce((sum, p) => sum + p.downloadCount, 0),
-    }),
-    [pdfs],
-  );
+  useEffect(() => {
+    load();
+  }, [load]);
 
   function openCreate() {
     setEditing(null);
     setForm(EMPTY);
     setTagsInput("");
+    setSelectedFile(null);
     setDialogOpen(true);
   }
 
@@ -138,76 +137,70 @@ export default function AdminPdfsPage() {
     setForm({
       title: p.title,
       description: p.description ?? "",
-      fileUrl: p.fileUrl,
       docType: p.docType,
       subExamCategoryId: p.subExamCategoryId ?? undefined,
       subject: p.subject ?? "",
       examName: p.examName ?? "",
       tags: p.tags,
-      fileSizeKb: p.fileSizeKb,
       pageCount: p.pageCount,
       isFeatured: p.isFeatured,
       isActive: p.isActive,
       isFree: p.isFree,
     });
     setTagsInput(p.tags.join(", "));
+    setSelectedFile(null);
     setDialogOpen(true);
   }
 
-  function handleSave() {
-    if (!form.title.trim() || !form.fileUrl.trim()) {
+  async function handleSave() {
+    if (!form.title.trim()) {
       toast.error("শিরোনাম ও PDF লিংক প্রয়োজন");
       return;
     }
-    if (!looksLikeFileUrl(form.fileUrl)) {
-      toast.error("সঠিক লিংক দিন (http:// অথবা https:// দিয়ে শুরু)");
+    if (!editing && !selectedFile) {
+      toast.error("একটি PDF ফাইল সিলেক্ট করুন");
       return;
     }
 
     setSaving(true);
-    const payload: CreatePdfInput = {
-      ...form,
-      tags: tagsInput
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-    };
-
-    // TODO: await pdfService.adminUpdate(editing.id, payload) /
-    // pdfService.adminCreate(payload) once the API is ready.
-    if (editing) {
-      setPdfs((prev) =>
-        prev.map((p) =>
-          p.id === editing.id
-            ? { ...p, ...payload, updatedAt: new Date().toISOString() }
-            : p,
-        ),
-      );
-      toast.success("পিডিএফ আপডেট হয়েছে");
-    } else {
-      const newPdf: PdfDocument = {
-        ...payload,
-        id: `pdf_${Date.now()}`,
-        downloadCount: 0,
-        viewCount: 0,
-        likeCount: 0,
-        commentCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    try {
+      const payload = {
+        ...form,
+        tags: tagsInput
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
       };
-      setPdfs((prev) => [newPdf, ...prev]);
-      toast.success("পিডিএফ যোগ হয়েছে");
+      if (editing) {
+        await pdfService.adminUpdate(
+          editing.id,
+          payload,
+          selectedFile ?? undefined,
+        );
+        toast.success("পিডিএফ আপডেট হয়েছে");
+      } else {
+        await pdfService.adminCreate(payload, selectedFile!);
+        toast.success("পিডিএফ যোগ হয়েছে");
+      }
+      setDialogOpen(false);
+      setSelectedFile(null);
+      load();
+    } catch {
+      toast.error("সংরক্ষণ করা যায়নি");
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
-    setDialogOpen(false);
   }
 
-  function handleDelete(p: PdfDocument) {
+  async function handleDelete(p: PdfDocument) {
     if (!confirm(`"${p.title}" মুছে ফেলতে চান?`)) return;
-    // TODO: await pdfService.adminDelete(p.id) once the API is ready.
-    setPdfs((prev) => prev.filter((x) => x.id !== p.id));
-    toast.success("মুছে ফেলা হয়েছে");
+    try {
+      await pdfService.adminDelete(p.id);
+      toast.success("মুছে ফেলা হয়েছে");
+      load();
+    } catch {
+      toast.error("মুছে ফেলা যায়নি");
+    }
   }
 
   return (
@@ -306,10 +299,16 @@ export default function AdminPdfsPage() {
         </Select>
       </div>
 
-      {pageItems.length === 0 ? (
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          ))}
+        </div>
+      ) : pdfs.length === 0 ? (
         <AdminEmptyState
           title="কোনো পিডিএফ নেই"
-          description="লিংক দিয়ে প্রথম পিডিএফ যোগ করুন"
+          description="ফাইল আপলোড করে প্রথম পিডিএফ যোগ করুন"
           action={
             <Button onClick={openCreate}>
               <Plus className="mr-2 size-4" />
@@ -332,7 +331,7 @@ export default function AdminPdfsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pageItems.map((p) => (
+              {pdfs.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
                     <div className="flex size-10 items-center justify-center rounded-lg bg-red-500/10 text-red-600">
@@ -436,24 +435,33 @@ export default function AdminPdfsPage() {
 
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>PDF ফাইল লিংক *</Label>
+              <Label>
+                PDF ফাইল {editing ? "(না বদলালে আগেরটাই থাকবে)" : "*"}
+              </Label>
               <Input
-                placeholder="https://cdn.farhanmcq.com/pdfs/..."
-                value={form.fileUrl}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, fileUrl: e.target.value }))
-                }
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f && f.size > 20 * 1024 * 1024) {
+                    toast.error("ফাইল সাইজ ২০MB-এর বেশি হতে পারবে না");
+                    return;
+                  }
+                  setSelectedFile(f ?? null);
+                }}
               />
+              {selectedFile && (
+                <p className="text-xs text-muted-foreground">
+                  {selectedFile.name} · {(selectedFile.size / 1024).toFixed(0)}{" "}
+                  KB
+                </p>
+              )}
+              {editing && !selectedFile && (
+                <p className="text-xs text-muted-foreground">
+                  বর্তমান ফাইল: {editing.fileName}
+                </p>
+              )}
             </div>
-
-            {looksLikeFileUrl(form.fileUrl) && (
-              <PdfPreview
-                fileUrl={form.fileUrl}
-                title={form.title}
-                fileSizeKb={form.fileSizeKb}
-                pageCount={form.pageCount}
-              />
-            )}
 
             <div className="space-y-2">
               <Label>শিরোনাম *</Label>
@@ -546,39 +554,21 @@ export default function AdminPdfsPage() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>পৃষ্ঠা সংখ্যা</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={form.pageCount ?? ""}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      pageCount: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    }))
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>ফাইল সাইজ (KB)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={form.fileSizeKb ?? ""}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      fileSizeKb: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    }))
-                  }
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>পৃষ্ঠা সংখ্যা</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.pageCount ?? ""}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    pageCount: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  }))
+                }
+              />
             </div>
 
             <div className="space-y-2">

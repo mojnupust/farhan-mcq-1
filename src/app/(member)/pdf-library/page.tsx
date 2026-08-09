@@ -11,13 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { pdfService } from "@/features/pdfs";
 import { PdfCard } from "@/features/pdfs/components/pdf-card";
 import {
   PDF_DOC_TYPES,
   PDF_SORT_OPTIONS,
   SUB_EXAM_CATEGORIES,
 } from "@/features/pdfs/constants";
-import { pdfService } from "@/features/pdfs/services/pdf.mock";
 import type { PdfDocType, PdfDocument, PdfSort } from "@/features/pdfs/types";
 import {
   ChevronLeft,

@@ -142,4 +142,50 @@ export const apiClient = {
       method: "DELETE",
       ...(body !== undefined && { body: JSON.stringify(body) }),
     }),
+
+  // Multipart/form-data uploads (PDF admin create/update). Do NOT set Content-Type —
+  // the browser needs to add its own multipart boundary automatically.
+  postForm: <T>(endpoint: string, formData: FormData) =>
+    requestForm<T>(endpoint, "POST", formData),
+
+  patchForm: <T>(endpoint: string, formData: FormData) =>
+    requestForm<T>(endpoint, "PATCH", formData),
 };
+
+async function requestForm<T>(
+  endpoint: string,
+  method: string,
+  formData: FormData,
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT * 4); // uploads ধীর হতে পারে
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: formData,
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const message = body?.error?.message || `API error: ${res.status}`;
+      throw new ApiError(res.status, message, body?.error?.details);
+    }
+    if (res.status === 204) return undefined as T;
+    return res.json();
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError(408, "Request timeout — please try again");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
