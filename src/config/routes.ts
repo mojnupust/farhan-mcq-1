@@ -69,4 +69,8 @@ export const ROUTES = {
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",
   adminSettings: "/admin/settings",
+  adminBroadcastCenter: "/admin/broadcast-center",
+  adminBroadcastIntegrations: "/admin/broadcast-center/integrations",
+  adminBroadcastHistory: "/admin/broadcast-center/history",
+  adminBroadcastRules: "/admin/broadcast-center/rules",
 } as const;

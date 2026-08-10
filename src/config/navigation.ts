@@ -15,6 +15,7 @@ import {
   LucideFileText,
   Megaphone,
   Package,
+  Radio,
   Receipt,
   Settings,
   Star,
@@ -63,6 +64,11 @@ export const adminNav: NavItem[] = [
   },
   { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
   { label: "নোটিফিকেশন", href: ROUTES.adminNotifications, icon: Megaphone },
+  {
+    label: "ব্রডকাস্ট সেন্টার",
+    href: ROUTES.adminBroadcastCenter,
+    icon: Radio,
+  },
 
   { label: "প্যাকেজ", href: ROUTES.adminPackages, icon: Package },
   { label: "ট্রানজাকশন", href: ROUTES.adminTransactions, icon: CreditCard },

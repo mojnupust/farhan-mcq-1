@@ -39,6 +39,7 @@ import type {
   UpdateJobCircularInput,
 } from "@/features/job-circular";
 import { jobCircularService } from "@/features/job-circular";
+import { BroadcastSendDialog } from "@/features/broadcast/components/broadcast-send-dialog";
 import {
   Briefcase,
   CheckCircle2,
@@ -475,6 +476,8 @@ export default function AdminJobCircularPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<JobCircular | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -516,6 +519,22 @@ export default function AdminJobCircularPage() {
     setEditing(c);
     setDialogOpen(true);
   };
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
+  function toggleSelectAllOnPage() {
+    const pageIds = circulars.map((c) => c.id);
+    const allSelected = pageIds.every((id) => selectedIds.includes(id));
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
+    } else {
+      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])]);
+    }
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm("এই বিজ্ঞপ্তিটি মুছে ফেলবেন?")) return;
@@ -583,6 +602,16 @@ export default function AdminJobCircularPage() {
             বাল্ক সম্পাদনা
           </Link>
         </Button>
+        {selectedIds.length > 0 && (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setBroadcastOpen(true)}
+          >
+            <Radio className="size-4 mr-1.5" />
+            Broadcast ({selectedIds.length})
+          </Button>
+        )}
         <Button onClick={openNew} size="sm">
           <Plus className="size-4 mr-1.5" />
           নতুন যোগ করুন
@@ -662,6 +691,17 @@ export default function AdminJobCircularPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="w-10">
+                      <input
+                        type="checkbox"
+                        checked={
+                          circulars.length > 0 &&
+                          circulars.every((c) => selectedIds.includes(c.id))
+                        }
+                        onChange={toggleSelectAllOnPage}
+                        aria-label="Select all on page"
+                      />
+                    </TableHead>
                     <TableHead>প্রতিষ্ঠান / পদ</TableHead>
                     <TableHead>ধরন</TableHead>
                     <TableHead className="text-center">পদ</TableHead>
@@ -679,6 +719,14 @@ export default function AdminJobCircularPage() {
                       key={c.id}
                       className="group transition-colors hover:bg-primary/[0.02]"
                     >
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(c.id)}
+                          onChange={() => toggleSelect(c.id)}
+                          aria-label={`Select ${c.title}`}
+                        />
+                      </TableCell>
                       <TableCell className="max-w-xs">
                         <div className="flex flex-col">
                           <span className="font-medium text-sm truncate leading-tight">
@@ -788,6 +836,22 @@ export default function AdminJobCircularPage() {
         onClose={() => setDialogOpen(false)}
         onSaved={load}
         editing={editing}
+      />
+
+      <BroadcastSendDialog
+        open={broadcastOpen}
+        onClose={() => setBroadcastOpen(false)}
+        title="চাকরির বিজ্ঞপ্তি Broadcast"
+        description={`${selectedIds.length}টি বিজ্ঞপ্তি আলাদা পোস্ট হিসেবে পাঠানো হবে (প্রতিটিতে ২.৫ সেকেন্ড বিরতি)।`}
+        payload={{
+          contentType: "JOB_CIRCULAR",
+          jobCircularIds: selectedIds,
+        }}
+        onSuccess={(msg) => {
+          toast.success(msg);
+          setSelectedIds([]);
+        }}
+        onError={(msg) => toast.error(msg)}
       />
     </div>
   );
