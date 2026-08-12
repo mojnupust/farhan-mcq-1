@@ -1,13 +1,13 @@
 "use client";
 
+import type { ExamCategory } from "@/features/exam-categories";
+import { examCategoryService } from "@/features/exam-categories";
 import { pdfService } from "@/features/pdfs";
 import type { PdfDocument } from "@/features/pdfs/types";
-import { examCategoryService } from "@/features/exam-categories";
-import type { ExamCategory } from "@/features/exam-categories";
-import { questionSetService } from "@/features/question-sets";
 import type { QuestionSet } from "@/features/question-sets";
-import { subExamCategoryService } from "@/features/sub-exam-categories";
+import { questionSetService } from "@/features/question-sets";
 import type { SubExamCategory } from "@/features/sub-exam-categories";
+import { subExamCategoryService } from "@/features/sub-exam-categories";
 import { authHeader } from "@/lib/auth-header";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -55,7 +55,8 @@ const TABS: { id: Tab; label: string }[] = [
 
 export default function BroadcastCenterPage() {
   const [tab, setTab] = useState<Tab>("text");
-  const [contentType, setContentType] = useState<TextContentType>("MOTIVATIONAL");
+  const [contentType, setContentType] =
+    useState<TextContentType>("MOTIVATIONAL");
   const [platforms, setPlatforms] = useState<Platform[]>(["TELEGRAM_GROUP"]);
   const [draft, setDraft] = useState("");
   const [context, setContext] = useState("");
@@ -92,10 +93,12 @@ export default function BroadcastCenterPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/ai/model-catalog", { headers: authHeader() });
+        const res = await fetch("/api/ai/model-catalog", {
+          headers: authHeader(),
+        });
         if (!res.ok) return;
-        const json = (await res.json()) as { models?: ModelOption[] };
-        const list = json.models ?? [];
+        const json = (await res.json()) as { options?: ModelOption[] };
+        const list = json.options ?? [];
         setModels(list);
         const first = list.find((m) => m.available);
         if (first) {
@@ -111,13 +114,16 @@ export default function BroadcastCenterPage() {
   useEffect(() => {
     if (tab !== "pdf") return;
     pdfService
-      .adminGetAll({ limit: 50 })
+      .adminGetAll({ limit: 48, sort: "newest" })
       .then((r) => setPdfs(r.data))
       .catch(() => setError("PDF list load failed"));
   }, [tab]);
 
   useEffect(() => {
-    examCategoryService.getAll().then(setExamCategories).catch(() => {});
+    examCategoryService
+      .getAll()
+      .then(setExamCategories)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -346,14 +352,22 @@ export default function BroadcastCenterPage() {
             <p className="text-sm font-medium">AI model</p>
             <div className="flex flex-wrap gap-2">
               {(
-                ["mistral", "gemini", "anthropic", "openai", "omniroute"] as AiProvider[]
+                [
+                  "mistral",
+                  "gemini",
+                  "anthropic",
+                  "openai",
+                  "omniroute",
+                ] as AiProvider[]
               ).map((p) => (
                 <button
                   key={p}
                   type="button"
                   onClick={() => {
                     setProvider(p);
-                    const first = models.find((m) => m.provider === p && m.available);
+                    const first = models.find(
+                      (m) => m.provider === p && m.available,
+                    );
                     setModelId(first?.id);
                   }}
                   className={`rounded-lg px-2 py-1 text-xs border capitalize ${
@@ -450,7 +464,8 @@ export default function BroadcastCenterPage() {
               onChange={(e) => setPdfCaption(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Telegram-এ PDF ফাইল হিসেবে যাবে। Facebook-এ শিরোনাম/নোটিশ টেক্সট পোস্ট হবে।
+              Telegram-এ PDF ফাইল হিসেবে যাবে। Facebook-এ শিরোনাম/নোটিশ টেক্সট
+              পোস্ট হবে।
             </p>
           </section>
           <button
@@ -520,8 +535,9 @@ export default function BroadcastCenterPage() {
               onChange={(e) => setSlideCaption(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              প্রথম grouped slide auto-render হবে (cache থাকলে instant)। Telegram-এ PNG
-              upload। Facebook-এ public image URL না থাকলে টেক্সট fallback।
+              প্রথম grouped slide auto-render হবে (cache থাকলে instant)।
+              Telegram-এ PNG upload। Facebook-এ public image URL না থাকলে টেক্সট
+              fallback।
             </p>
           </section>
           <button

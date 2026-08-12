@@ -90,6 +90,7 @@ export const apiPdfService: PdfService = {
   },
 
   async adminGetAll(filter) {
+    console.log(filter);
     return apiClient.get<PaginatedPdfs>(
       `/v1/pdfs/admin/list${buildParams(filter)}`,
     );

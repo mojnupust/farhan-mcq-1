@@ -33,6 +33,7 @@ const API_ROOT = (
 
 // ISR: rebuild the sitemap every 6 hours.
 // Matches the cache TTL we'll use on the two new endpoints.
+export const dynamic = "force-dynamic";
 export const revalidate = 21_600;
 
 // ── Static roadmap slugs (src/features/roadmap/roadmap-data.ts) ───────────────
