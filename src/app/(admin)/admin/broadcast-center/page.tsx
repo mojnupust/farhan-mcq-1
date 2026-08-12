@@ -114,7 +114,7 @@ export default function BroadcastCenterPage() {
   useEffect(() => {
     if (tab !== "pdf") return;
     pdfService
-      .adminGetAll({ limit: 48, sort: "newest" })
+      .adminGetAll({ limit: 10, sort: "newest" })
       .then((r) => setPdfs(r.data))
       .catch(() => setError("PDF list load failed"));
   }, [tab]);
