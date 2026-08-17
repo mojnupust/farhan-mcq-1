@@ -30,6 +30,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Pricing from "./Pricing";
 
@@ -206,36 +207,56 @@ export default function LandingPage() {
             <div className="absolute -top-40 -right-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float" />
             <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/3 blur-3xl animate-float-delayed" />
           </div>
-          <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28 relative">
-            <div className="max-w-2xl">
-              {/* Badge */}
-              <AnimateIn variant="fade-up" delay={50} duration={500}>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-                  <span className="relative size-2 rounded-full bg-green-500">
-                    <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
-                  </span>
-                  ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
+          <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 relative">
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+              {/* ── Text content ── */}
+              <div className="max-w-2xl">
+                {/* Badge */}
+                <AnimateIn variant="fade-up" delay={50} duration={500}>
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+                    <span className="relative size-2 rounded-full bg-green-500">
+                      <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
+                    </span>
+                    ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
+                  </div>
+                </AnimateIn>
+
+                <AnimateIn variant="fade-up" delay={100} duration={600}>
+                  <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                    সরকারি চাকরিতে
+                    <span className="text-primary"> সফল হওয়ার</span>
+                    <br />
+                    সবচেয়ে স্মার্ট উপায়
+                  </h1>
+                </AnimateIn>
+                <AnimateIn variant="fade-up" delay={200} duration={600}>
+                  <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
+                    BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার
+                    জন্য পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং
+                    অভিজ্ঞ মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
+                  </p>
+                </AnimateIn>
+
+                <AnimateIn variant="fade-up" delay={300} duration={600}>
+                  <HeroCTA />
+                </AnimateIn>
+              </div>
+
+              {/* ── Hero image ── */}
+              <AnimateIn variant="fade-up" delay={350} duration={700}>
+                <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+                  <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/5 blur-2xl" />
+                  <div className="relative overflow-hidden rounded-2xl border bg-background shadow-xl">
+                    <Image
+                      src="/images/hero-illustration.png"
+                      alt="Farhan MCQ প্ল্যাটফর্মে পরীক্ষার প্রস্তুতি"
+                      width={640}
+                      height={640}
+                      priority
+                      className="h-auto w-full object-cover"
+                    />
+                  </div>
                 </div>
-              </AnimateIn>
-
-              <AnimateIn variant="fade-up" delay={100} duration={600}>
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  সরকারি চাকরিতে
-                  <span className="text-primary"> সফল হওয়ার</span>
-                  <br />
-                  সবচেয়ে স্মার্ট উপায়
-                </h1>
-              </AnimateIn>
-              <AnimateIn variant="fade-up" delay={200} duration={600}>
-                <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
-                  BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার
-                  জন্য পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং
-                  অভিজ্ঞ মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
-                </p>
-              </AnimateIn>
-
-              <AnimateIn variant="fade-up" delay={300} duration={600}>
-                <HeroCTA />
               </AnimateIn>
             </div>
           </div>

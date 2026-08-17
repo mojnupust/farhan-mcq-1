@@ -35,7 +35,7 @@ export function HeroCTA() {
   }
 
   return (
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="max-w-xs mt-8 flex flex-col gap-3">
       <Button size="lg" className="text-base shadow-lg" asChild>
         <Link href="/dashboard">
           <LogInIcon />
