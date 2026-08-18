@@ -47,6 +47,9 @@ export const ROUTES = {
   images: "/images",
   imagesPreview: (questionSetId: string) =>
     `/images/preview/${questionSetId}` as const,
+  docs: "/docs",
+  docsPreview: (documentId: string) =>
+    `/docs/preview/${documentId}` as const,
   videos: "/videos",
   videoDetail: (id: string) => `/videos/${id}` as const,
   pdf: "/pdf-library",

@@ -10,7 +10,6 @@ import {
   FileTextIcon,
   FolderOpen,
   Home,
-  ImageIcon,
   LayoutDashboard,
   LucideFileText,
   Megaphone,
@@ -62,7 +61,7 @@ export const adminNav: NavItem[] = [
     href: ROUTES.adminPdfManagement,
     icon: FileTextIcon,
   },
-  { label: "ছবি স্লাইড", href: ROUTES.images, icon: ImageIcon },
+  { label: "Docx এক্সপোর্ট", href: ROUTES.docs, icon: FileTextIcon },
   { label: "নোটিফিকেশন", href: ROUTES.adminNotifications, icon: Megaphone },
   {
     label: "ব্রডকাস্ট সেন্টার",
