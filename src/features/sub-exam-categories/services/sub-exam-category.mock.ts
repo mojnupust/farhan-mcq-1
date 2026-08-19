@@ -69,6 +69,9 @@ const mockSubCategories: Record<string, SubExamCategory[]> = {
 };
 
 export const mockSubExamCategoryService: SubExamCategoryService = {
+  async getAll() {
+    return Object.values(mockSubCategories).flat();
+  },
   async getByCategorySlug(slug: string) {
     return mockSubCategories[slug] || [];
   },

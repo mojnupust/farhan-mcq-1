@@ -14,6 +14,10 @@ import {
   subExamCategoryLabel,
 } from "@/features/pdfs/constants";
 import type { PdfComment, PdfDocument } from "@/features/pdfs/types";
+import {
+  subExamCategoryService,
+  type SubExamCategory,
+} from "@/features/sub-exam-categories";
 import { apiClient } from "@/lib/api-client";
 import { downloadBlob } from "@/lib/download-blob";
 import {
@@ -39,6 +43,9 @@ export default function PdfDetailPage({
   const { user, isAdmin } = useAuth();
   const [pdf, setPdf] = useState<PdfDocument | null>(null);
   const [comments, setComments] = useState<PdfComment[]>([]);
+  const [subExamCategories, setSubExamCategories] = useState<
+    SubExamCategory[]
+  >([]);
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
   const [commentLoading, setCommentLoading] = useState(false);
@@ -73,6 +80,13 @@ export default function PdfDetailPage({
     setLoading(true);
     Promise.all([loadPdf(), loadComments()]).finally(() => setLoading(false));
   }, [loadPdf, loadComments]);
+
+  useEffect(() => {
+    subExamCategoryService
+      .getAll()
+      .then(setSubExamCategories)
+      .catch(() => setSubExamCategories([]));
+  }, []);
 
   async function handleDownload() {
     if (!pdf) return;
@@ -187,7 +201,7 @@ export default function PdfDetailPage({
           <div className="mb-2 flex flex-wrap gap-2">
             <Badge variant="secondary">{docTypeLabel(pdf.docType)}</Badge>
             <Badge variant="outline">
-              {subExamCategoryLabel(pdf.subExamCategoryId)}
+              {subExamCategoryLabel(pdf.subExamCategoryId, subExamCategories)}
             </Badge>
           </div>
           <h1 className="text-xl font-bold leading-snug sm:text-2xl">

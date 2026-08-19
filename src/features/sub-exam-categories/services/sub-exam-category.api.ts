@@ -10,6 +10,14 @@ import type {
 import type { SubExamCategoryService } from "./sub-exam-category.service";
 
 export const apiSubExamCategoryService: SubExamCategoryService = {
+  async getAll(activeOnly?: boolean) {
+    const url =
+      activeOnly === false
+        ? "/v1/sub-exam-categories?activeOnly=false"
+        : "/v1/sub-exam-categories";
+    const res = await apiClient.get<{ data: SubExamCategory[] }>(url);
+    return res.data;
+  },
   async getByCategorySlug(categorySlug: string) {
     const res = await apiClient.get<{ data: SubExamCategory[] }>(
       `/v1/sub-exam-categories/by-category/${categorySlug}`,

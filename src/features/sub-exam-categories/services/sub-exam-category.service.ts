@@ -8,6 +8,7 @@ import type {
 } from "../types";
 
 export interface SubExamCategoryService {
+  getAll(activeOnly?: boolean): Promise<SubExamCategory[]>;
   getByCategorySlug(categorySlug: string): Promise<SubExamCategory[]>;
   getUserSummary(categorySlug: string): Promise<UserCategorySummary>;
   getMeritList(subCategorySlug: string): Promise<MeritListEntry[]>;

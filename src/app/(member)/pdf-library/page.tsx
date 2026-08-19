@@ -13,12 +13,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { pdfService } from "@/features/pdfs";
 import { PdfCard } from "@/features/pdfs/components/pdf-card";
-import {
-  PDF_DOC_TYPES,
-  PDF_SORT_OPTIONS,
-  SUB_EXAM_CATEGORIES,
-} from "@/features/pdfs/constants";
+import { PDF_DOC_TYPES, PDF_SORT_OPTIONS } from "@/features/pdfs/constants";
 import type { PdfDocType, PdfDocument, PdfSort } from "@/features/pdfs/types";
+import {
+  subExamCategoryService,
+  type SubExamCategory,
+} from "@/features/sub-exam-categories";
 import {
   ChevronLeft,
   ChevronRight,
@@ -59,6 +59,9 @@ export default function PdfLibraryPage() {
   const [subExam, setSubExam] = useState<string>("ALL");
   const [sort, setSort] = useState<PdfSort>("newest");
   const [freeOnly, setFreeOnly] = useState(false);
+  const [subExamCategories, setSubExamCategories] = useState<
+    SubExamCategory[]
+  >([]);
 
   const loadFeatured = useCallback(async () => {
     try {
@@ -95,6 +98,13 @@ export default function PdfLibraryPage() {
   useEffect(() => {
     loadFeatured();
   }, [loadFeatured]);
+
+  useEffect(() => {
+    subExamCategoryService
+      .getAll()
+      .then(setSubExamCategories)
+      .catch(() => setSubExamCategories([]));
+  }, []);
 
   useEffect(() => {
     loadPdfs();
@@ -236,7 +246,7 @@ export default function PdfLibraryPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">সব বিভাগ</SelectItem>
-                {SUB_EXAM_CATEGORIES.map((c) => (
+                {subExamCategories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>
                     {c.name}
                   </SelectItem>

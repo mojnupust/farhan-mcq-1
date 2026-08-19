@@ -48,7 +48,6 @@ import { toast } from "sonner";
 import { pdfService } from "@/features/pdfs";
 import {
   PDF_DOC_TYPES,
-  SUB_EXAM_CATEGORIES,
   docTypeLabel,
   formatCount,
   formatFileSize,
@@ -59,6 +58,10 @@ import type {
   PdfDocType,
   PdfDocument,
 } from "@/features/pdfs/types";
+import {
+  subExamCategoryService,
+  type SubExamCategory,
+} from "@/features/sub-exam-categories";
 
 const EMPTY: CreatePdfInput = {
   title: "",
@@ -88,6 +91,9 @@ export default function AdminPdfsPage() {
   const [search, setSearch] = useState("");
   const [docTypeFilter, setDocTypeFilter] = useState<PdfDocType | "ALL">("ALL");
   const [subExamFilter, setSubExamFilter] = useState<string>("ALL");
+  const [subExamCategories, setSubExamCategories] = useState<
+    SubExamCategory[]
+  >([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<PdfDocument | null>(null);
@@ -124,6 +130,13 @@ export default function AdminPdfsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    subExamCategoryService
+      .getAll(false)
+      .then(setSubExamCategories)
+      .catch(() => setSubExamCategories([]));
+  }, []);
 
   function openCreate() {
     setEditing(null);
@@ -294,7 +307,7 @@ export default function AdminPdfsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">সব বিভাগ</SelectItem>
-            {SUB_EXAM_CATEGORIES.map((c) => (
+            {subExamCategories.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name}
               </SelectItem>
@@ -358,7 +371,10 @@ export default function AdminPdfsPage() {
                         {docTypeLabel(p.docType)}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        {subExamCategoryLabel(p.subExamCategoryId)}
+                        {subExamCategoryLabel(
+                          p.subExamCategoryId,
+                          subExamCategories,
+                        )}
                       </span>
                     </div>
                   </TableCell>
@@ -541,7 +557,7 @@ export default function AdminPdfsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="NONE">সাধারণ (নির্দিষ্ট নয়)</SelectItem>
-                    {SUB_EXAM_CATEGORIES.map((c) => (
+                    {subExamCategories.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}
                       </SelectItem>

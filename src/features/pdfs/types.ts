@@ -12,14 +12,6 @@ export type PdfDocType =
   | "MODEL_TEST"
   | "OTHER";
 
-// A lightweight reference to sub_exam_categories (see sub_exam_categories table)
-// so a PDF can optionally be tied to the same exam track used by
-// question_sets, routines and syllabuses.
-export interface SubExamCategoryOption {
-  id: string;
-  name: string;
-}
-
 export interface PdfDocument {
   id: string;
   title: string;

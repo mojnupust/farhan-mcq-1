@@ -1,0 +1,7 @@
+USE_MOCKS=false
+NEXT_PUBLIC_API_URL=/api
+NEXT_PUBLIC_API_ORIGIN=https://govt-job-preparation-platform-backend.onrender.com
+API_PROXY_TARGET=https://govt-job-preparation-platform-backend.onrender.com
+NEXT_PUBLIC_APP_URL=https://farhanmcq.com
+INTERNAL_API_SECRET=aff58d0423beb3094106ee90c37c8f297e82327d6dba01258ae830033eab8983
+JWT_SECRET=2a28ade009ee32d80d330c62f686f27e6972525398def21004c73ab09e8ef4d4

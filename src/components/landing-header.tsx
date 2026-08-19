@@ -14,20 +14,20 @@ import { useAuth } from "@/features/auth";
 import {
   BookOpen,
   Briefcase,
-  Calendar,
+  Folder,
   LayoutDashboard,
   LogInIcon,
   LogOut,
-  Route,
+  Play,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/routines", label: "রুটিন", icon: Calendar },
+  { href: "/pdf-library", label: "জনপ্রিয় PDF", icon: Folder },
   { href: "/syllabus", label: "সিলেবাস", icon: BookOpen },
-  { href: "/job-circular", label: "নিয়োগ বিজ্ঞপ্তি", icon: Briefcase },
-  { href: "/roadmap", label: "রোডম্যাপ", icon: Route },
+  { href: "/job-circular", label: "জব", icon: Briefcase },
+  { href: "/videos", label: "ভিডিও", icon: Play },
 ];
 
 export function LandingHeader() {

@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Calendar, ClipboardList, Star } from "lucide-react";
+import { BookOpen, Calendar, Star } from "lucide-react";
 import Link from "next/link";
 
 const studyItems = [
@@ -18,16 +18,7 @@ const studyItems = [
     borderColor:
       "group-hover:border-emerald-200 dark:group-hover:border-emerald-800",
   },
-  {
-    title: "সাপ্তাহিক মডেল টেস্ট",
-    description: "প্রতি সপ্তাহে সম্পূর্ণ বিনামূল্যে পূর্ণাঙ্গ মডেল টেস্ট দিন",
-    icon: ClipboardList,
-    href: "/exams/free-saptahik-model-test",
-    color: "text-violet-600",
-    bgColor: "bg-violet-50 dark:bg-violet-950/30",
-    borderColor:
-      "group-hover:border-violet-200 dark:group-hover:border-violet-800",
-  },
+
   {
     title: "পরীক্ষার রুটিন",
     description: "আসন্ন পরীক্ষার তারিখ দেখুন",
@@ -51,22 +42,27 @@ const studyItems = [
 
 export function StudySection() {
   return (
-    <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {studyItems.map((item) => (
-        <Link key={item.title} href={item.href}>
+        <Link key={item.title} href={item.href} className="block">
           <Card
-            className={`group card-hover-lift cursor-pointer h-full transition-all duration-300 ${item.borderColor}`}
+            className={`group h-full cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${item.borderColor}`}
           >
-            <CardHeader className="p-4">
+            <CardHeader className="flex flex-col items-center justify-center p-5 text-center">
+              {/* Icon */}
               <div
-                className={`inline-flex size-10 items-center justify-center rounded-xl ${item.bgColor} transition-transform duration-300 group-hover:scale-105`}
+                className={`flex size-12 items-center justify-center rounded-2xl ${item.bgColor} transition-transform duration-300 group-hover:scale-110`}
               >
-                <item.icon className={`size-5 ${item.color}`} />
+                <item.icon className={`size-6 ${item.color}`} />
               </div>
-              <CardTitle className="text-sm font-medium mt-2">
+
+              {/* Title */}
+              <CardTitle className="mt-3 text-sm font-semibold">
                 {item.title}
               </CardTitle>
-              <CardDescription className="text-xs">
+
+              {/* Description */}
+              <CardDescription className="mt-1 text-xs leading-relaxed">
                 {item.description}
               </CardDescription>
             </CardHeader>

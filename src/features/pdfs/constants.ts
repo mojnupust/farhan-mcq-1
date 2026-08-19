@@ -1,4 +1,4 @@
-import type { PdfDocType, PdfFilter, SubExamCategoryOption } from "./types";
+import type { PdfDocType, PdfFilter } from "./types";
 
 export const PDF_DOC_TYPES: {
   value: PdfDocType;
@@ -29,30 +29,12 @@ export function docTypeLabel(value: PdfDocType): string {
   return PDF_DOC_TYPES.find((c) => c.value === value)?.label ?? value;
 }
 
-// Pulled from sub_exam_categories_rows.json + one extra id spotted as a
-// foreign key inside syllabuses_rows.json (DSS) that wasn't in that sample.
-// Once the API is wired up, fetch this list from the sub_exam_categories
-// table instead of hardcoding it here.
-export const SUB_EXAM_CATEGORIES: SubExamCategoryOption[] = [
-  { id: "cmnv745290005uxikq56hsyxc", name: "বিসিএস প্রিলিমিনারি জব সল্যুশন" },
-  {
-    id: "cmnv7455y0007uxikovownw5m",
-    name: "বেসরকারি শিক্ষক নিয়োগ (NTRCA) জব সল্যুশন",
-  },
-  {
-    id: "cmnv745hc000huxikxavri5d3",
-    name: "19th (NTRCA) বেসরকারি শিক্ষক নিয়োগ প্রস্তুতি",
-  },
-  { id: "cmopm6c5u0001uxzgaig4s2gf", name: "Only ICT" },
-  {
-    id: "cmpyvd9m70001uxgcoxb7tx5f",
-    name: "সমাজসেবা অধিদপ্তর (DSS) নিয়োগ পরীক্ষা",
-  },
-];
-
-export function subExamCategoryLabel(id?: string | null): string {
+export function subExamCategoryLabel(
+  id?: string | null,
+  categories: { id: string; name: string }[] = [],
+): string {
   if (!id) return "সাধারণ (কোনো নির্দিষ্ট বিভাগ নয়)";
-  return SUB_EXAM_CATEGORIES.find((c) => c.id === id)?.name ?? "অজানা বিভাগ";
+  return categories.find((c) => c.id === id)?.name ?? "অজানা বিভাগ";
 }
 
 export function formatFileSize(kb?: number): string {
