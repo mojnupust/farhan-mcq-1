@@ -89,7 +89,7 @@ export default function DocsPreviewPage({
     try {
       await docxService.deleteExport(documentId);
       toastSuccessAfterCommit("Docx মুছে ফেলা হয়েছে");
-      window.location.href = ROUTES.docs;
+      window.location.href = ROUTES.adminDocs;
     } catch {
       toastErrorAfterCommit("Docx মুছে ফেলা যায়নি");
     } finally {
@@ -110,7 +110,7 @@ export default function DocsPreviewPage({
       <div className="mx-auto max-w-2xl px-4 py-6 text-center">
         <p className="text-muted-foreground">Docx পাওয়া যায়নি।</p>
         <Button asChild className="mt-4">
-          <Link href={ROUTES.docs}>আবার তৈরি করুন</Link>
+          <Link href={ROUTES.adminDocs}>আবার তৈরি করুন</Link>
         </Button>
       </div>
     );
@@ -122,7 +122,7 @@ export default function DocsPreviewPage({
     <div className="mx-auto max-w-2xl px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter">
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={ROUTES.docs}>
+          <Link href={ROUTES.adminDocs}>
             <ArrowLeft className="size-5" />
           </Link>
         </Button>
@@ -138,7 +138,7 @@ export default function DocsPreviewPage({
             রিফ্রেশ
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href={ROUTES.docs}>
+            <Link href={ROUTES.adminDocs}>
               <RefreshCw className="mr-2 size-4" />
               নতুন স্টাইলে তৈরি
             </Link>

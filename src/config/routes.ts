@@ -47,9 +47,6 @@ export const ROUTES = {
   images: "/images",
   imagesPreview: (questionSetId: string) =>
     `/images/preview/${questionSetId}` as const,
-  docs: "/docs",
-  docsPreview: (documentId: string) =>
-    `/docs/preview/${documentId}` as const,
   videos: "/videos",
   videoDetail: (id: string) => `/videos/${id}` as const,
   pdf: "/pdf-library",
@@ -68,6 +65,9 @@ export const ROUTES = {
   adminQuestionSets: "/admin/question-sets",
   adminQuestionSetsAutomotion: "/admin/question-sets-automotion",
   adminPdfManagement: "/admin/pdf-management",
+  adminDocs: "/admin/docs",
+  adminDocsPreview: (documentId: string) =>
+    `/admin/docs/preview/${documentId}` as const,
   adminSubscriptions: "/admin/subscriptions",
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",

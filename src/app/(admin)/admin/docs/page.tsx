@@ -140,7 +140,7 @@ export default function DocsPage() {
 
         if (status.status === "DONE" && status.document) {
           setGenerating(false);
-          router.push(ROUTES.docsPreview(status.document.id));
+          router.push(ROUTES.adminDocsPreview(status.document.id));
         } else if (status.status === "FAILED") {
           setGenerating(false);
           setGenerateError(status.errorMessage || "Docx তৈরি ব্যর্থ হয়েছে।");
@@ -167,7 +167,7 @@ export default function DocsPage() {
       const result = await docxService.generate(selectedSetIds, styleConfig);
       if (result.cached && result.document) {
         setGenerating(false);
-        router.push(ROUTES.docsPreview(result.document.id));
+        router.push(ROUTES.adminDocsPreview(result.document.id));
         return;
       }
       if (result.jobId) {

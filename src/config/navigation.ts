@@ -61,7 +61,7 @@ export const adminNav: NavItem[] = [
     href: ROUTES.adminPdfManagement,
     icon: FileTextIcon,
   },
-  { label: "Docx এক্সপোর্ট", href: ROUTES.docs, icon: FileTextIcon },
+  { label: "Docx এক্সপোর্ট", href: ROUTES.adminDocs, icon: FileTextIcon },
   { label: "নোটিফিকেশন", href: ROUTES.adminNotifications, icon: Megaphone },
   {
     label: "ব্রডকাস্ট সেন্টার",
