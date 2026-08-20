@@ -4,20 +4,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Calendar, Star } from "lucide-react";
+import { Calendar, Star } from "lucide-react";
 import Link from "next/link";
 
 const studyItems = [
-  {
-    title: "বিষয়ভিত্তিক প্র্যাক্টিস",
-    description: "বিষয় বেছে নিয়ে প্র্যাক্টিস করুন",
-    icon: BookOpen,
-    href: "/exam-subject-topic",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-    borderColor:
-      "group-hover:border-emerald-200 dark:group-hover:border-emerald-800",
-  },
+  // {
+  //   title: "বিষয়ভিত্তিক প্র্যাক্টিস",
+  //   description: "বিষয় বেছে নিয়ে প্র্যাক্টিস করুন",
+  //   icon: BookOpen,
+  //   href: "/exam-subject-topic",
+  //   color: "text-emerald-600",
+  //   bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+  //   borderColor:
+  //     "group-hover:border-emerald-200 dark:group-hover:border-emerald-800",
+  // },
 
   {
     title: "পরীক্ষার রুটিন",

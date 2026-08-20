@@ -120,7 +120,7 @@ export function LandingHeader() {
         ) : (
           /* ── Logged-out: Login button ── */
           <Button size="sm" asChild>
-            <Link href="/register">
+            <Link href="/login">
               <LogInIcon />
               লগইন / রেজিস্ট্রেশন
             </Link>
