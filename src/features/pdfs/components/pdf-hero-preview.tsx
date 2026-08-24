@@ -10,24 +10,22 @@ interface PdfHeroPreviewProps {
   pageCount?: number;
   onDownload: () => void;
   downloading?: boolean;
-  locked?: boolean;
+  lockReason?: "login" | "subscription" | null;
+  loginHref?: string;
 }
 
-// There's no real thumbnail/first-page render pipeline yet, so this is a
-// deliberately simple centerpiece — icon + meta + the one action that
-// actually matters (download) — rather than a broken iframe pointed at a
-// placeholder URL.
 export function PdfHeroPreview({
   fileSizeKb,
   pageCount,
   onDownload,
   downloading,
-  locked,
+  lockReason,
+  loginHref = "/login",
 }: PdfHeroPreviewProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border bg-gradient-to-br from-primary/10 via-card to-card px-6 py-12 text-center sm:py-16">
       <div className="flex size-20 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-        {locked ? (
+        {lockReason ? (
           <Lock className="size-10" />
         ) : (
           <FileText className="size-10" />
@@ -37,21 +35,33 @@ export function PdfHeroPreview({
         {formatFileSize(fileSizeKb)}
         {pageCount ? ` · ${pageCount} পৃষ্ঠা` : ""}
       </p>
-      {locked ? (
-        <>
-          <p className="max-w-xs text-sm text-amber-600">
-            এই পিডিএফটি প্রিমিয়াম — ডাউনলোড করতে সাবস্ক্রিপশন লাগবে।
-          </p>
-          <Button size="lg" asChild>
-            <Link href="/subscriptions">সাবস্ক্রিপশন নিন</Link>
-          </Button>
-        </>
-      ) : (
+      {lockReason === "login" && (
+        <p className="max-w-sm text-sm text-amber-600">
+          শুধু লগইন করা ব্যবহারকারী এই পিডিএফ ডাউনলোড করতে পারবেন।
+        </p>
+      )}
+      {lockReason === "subscription" && (
+        <p className="max-w-sm text-sm text-amber-600">
+          এই পিডিএফটি পেইড — শুধু সক্রিয় সাবস্ক্রিপশনধারী ব্যবহারকারী ডাউনলোড
+          করতে পারবেন।
+        </p>
+      )}
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <Button size="lg" onClick={onDownload} disabled={downloading}>
           <Download className="mr-2 size-4" />
           {downloading ? "ডাউনলোড হচ্ছে..." : "ডাউনলোড করুন"}
         </Button>
-      )}
+        {lockReason === "login" && (
+          <Button size="lg" variant="outline" asChild>
+            <Link href={loginHref}>লগইন করুন</Link>
+          </Button>
+        )}
+        {lockReason === "subscription" && (
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/subscriptions">সাবস্ক্রিপশন নিন</Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

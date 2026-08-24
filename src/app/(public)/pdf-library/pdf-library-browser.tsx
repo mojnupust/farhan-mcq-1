@@ -29,7 +29,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
@@ -44,13 +44,23 @@ function PdfCardSkeleton() {
   );
 }
 
-export default function PdfLibraryPage() {
-  const [featured, setFeatured] = useState<PdfDocument[]>([]);
-  const [pdfs, setPdfs] = useState<PdfDocument[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
+export function PdfLibraryBrowser({
+  initialFeatured,
+  initialPdfs,
+  initialTotal,
+  initialTotalPages,
+}: {
+  initialFeatured: PdfDocument[];
+  initialPdfs: PdfDocument[];
+  initialTotal: number;
+  initialTotalPages: number;
+}) {
+  const [featured, setFeatured] = useState<PdfDocument[]>(initialFeatured);
+  const [pdfs, setPdfs] = useState<PdfDocument[]>(initialPdfs);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [total, setTotal] = useState(initialTotal);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -63,14 +73,16 @@ export default function PdfLibraryPage() {
     SubExamCategory[]
   >([]);
 
+  const skipNextFetch = useRef(initialPdfs.length > 0);
+
   const loadFeatured = useCallback(async () => {
     try {
       const data = await pdfService.getFeatured();
       setFeatured(data);
     } catch {
-      setFeatured([]);
+      setFeatured(initialFeatured);
     }
-  }, []);
+  }, [initialFeatured]);
 
   const loadPdfs = useCallback(async () => {
     setLoading(true);
@@ -96,8 +108,10 @@ export default function PdfLibraryPage() {
   }, [page, sort, search, docType, subExam, freeOnly]);
 
   useEffect(() => {
-    loadFeatured();
-  }, [loadFeatured]);
+    if (initialFeatured.length === 0) {
+      loadFeatured();
+    }
+  }, [initialFeatured.length, loadFeatured]);
 
   useEffect(() => {
     subExamCategoryService
@@ -107,6 +121,10 @@ export default function PdfLibraryPage() {
   }, []);
 
   useEffect(() => {
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
+      return;
+    }
     loadPdfs();
   }, [loadPdfs]);
 
@@ -135,7 +153,6 @@ export default function PdfLibraryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 pb-12 sm:px-6 lg:px-8 page-enter">
-      {/* Hero */}
       <div className="mb-8 rounded-2xl border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-8">
         <div className="flex items-start gap-4">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -154,7 +171,6 @@ export default function PdfLibraryPage() {
         </div>
       </div>
 
-      {/* Featured */}
       {featured.length > 0 && !hasActiveFilters && page === 1 && (
         <section className="mb-10">
           <div className="mb-4 flex items-center gap-2">
@@ -169,7 +185,6 @@ export default function PdfLibraryPage() {
         </section>
       )}
 
-      {/* Filters */}
       <div className="mb-6 space-y-4">
         <form onSubmit={applySearch} className="flex gap-2">
           <div className="relative flex-1">
@@ -300,7 +315,6 @@ export default function PdfLibraryPage() {
         )}
       </div>
 
-      {/* Grid */}
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -325,7 +339,6 @@ export default function PdfLibraryPage() {
         </div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-2">
           <Button

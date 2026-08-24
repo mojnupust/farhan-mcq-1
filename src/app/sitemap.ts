@@ -4,13 +4,14 @@
 //
 //  WHAT THIS COVERS (every public URL in the frontend):
 //  ─────────────────────────────────────────────────────
-//  Static      /  /roadmap  /routines  /syllabus  /job-circular  /login  /register
+//  Static      /  /roadmap  /routines  /syllabus  /job-circular  /pdf-library  /login  /register
 //  Roadmap     /roadmap/[roleSlug]                         (9 static slugs)
 //  Exam        /exams/[categorySlug]                       → GET /api/v1/exam-categories
 //  Sub-exam    /exams/[categorySlug]/[subSlug]             → NEW endpoint (see below)
 //  Sub-pages   /exams/[categorySlug]/[subSlug]/{routine,results,archive,merit-list,syllabus}
 //  Syllabus    /syllabus/[syllabusSlug]                    → GET /api/v1/syllabuses  (detail/:slug)
 //  Questions   /[slug]                                     → GET /api/v1/question-sets/public/slugs (NEW)
+//  PDFs        /pdf-library  /pdf-library/[id]             → GET /api/v1/pdfs/sitemap (fallback: paginated /pdfs)
 //
 //  NEW BACKEND ENDPOINTS REQUIRED (see STEP-BY-STEP guide below):
 //    GET /api/v1/sub-exam-categories/sitemap   → [{categorySlug, subSlug, updatedAt}]
@@ -20,6 +21,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { MetadataRoute } from "next";
+import { fetchPdfSitemapEntries } from "@/features/pdfs/server";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -107,7 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // Fetch all dynamic data in parallel — one network round-trip budget
-  const [examCategories, subExamItems, syllabuses, questionSlugs] =
+  const [examCategories, subExamItems, syllabuses, questionSlugs, pdfEntries] =
     await Promise.all([
       // Existing endpoint ✅
       safeFetch<ExamCategoryItem>(
@@ -126,6 +128,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         `${API_ROOT}/api/v1/question-sets/public/slugs`,
         "question-slugs",
       ),
+      fetchPdfSitemapEntries(),
     ]);
 
   // ── 1. Static shell routes ─────────────────────────────────────────────────
@@ -160,6 +163,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/pdf-library`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     // Auth pages — crawlable but low-value
     {
@@ -278,6 +287,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.55,
   }));
 
+  const pdfRoutes: MetadataRoute.Sitemap = pdfEntries
+    .filter((p) => p.id)
+    .map((p) => ({
+      url: `${BASE_URL}/pdf-library/${p.id}`,
+      lastModified: p.updatedAt ? new Date(p.updatedAt) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+
   // ── Assemble ───────────────────────────────────────────────────────────────
 
   return [
@@ -287,6 +305,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...subExamRoutes, //  dynamic × 6
     ...syllabusRoutes, //  dynamic
     ...questionRoutes, //  dynamic (largest set)
+    ...pdfRoutes,
   ];
 }
 

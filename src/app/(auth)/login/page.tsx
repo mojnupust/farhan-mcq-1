@@ -42,7 +42,12 @@ export default function LoginPage() {
     setError("");
     try {
       await login(data);
-      router.push("/dashboard");
+      const next = new URLSearchParams(window.location.search).get("next");
+      const safeNext =
+        next && next.startsWith("/") && !next.startsWith("//")
+          ? next
+          : "/dashboard";
+      router.push(safeNext);
     } catch (err) {
       setError(err instanceof Error ? err.message : "লগইন ব্যর্থ হয়েছে");
     }
