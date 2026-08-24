@@ -8,9 +8,7 @@ import {
   subExamCategoryLabel,
 } from "@/features/pdfs/constants";
 import {
-  fetchPdfSitemapEntries,
   fetchPublicPdfById,
-  PDF_REVALIDATE_SECONDS,
   PDF_SITE_ORIGIN,
   pdfCanonicalUrl,
   pdfSeoDescription,
@@ -25,16 +23,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PdfDetailInteractive } from "./pdf-detail-interactive";
 
-export const revalidate = PDF_REVALIDATE_SECONDS;
+export const revalidate = 1800;
 export const dynamicParams = true;
 
 interface Props {
   params: Promise<{ id: string }>;
-}
-
-export async function generateStaticParams() {
-  const entries = await fetchPdfSitemapEntries();
-  return entries.map((p) => ({ id: p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

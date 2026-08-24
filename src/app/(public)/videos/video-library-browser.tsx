@@ -11,14 +11,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ROUTES } from "@/config/routes";
 import { VideoCard } from "@/features/videos/components/video-card";
 import {
   VIDEO_CATEGORIES,
   VIDEO_SORT_OPTIONS,
 } from "@/features/videos/constants";
 import { videoService } from "@/features/videos";
-import type { Video, VideoCategory, VideoFilter, VideoSort } from "@/features/videos/types";
+import type {
+  Video,
+  VideoCategory,
+  VideoFilter,
+  VideoSort,
+} from "@/features/videos/types";
 import {
   ChevronLeft,
   ChevronRight,
@@ -29,7 +33,7 @@ import {
   Video as VideoIcon,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
@@ -44,13 +48,23 @@ function VideoCardSkeleton() {
   );
 }
 
-export default function VideosPage() {
-  const [featured, setFeatured] = useState<Video[]>([]);
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
+export function VideoLibraryBrowser({
+  initialFeatured,
+  initialVideos,
+  initialTotal,
+  initialTotalPages,
+}: {
+  initialFeatured: Video[];
+  initialVideos: Video[];
+  initialTotal: number;
+  initialTotalPages: number;
+}) {
+  const [featured, setFeatured] = useState<Video[]>(initialFeatured);
+  const [videos, setVideos] = useState<Video[]>(initialVideos);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [total, setTotal] = useState(initialTotal);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -58,14 +72,16 @@ export default function VideosPage() {
   const [category, setCategory] = useState<VideoCategory | "ALL">("ALL");
   const [sort, setSort] = useState<VideoSort>("newest");
 
+  const skipNextFetch = useRef(initialVideos.length > 0);
+
   const loadFeatured = useCallback(async () => {
     try {
       const data = await videoService.getFeatured();
       setFeatured(data);
     } catch {
-      setFeatured([]);
+      setFeatured(initialFeatured);
     }
-  }, []);
+  }, [initialFeatured]);
 
   const loadVideos = useCallback(async () => {
     setLoading(true);
@@ -90,10 +106,16 @@ export default function VideosPage() {
   }, [page, sort, search, category]);
 
   useEffect(() => {
-    loadFeatured();
-  }, [loadFeatured]);
+    if (initialFeatured.length === 0) {
+      loadFeatured();
+    }
+  }, [initialFeatured.length, loadFeatured]);
 
   useEffect(() => {
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
+      return;
+    }
     loadVideos();
   }, [loadVideos]);
 
@@ -115,7 +137,6 @@ export default function VideosPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 pb-12 sm:px-6 lg:px-8 page-enter">
-      {/* Hero */}
       <div className="mb-8 rounded-2xl border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-8">
         <div className="flex items-start gap-4">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -133,7 +154,6 @@ export default function VideosPage() {
         </div>
       </div>
 
-      {/* Featured */}
       {featured.length > 0 && !hasActiveFilters && page === 1 && (
         <section className="mb-10">
           <div className="mb-4 flex items-center gap-2">
@@ -148,7 +168,6 @@ export default function VideosPage() {
         </section>
       )}
 
-      {/* Filters */}
       <div className="mb-6 space-y-4">
         <form onSubmit={applySearch} className="flex gap-2">
           <div className="relative flex-1">
@@ -250,7 +269,6 @@ export default function VideosPage() {
         )}
       </div>
 
-      {/* Grid */}
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -275,7 +293,6 @@ export default function VideosPage() {
         </div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-2">
           <Button

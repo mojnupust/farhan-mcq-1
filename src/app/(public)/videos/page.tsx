@@ -1,10 +1,10 @@
 import { LandingHeader } from "@/components/landing-header";
 import {
-  fetchFeaturedPdfs,
-  fetchPublicPdfs,
-  PDF_SITE_ORIGIN,
-} from "@/features/pdfs/server";
-import { PdfLibraryBrowser } from "./pdf-library-browser";
+  fetchFeaturedVideos,
+  fetchPublicVideos,
+  VIDEO_SITE_ORIGIN,
+} from "@/features/videos/server";
+import { VideoLibraryBrowser } from "./video-library-browser";
 
 export const revalidate = 1800;
 
@@ -18,16 +18,16 @@ function LibraryJsonLd({
     "@graph": [
       {
         "@type": "CollectionPage",
-        "@id": `${PDF_SITE_ORIGIN}/pdf-library`,
-        name: "পিডিএফ লাইব্রেরি | Farhan MCQ",
+        "@id": `${VIDEO_SITE_ORIGIN}/videos`,
+        name: "ভিডিও লাইব্রেরি | Farhan MCQ",
         description:
-          "BCS, NTRCA, ব্যাংক ও সরকারি চাকরির সিলেবাস, প্রশ্নব্যাংক, বিগত প্রশ্ন ও নোট PDF।",
-        url: `${PDF_SITE_ORIGIN}/pdf-library`,
+          "BCS, NTRCA, ব্যাংক ও সরকারি চাকরির প্রস্তুতির YouTube লেকচার।",
+        url: `${VIDEO_SITE_ORIGIN}/videos`,
         inLanguage: "bn",
         isPartOf: {
           "@type": "WebSite",
           name: "Farhan MCQ",
-          url: PDF_SITE_ORIGIN,
+          url: VIDEO_SITE_ORIGIN,
         },
       },
       {
@@ -37,24 +37,24 @@ function LibraryJsonLd({
             "@type": "ListItem",
             position: 1,
             name: "হোম",
-            item: PDF_SITE_ORIGIN,
+            item: VIDEO_SITE_ORIGIN,
           },
           {
             "@type": "ListItem",
             position: 2,
-            name: "পিডিএফ লাইব্রেরি",
-            item: `${PDF_SITE_ORIGIN}/pdf-library`,
+            name: "ভিডিও লাইব্রেরি",
+            item: `${VIDEO_SITE_ORIGIN}/videos`,
           },
         ],
       },
       {
         "@type": "ItemList",
-        name: "Farhan MCQ পিডিএফ তালিকা",
-        itemListElement: titles.map((p, i) => ({
+        name: "Farhan MCQ ভিডিও তালিকা",
+        itemListElement: titles.map((v, i) => ({
           "@type": "ListItem",
           position: i + 1,
-          url: `${PDF_SITE_ORIGIN}/pdf-library/${p.id}`,
-          name: p.title,
+          url: `${VIDEO_SITE_ORIGIN}/videos/${v.id}`,
+          name: v.title,
         })),
       },
     ],
@@ -68,26 +68,28 @@ function LibraryJsonLd({
   );
 }
 
-export default async function PdfLibraryPage() {
+export default async function VideosPage() {
   const [featured, list] = await Promise.all([
-    fetchFeaturedPdfs(),
-    fetchPublicPdfs({ page: 1, limit: 12, sort: "newest" }),
+    fetchFeaturedVideos(),
+    fetchPublicVideos({ page: 1, limit: 12, sort: "newest" }),
   ]);
 
   const listed = [
     ...featured.slice(0, 3),
-    ...list.data.filter((p) => !featured.slice(0, 3).some((f) => f.id === p.id)),
+    ...list.data.filter(
+      (v) => !featured.slice(0, 3).some((f) => f.id === v.id),
+    ),
   ];
 
   return (
     <>
       <LibraryJsonLd
-        titles={listed.map((p) => ({ id: p.id, title: p.title }))}
+        titles={listed.map((v) => ({ id: v.id, title: v.title }))}
       />
       <LandingHeader />
-      <PdfLibraryBrowser
+      <VideoLibraryBrowser
         initialFeatured={featured}
-        initialPdfs={list.data}
+        initialVideos={list.data}
         initialTotal={list.total}
         initialTotalPages={list.totalPages}
       />

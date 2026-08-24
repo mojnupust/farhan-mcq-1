@@ -4,7 +4,7 @@
 //
 //  WHAT THIS COVERS (every public URL in the frontend):
 //  ─────────────────────────────────────────────────────
-//  Static      /  /roadmap  /routines  /syllabus  /job-circular  /pdf-library  /login  /register
+//  Static      /  /roadmap  /routines  /syllabus  /job-circular  /pdf-library  /videos  /login  /register
 //  Roadmap     /roadmap/[roleSlug]                         (9 static slugs)
 //  Exam        /exams/[categorySlug]                       → GET /api/v1/exam-categories
 //  Sub-exam    /exams/[categorySlug]/[subSlug]             → NEW endpoint (see below)
@@ -12,6 +12,7 @@
 //  Syllabus    /syllabus/[syllabusSlug]                    → GET /api/v1/syllabuses  (detail/:slug)
 //  Questions   /[slug]                                     → GET /api/v1/question-sets/public/slugs (NEW)
 //  PDFs        /pdf-library  /pdf-library/[id]             → GET /api/v1/pdfs/sitemap (fallback: paginated /pdfs)
+//  Videos      /videos  /videos/[id]                       → GET /api/v1/videos/sitemap (fallback: paginated /videos)
 //
 //  NEW BACKEND ENDPOINTS REQUIRED (see STEP-BY-STEP guide below):
 //    GET /api/v1/sub-exam-categories/sitemap   → [{categorySlug, subSlug, updatedAt}]
@@ -22,6 +23,7 @@
 
 import type { MetadataRoute } from "next";
 import { fetchPdfSitemapEntries } from "@/features/pdfs/server";
+import { fetchVideoSitemapEntries } from "@/features/videos/server";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -35,8 +37,7 @@ const API_ROOT = (
 
 // ISR: rebuild the sitemap every 6 hours.
 // Matches the cache TTL we'll use on the two new endpoints.
-export const dynamic = "force-dynamic";
-export const revalidate = 21_600;
+export const revalidate = 21600;
 
 // ── Static roadmap slugs (src/features/roadmap/roadmap-data.ts) ───────────────
 
@@ -109,8 +110,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // Fetch all dynamic data in parallel — one network round-trip budget
-  const [examCategories, subExamItems, syllabuses, questionSlugs, pdfEntries] =
-    await Promise.all([
+  const [
+    examCategories,
+    subExamItems,
+    syllabuses,
+    questionSlugs,
+    pdfEntries,
+    videoEntries,
+  ] = await Promise.all([
       // Existing endpoint ✅
       safeFetch<ExamCategoryItem>(
         `${API_ROOT}/api/v1/exam-categories`,
@@ -129,6 +136,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         "question-slugs",
       ),
       fetchPdfSitemapEntries(),
+      fetchVideoSitemapEntries(),
     ]);
 
   // ── 1. Static shell routes ─────────────────────────────────────────────────
@@ -166,6 +174,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${BASE_URL}/pdf-library`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/videos`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
@@ -296,6 +310,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
+  const videoRoutes: MetadataRoute.Sitemap = videoEntries
+    .filter((v) => v.id)
+    .map((v) => ({
+      url: `${BASE_URL}/videos/${v.id}`,
+      lastModified: v.updatedAt ? new Date(v.updatedAt) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+
   // ── Assemble ───────────────────────────────────────────────────────────────
 
   return [
@@ -306,6 +329,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...syllabusRoutes, //  dynamic
     ...questionRoutes, //  dynamic (largest set)
     ...pdfRoutes,
+    ...videoRoutes,
   ];
 }
 
