@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/pdf-library", label: "জনপ্রিয় PDF", icon: Folder },
+  { href: "/pdf-library", label: "Popular PDF", icon: Folder },
   { href: "/syllabus", label: "সিলেবাস", icon: BookOpen },
   { href: "/job-circular", label: "জব", icon: Briefcase },
   { href: "/videos", label: "ভিডিও", icon: Play },

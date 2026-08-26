@@ -1,9 +1,15 @@
 import { AuthProvider } from "@/features/auth";
+import { Toaster } from "sonner";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <AuthProvider>
+      <Toaster richColors position="top-center" closeButton />
+      {children}
+    </AuthProvider>
+  );
 }

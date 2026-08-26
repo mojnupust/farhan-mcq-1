@@ -1,12 +1,25 @@
 "use client";
 
 import { BrandMark } from "@/components/brand-logo";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authService, useAuth } from "@/features/auth";
+import {
+  PasswordResetDialog,
+  RegistrationClosedDialog,
+  useAuth,
+} from "@/features/auth";
+import { normalizeBdMobile } from "@/features/auth/lib/mobile";
 import { loginSchema } from "@/features/auth/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, Eye, EyeOff, House, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,24 +32,27 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [resetMobile, setResetMobile] = useState("");
-  const [resetStep, setResetStep] = useState<"mobile" | "otp" | "password">(
-    "mobile",
-  );
-  const [resetOtp, setResetOtp] = useState("");
-  const [resetPassword, setResetPassword] = useState("");
-  const [resetConfirm, setResetConfirm] = useState("");
-  const [resetError, setResetError] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { mobile: "", password: "" },
   });
+
+  const mobileRegister = register("mobile");
+
+  function openResetModal() {
+    setResetMobile(getValues("mobile") ?? "");
+    setShowResetModal(true);
+  }
 
   async function onSubmit(data: LoginForm) {
     setError("");
@@ -53,250 +69,163 @@ export default function LoginPage() {
     }
   }
 
-  async function handleResetSendOtp() {
-    setResetError("");
-    setResetLoading(true);
-    try {
-      await authService.sendOtp({ mobile: resetMobile });
-      setResetStep("otp");
-    } catch (err) {
-      setResetError(err instanceof Error ? err.message : "OTP পাঠানো যায়নি");
-    } finally {
-      setResetLoading(false);
-    }
-  }
-
-  async function handleResetVerifyOtp() {
-    setResetError("");
-    setResetLoading(true);
-    try {
-      await authService.verifyOtp({ mobile: resetMobile, code: resetOtp });
-      setResetStep("password");
-    } catch (err) {
-      setResetError(err instanceof Error ? err.message : "OTP সঠিক নয়");
-    } finally {
-      setResetLoading(false);
-    }
-  }
-
-  async function handleResetPassword() {
-    setResetError("");
-    if (resetPassword.length < 6) {
-      setResetError("পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে");
-      return;
-    }
-    if (resetPassword !== resetConfirm) {
-      setResetError("পাসওয়ার্ড মিলছে না");
-      return;
-    }
-    setResetLoading(true);
-    try {
-      await authService.resetPassword({
-        mobile: resetMobile,
-        password: resetPassword,
-      });
-      setShowResetModal(false);
-      setResetStep("mobile");
-      setResetMobile("");
-      setResetOtp("");
-      setResetPassword("");
-      setResetConfirm("");
-    } catch (err) {
-      setResetError(
-        err instanceof Error ? err.message : "পাসওয়ার্ড রিসেট ব্যর্থ",
-      );
-    } finally {
-      setResetLoading(false);
-    }
-  }
-
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
-      <div className="mx-auto w-full max-w-sm">
-        <div className="flex flex-col items-center">
-          <BrandMark />
-          <h1 className="text-2xl font-semibold tracking-tight">Farhan MCQ</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            আপনার অ্যাকাউন্টে লগইন করুন
+    <div className="flex min-h-dvh flex-col bg-background">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-start px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:justify-center sm:pt-6">
+        <div className="mb-6 flex flex-col items-center text-center sm:mb-8">
+          <Link
+            href="/"
+            className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <BrandMark className="size-12" />
+            <span className="sr-only">হোমে ফিরুন</span>
+          </Link>
+          <p className="mt-3 text-lg font-semibold tracking-tight">
+            Farhan MCQ
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="mobile">মোবাইল নম্বর</Label>
-            <Input
-              id="mobile"
-              type="tel"
-              placeholder="01XXXXXXXXX"
-              maxLength={11}
-              {...register("mobile")}
-            />
-            {errors.mobile && (
-              <p className="text-sm text-destructive">
-                {errors.mobile.message}
-              </p>
-            )}
+        <Card className="gap-0 border-0 shadow-none sm:border sm:shadow-sm">
+          <CardHeader className="px-0 text-center sm:px-6">
+            <h1 className="text-2xl font-semibold tracking-tight">লগইন</h1>
+            <CardDescription>
+              মোবাইল নম্বর ও পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্টে প্রবেশ করুন
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-0 pt-6 sm:px-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="mobile">মোবাইল নম্বর</Label>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  placeholder="01XXXXXXXXX"
+                  maxLength={11}
+                  className="h-11 text-base"
+                  aria-invalid={!!errors.mobile}
+                  aria-describedby={errors.mobile ? "mobile-error" : undefined}
+                  {...mobileRegister}
+                  onChange={(e) => {
+                    e.target.value = normalizeBdMobile(e.target.value);
+                    void mobileRegister.onChange(e);
+                  }}
+                />
+                {errors.mobile ? (
+                  <p id="mobile-error" className="text-sm text-destructive">
+                    {errors.mobile.message}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    ১১ ডিজিট, যেমন 017XXXXXXXX
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <Label htmlFor="password">পাসওয়ার্ড</Label>
+                  <button
+                    type="button"
+                    onClick={openResetModal}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    ভুলে গেছেন?
+                  </button>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="আপনার পাসওয়ার্ড"
+                    className="h-11 pr-11 text-base"
+                    aria-invalid={!!errors.password}
+                    aria-describedby={
+                      errors.password ? "password-error" : undefined
+                    }
+                    {...register("password")}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={
+                      showPassword ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.password ? (
+                  <p id="password-error" className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
+                ) : null}
+              </div>
+
+              {error ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <Button
+                type="submit"
+                size="lg"
+                className="h-11 w-full text-base"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    লগইন হচ্ছে...
+                  </>
+                ) : (
+                  "লগইন করুন"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+
+          <div className="mt-6 flex items-center justify-center gap-1.5 text-sm">
+            <span className="text-muted-foreground">অ্যাকাউন্ট নেই?</span>
+            <button
+              type="button"
+              onClick={() => setShowRegisterDialog(true)}
+              className="font-medium text-primary hover:underline"
+            >
+              নতুন একাউন্ট খুলুন
+            </button>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">পাসওয়ার্ড</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="আপনার পাসওয়ার্ড"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
-          )}
-
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isSubmitting}
+        </Card>
+        <div className="w-full flex justify-center px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            {isSubmitting ? "লগইন হচ্ছে..." : "লগইন"}
-          </Button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => setShowResetModal(true)}
-            className="text-sm text-primary hover:underline"
-          >
-            পাসওয়ার্ড ভুলে গেছেন?
-          </button>
+            <House className="size-4" />
+            হোমে ফিরুন
+          </Link>
         </div>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          অ্যাকাউন্ট নেই?{" "}
-          <Link href="/register" className="text-primary hover:underline">
-            রেজিস্ট্রেশন করুন
-          </Link>
-        </p>
-
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            &larr; হোমে ফিরুন
-          </Link>
-        </p>
       </div>
 
-      {/* Reset Password Modal */}
-      {showResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-sm rounded-lg bg-background p-6 shadow-lg">
-            <h2 className="text-lg font-semibold">পাসওয়ার্ড রিসেট</h2>
+      <RegistrationClosedDialog
+        open={showRegisterDialog}
+        onOpenChange={setShowRegisterDialog}
+      />
 
-            {resetStep === "mobile" && (
-              <div className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label>মোবাইল নম্বর</Label>
-                  <Input
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    maxLength={11}
-                    value={resetMobile}
-                    onChange={(e) => setResetMobile(e.target.value)}
-                  />
-                </div>
-                {resetError && (
-                  <p className="text-sm text-destructive">{resetError}</p>
-                )}
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowResetModal(false);
-                      setResetStep("mobile");
-                      setResetError("");
-                    }}
-                  >
-                    বাতিল
-                  </Button>
-                  <Button
-                    onClick={handleResetSendOtp}
-                    disabled={resetLoading || resetMobile.length !== 11}
-                    className="flex-1"
-                  >
-                    {resetLoading ? "পাঠানো হচ্ছে..." : "OTP পাঠান"}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {resetStep === "otp" && (
-              <div className="mt-4 space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {resetMobile} নম্বরে OTP পাঠানো হয়েছে
-                </p>
-                <div className="space-y-2">
-                  <Label>OTP কোড</Label>
-                  <Input
-                    type="text"
-                    placeholder="৪ ডিজিট OTP"
-                    maxLength={4}
-                    value={resetOtp}
-                    onChange={(e) => setResetOtp(e.target.value)}
-                  />
-                </div>
-                {resetError && (
-                  <p className="text-sm text-destructive">{resetError}</p>
-                )}
-                <Button
-                  onClick={handleResetVerifyOtp}
-                  disabled={resetLoading || resetOtp.length !== 4}
-                  className="w-full"
-                >
-                  {resetLoading ? "যাচাই হচ্ছে..." : "যাচাই করুন"}
-                </Button>
-              </div>
-            )}
-
-            {resetStep === "password" && (
-              <div className="mt-4 space-y-4">
-                <div className="space-y-2">
-                  <Label>নতুন পাসওয়ার্ড</Label>
-                  <Input
-                    type="password"
-                    placeholder="কমপক্ষে ৬ অক্ষর"
-                    value={resetPassword}
-                    onChange={(e) => setResetPassword(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>পাসওয়ার্ড নিশ্চিত করুন</Label>
-                  <Input
-                    type="password"
-                    placeholder="পুনরায় পাসওয়ার্ড"
-                    value={resetConfirm}
-                    onChange={(e) => setResetConfirm(e.target.value)}
-                  />
-                </div>
-                {resetError && (
-                  <p className="text-sm text-destructive">{resetError}</p>
-                )}
-                <Button
-                  onClick={handleResetPassword}
-                  disabled={resetLoading}
-                  className="w-full"
-                >
-                  {resetLoading ? "রিসেট হচ্ছে..." : "পাসওয়ার্ড রিসেট করুন"}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <PasswordResetDialog
+        open={showResetModal}
+        onOpenChange={setShowResetModal}
+        initialMobile={resetMobile}
+      />
     </div>
   );
 }
