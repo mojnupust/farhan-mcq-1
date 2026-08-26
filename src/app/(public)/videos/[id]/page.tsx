@@ -1,11 +1,6 @@
 import { LandingHeader } from "@/components/landing-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { YoutubePlayer } from "@/features/videos/components/youtube-player";
 import {
   categoryLabel,
-  formatRelativeDate,
-  formatViewCount,
   youtubeEmbedUrl,
   youtubeThumbnail,
 } from "@/features/videos/constants";
@@ -16,11 +11,9 @@ import {
   videoCanonicalUrl,
   videoSeoDescription,
 } from "@/features/videos/server";
-import { ArrowLeft, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { VideoDetailInteractive } from "./video-detail-interactive";
+import { VideoDetailClient } from "./video-detail-client";
+import { VideoDetailView } from "./video-detail-view";
 
 export const revalidate = 1800;
 export const dynamicParams = true;
@@ -166,67 +159,12 @@ function VideoJsonLd({ video }: { video: NonNullable<Awaited<ReturnType<typeof f
 export default async function VideoDetailPage({ params }: Props) {
   const { id } = await params;
   const video = await fetchPublicVideoById(id);
-  if (!video) notFound();
 
   return (
     <>
-      <VideoJsonLd video={video} />
+      {video && <VideoJsonLd video={video} />}
       <LandingHeader />
-      <article className="mx-auto max-w-4xl px-4 py-6 pb-12 sm:px-6 page-enter">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link href="/videos">
-            <ArrowLeft className="mr-2 size-4" />
-            ভিডিও লাইব্রেরি
-          </Link>
-        </Button>
-
-        <YoutubePlayer videoId={video.youtubeVideoId} title={video.title} />
-
-        <header className="mt-5 space-y-3">
-          <Badge variant="secondary">{categoryLabel(video.category)}</Badge>
-          <h1 className="text-xl font-bold leading-snug sm:text-2xl">
-            {video.title}
-          </h1>
-          <p className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <span>{formatViewCount(video.viewCount)} দেখা</span>
-            <time dateTime={video.publishedAt ?? video.createdAt}>
-              {formatRelativeDate(video.publishedAt)}
-            </time>
-          </p>
-          {video.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {video.tags.map((t) => (
-                <Badge key={t} variant="outline" className="text-xs">
-                  #{t}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </header>
-
-        <div className="mt-4">
-          <Button variant="outline" size="sm" asChild>
-            <a
-              href={video.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink className="mr-2 size-4" />
-              YouTube-এ দেখুন
-            </a>
-          </Button>
-        </div>
-
-        {video.description && (
-          <div className="mt-5 rounded-xl border bg-muted/30 p-4">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-              {video.description}
-            </p>
-          </div>
-        )}
-
-        <VideoDetailInteractive videoId={id} initialVideo={video} />
-      </article>
+      {video ? <VideoDetailView video={video} /> : <VideoDetailClient id={id} />}
     </>
   );
 }

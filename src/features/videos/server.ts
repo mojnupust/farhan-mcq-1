@@ -1,11 +1,9 @@
+import { getServerApiBase } from "@/lib/server-api-base";
 import { categoryLabel } from "./constants";
 import type { PaginatedVideos, Video, VideoFilter } from "./types";
 
 export const VIDEO_SITE_ORIGIN = "https://farhanmcq.com";
 const VIDEO_REVALIDATE_SECONDS = 1800;
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api";
 
 function buildListQuery(filter?: VideoFilter): string {
   if (!filter) return "";
@@ -20,8 +18,8 @@ function buildListQuery(filter?: VideoFilter): string {
 async function jsonGet(path: string): Promise<unknown | null> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8_000);
-    const res = await fetch(`${API_BASE}${path}`, {
+    const timeoutId = setTimeout(() => controller.abort(), 20_000);
+    const res = await fetch(`${getServerApiBase()}${path}`, {
       next: { revalidate: VIDEO_REVALIDATE_SECONDS },
       headers: { Accept: "application/json" },
       signal: controller.signal,

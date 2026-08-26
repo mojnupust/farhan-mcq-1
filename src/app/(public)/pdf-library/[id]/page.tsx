@@ -1,12 +1,5 @@
 import { LandingHeader } from "@/components/landing-header";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  docTypeLabel,
-  formatCount,
-  formatRelativeDate,
-  subExamCategoryLabel,
-} from "@/features/pdfs/constants";
+import { docTypeLabel } from "@/features/pdfs/constants";
 import {
   fetchPublicPdfById,
   PDF_SITE_ORIGIN,
@@ -14,14 +7,15 @@ import {
   pdfSeoDescription,
 } from "@/features/pdfs/server";
 import {
+  subExamCategoryLabel,
+} from "@/features/pdfs/constants";
+import {
   subExamCategoryService,
   type SubExamCategory,
 } from "@/features/sub-exam-categories";
-import { ArrowLeft, Download, Eye } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { PdfDetailInteractive } from "./pdf-detail-interactive";
+import { PdfDetailClient } from "./pdf-detail-client";
+import { PdfDetailView } from "./pdf-detail-view";
 
 export const revalidate = 1800;
 export const dynamicParams = true;
@@ -166,79 +160,29 @@ function PdfJsonLd({
 export default async function PdfDetailPage({ params }: Props) {
   const { id } = await params;
   const pdf = await fetchPublicPdfById(id);
-  if (!pdf) notFound();
 
   let categories: SubExamCategory[] = [];
-  try {
-    categories = await subExamCategoryService.getAll();
-  } catch {
-    categories = [];
+  if (pdf) {
+    try {
+      categories = await subExamCategoryService.getAll();
+    } catch {
+      categories = [];
+    }
   }
 
-  const categoryName = subExamCategoryLabel(
-    pdf.subExamCategoryId,
-    categories,
-  );
+  const categoryName = pdf
+    ? subExamCategoryLabel(pdf.subExamCategoryId, categories)
+    : "";
 
   return (
     <>
-      <PdfJsonLd pdf={pdf} categoryName={categoryName} />
+      {pdf && <PdfJsonLd pdf={pdf} categoryName={categoryName} />}
       <LandingHeader />
-      <article className="mx-auto max-w-4xl px-4 py-6 pb-12 sm:px-6 page-enter">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link href="/pdf-library">
-            <ArrowLeft className="mr-2 size-4" />
-            পিডিএফ লাইব্রেরি
-          </Link>
-        </Button>
-
-        <header className="mb-5 space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{docTypeLabel(pdf.docType)}</Badge>
-            <Badge variant="outline">{categoryName}</Badge>
-            {pdf.isFree ? (
-              <Badge className="bg-emerald-600 hover:bg-emerald-600">ফ্রি</Badge>
-            ) : (
-              <Badge variant="secondary">প্রিমিয়াম</Badge>
-            )}
-          </div>
-          <h1 className="text-xl font-bold leading-snug sm:text-2xl">
-            {pdf.title}
-          </h1>
-          <p className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Download className="size-3.5" />
-              {formatCount(pdf.downloadCount)} ডাউনলোড
-            </span>
-            <span className="flex items-center gap-1">
-              <Eye className="size-3.5" />
-              {formatCount(pdf.viewCount)} দেখা
-            </span>
-            <time dateTime={pdf.updatedAt}>
-              {formatRelativeDate(pdf.updatedAt)}
-            </time>
-          </p>
-          {pdf.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {pdf.tags.map((t) => (
-                <Badge key={t} variant="outline" className="text-xs">
-                  #{t}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </header>
-
-        {pdf.description && (
-          <div className="mb-5 rounded-xl border bg-muted/30 p-4">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-              {pdf.description}
-            </p>
-          </div>
-        )}
-
-        <PdfDetailInteractive pdfId={id} initialPdf={pdf} />
-      </article>
+      {pdf ? (
+        <PdfDetailView pdf={pdf} categoryName={categoryName} />
+      ) : (
+        <PdfDetailClient id={id} />
+      )}
     </>
   );
 }
