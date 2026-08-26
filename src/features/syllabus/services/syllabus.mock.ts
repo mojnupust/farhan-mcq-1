@@ -41,9 +41,14 @@ export const mockSyllabusService: SyllabusService = {
     return mockSyllabuses;
   },
   async getBySlug(slug: string) {
-    const s = mockSyllabuses.find((s) => s.slug === slug);
+    const s = mockSyllabuses.find((item) => item.slug === slug);
     if (!s) throw new Error("Not found");
-    return s;
+    return {
+      ...s,
+      subExamCategoryName: "প্রাইমারি শিক্ষক নিয়োগ",
+      subExamCategorySlug: "primary-teacher",
+      examCategorySlug: "primary",
+    };
   },
   async create(input) {
     return {

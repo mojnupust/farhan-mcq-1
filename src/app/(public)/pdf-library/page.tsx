@@ -1,18 +1,8 @@
 import { LandingHeader } from "@/components/landing-header";
-import {
-  fetchFeaturedPdfs,
-  fetchPublicPdfs,
-  PDF_SITE_ORIGIN,
-} from "@/features/pdfs/server";
+import { PDF_SITE_ORIGIN } from "@/features/pdfs/server";
 import { PdfLibraryBrowser } from "./pdf-library-browser";
 
-export const revalidate = 1800;
-
-function LibraryJsonLd({
-  titles,
-}: {
-  titles: { id: string; title: string }[];
-}) {
+function LibraryJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -47,16 +37,6 @@ function LibraryJsonLd({
           },
         ],
       },
-      {
-        "@type": "ItemList",
-        name: "Farhan MCQ পিডিএফ তালিকা",
-        itemListElement: titles.map((p, i) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          url: `${PDF_SITE_ORIGIN}/pdf-library/${p.id}`,
-          name: p.title,
-        })),
-      },
     ],
   };
 
@@ -68,29 +48,12 @@ function LibraryJsonLd({
   );
 }
 
-export default async function PdfLibraryPage() {
-  const [featured, list] = await Promise.all([
-    fetchFeaturedPdfs(),
-    fetchPublicPdfs({ page: 1, limit: 12, sort: "newest" }),
-  ]);
-
-  const listed = [
-    ...featured.slice(0, 3),
-    ...list.data.filter((p) => !featured.slice(0, 3).some((f) => f.id === p.id)),
-  ];
-
+export default function PdfLibraryPage() {
   return (
     <>
-      <LibraryJsonLd
-        titles={listed.map((p) => ({ id: p.id, title: p.title }))}
-      />
+      <LibraryJsonLd />
       <LandingHeader />
-      <PdfLibraryBrowser
-        initialFeatured={featured}
-        initialPdfs={list.data}
-        initialTotal={list.total}
-        initialTotalPages={list.totalPages}
-      />
+      <PdfLibraryBrowser />
     </>
   );
 }

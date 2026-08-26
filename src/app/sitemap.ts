@@ -87,6 +87,7 @@ async function safeFetch<T>(url: string, label: string): Promise<T[]> {
     const res = await fetch(url, {
       next: { revalidate },
       headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(8_000),
     });
 
     if (!res.ok) {

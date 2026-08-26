@@ -1,18 +1,8 @@
 import { LandingHeader } from "@/components/landing-header";
-import {
-  fetchFeaturedVideos,
-  fetchPublicVideos,
-  VIDEO_SITE_ORIGIN,
-} from "@/features/videos/server";
+import { VIDEO_SITE_ORIGIN } from "@/features/videos/server";
 import { VideoLibraryBrowser } from "./video-library-browser";
 
-export const revalidate = 1800;
-
-function LibraryJsonLd({
-  titles,
-}: {
-  titles: { id: string; title: string }[];
-}) {
+function LibraryJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -47,16 +37,6 @@ function LibraryJsonLd({
           },
         ],
       },
-      {
-        "@type": "ItemList",
-        name: "Farhan MCQ ভিডিও তালিকা",
-        itemListElement: titles.map((v, i) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          url: `${VIDEO_SITE_ORIGIN}/videos/${v.id}`,
-          name: v.title,
-        })),
-      },
     ],
   };
 
@@ -68,31 +48,12 @@ function LibraryJsonLd({
   );
 }
 
-export default async function VideosPage() {
-  const [featured, list] = await Promise.all([
-    fetchFeaturedVideos(),
-    fetchPublicVideos({ page: 1, limit: 12, sort: "newest" }),
-  ]);
-
-  const listed = [
-    ...featured.slice(0, 3),
-    ...list.data.filter(
-      (v) => !featured.slice(0, 3).some((f) => f.id === v.id),
-    ),
-  ];
-
+export default function VideosPage() {
   return (
     <>
-      <LibraryJsonLd
-        titles={listed.map((v) => ({ id: v.id, title: v.title }))}
-      />
+      <LibraryJsonLd />
       <LandingHeader />
-      <VideoLibraryBrowser
-        initialFeatured={featured}
-        initialVideos={list.data}
-        initialTotal={list.total}
-        initialTotalPages={list.totalPages}
-      />
+      <VideoLibraryBrowser />
     </>
   );
 }

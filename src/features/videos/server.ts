@@ -19,10 +19,14 @@ function buildListQuery(filter?: VideoFilter): string {
 
 async function jsonGet(path: string): Promise<unknown | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8_000);
     const res = await fetch(`${API_BASE}${path}`, {
       next: { revalidate: VIDEO_REVALIDATE_SECONDS },
       headers: { Accept: "application/json" },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -99,7 +103,7 @@ export async function fetchVideoSitemapEntries(): Promise<VideoSitemapEntry[]> {
   }
 
   const all: VideoSitemapEntry[] = [];
-  for (let page = 1; page <= 50; page++) {
+  for (let page = 1; page <= 5; page++) {
     const result = await fetchPublicVideos({
       page,
       limit: 100,

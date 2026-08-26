@@ -19,10 +19,14 @@ function buildListQuery(filter?: PdfFilter): string {
 
 async function jsonGet(path: string): Promise<unknown | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8_000);
     const res = await fetch(`${API_BASE}${path}`, {
       next: { revalidate: PDF_REVALIDATE_SECONDS },
       headers: { Accept: "application/json" },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -101,7 +105,7 @@ export async function fetchPdfSitemapEntries(): Promise<PdfSitemapEntry[]> {
   }
 
   const all: PdfSitemapEntry[] = [];
-  for (let page = 1; page <= 50; page++) {
+  for (let page = 1; page <= 5; page++) {
     const result = await fetchPublicPdfs({ page, limit: 100, sort: "newest" });
     if (!result.data.length) break;
     for (const pdf of result.data) {

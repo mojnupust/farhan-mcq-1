@@ -21,7 +21,7 @@ export const apiSyllabusService: SyllabusService = {
     return res.data;
   },
   async getBySlug(slug: string) {
-    const res = await apiClient.get<{ data: Syllabus }>(
+    const res = await apiClient.get<{ data: SyllabusWithCategory }>(
       `/v1/syllabuses/detail/${slug}`,
     );
     return res.data;

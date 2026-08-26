@@ -10,6 +10,10 @@ export interface Syllabus {
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
+  /** Present on GET /syllabuses/detail/:slug */
+  subExamCategoryName?: string;
+  subExamCategorySlug?: string;
+  examCategorySlug?: string;
 }
 
 export interface SyllabusWithCategory extends Syllabus {

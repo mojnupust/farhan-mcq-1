@@ -33,7 +33,7 @@ import {
   Video as VideoIcon,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
@@ -48,23 +48,13 @@ function VideoCardSkeleton() {
   );
 }
 
-export function VideoLibraryBrowser({
-  initialFeatured,
-  initialVideos,
-  initialTotal,
-  initialTotalPages,
-}: {
-  initialFeatured: Video[];
-  initialVideos: Video[];
-  initialTotal: number;
-  initialTotalPages: number;
-}) {
-  const [featured, setFeatured] = useState<Video[]>(initialFeatured);
-  const [videos, setVideos] = useState<Video[]>(initialVideos);
-  const [totalPages, setTotalPages] = useState(initialTotalPages);
-  const [total, setTotal] = useState(initialTotal);
+export function VideoLibraryBrowser() {
+  const [featured, setFeatured] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -72,52 +62,49 @@ export function VideoLibraryBrowser({
   const [category, setCategory] = useState<VideoCategory | "ALL">("ALL");
   const [sort, setSort] = useState<VideoSort>("newest");
 
-  const skipNextFetch = useRef(initialVideos.length > 0);
-
   const loadFeatured = useCallback(async () => {
     try {
       const data = await videoService.getFeatured();
       setFeatured(data);
     } catch {
-      setFeatured(initialFeatured);
+      setFeatured([]);
     }
-  }, [initialFeatured]);
+  }, []);
 
-  const loadVideos = useCallback(async () => {
+  useEffect(() => {
+    loadFeatured();
+  }, [loadFeatured]);
+
+  useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    try {
-      const filter: VideoFilter = {
-        page,
-        limit: PAGE_SIZE,
-        sort,
-        search: search || undefined,
-        category: category === "ALL" ? undefined : category,
-      };
-      const result = await videoService.getAll(filter);
-      setVideos(result.data);
-      setTotalPages(result.totalPages);
-      setTotal(result.total);
-    } catch {
-      setVideos([]);
-      toast.error("ভিডিও লোড করা যায়নি");
-    } finally {
-      setLoading(false);
-    }
+    const filter: VideoFilter = {
+      page,
+      limit: PAGE_SIZE,
+      sort,
+      search: search || undefined,
+      category: category === "ALL" ? undefined : category,
+    };
+    videoService
+      .getAll(filter)
+      .then((result) => {
+        if (cancelled) return;
+        setVideos(result.data ?? []);
+        setTotalPages(result.totalPages ?? 1);
+        setTotal(result.total ?? 0);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setVideos([]);
+        toast.error("ভিডিও লোড করা যায়নি");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [page, sort, search, category]);
-
-  useEffect(() => {
-    if (initialFeatured.length === 0) {
-      loadFeatured();
-    }
-  }, [initialFeatured.length, loadFeatured]);
-
-  useEffect(() => {
-    if (skipNextFetch.current) {
-      skipNextFetch.current = false;
-      return;
-    }
-    loadVideos();
-  }, [loadVideos]);
 
   function applySearch(e?: React.FormEvent) {
     e?.preventDefault();

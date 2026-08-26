@@ -29,7 +29,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
@@ -44,23 +44,13 @@ function PdfCardSkeleton() {
   );
 }
 
-export function PdfLibraryBrowser({
-  initialFeatured,
-  initialPdfs,
-  initialTotal,
-  initialTotalPages,
-}: {
-  initialFeatured: PdfDocument[];
-  initialPdfs: PdfDocument[];
-  initialTotal: number;
-  initialTotalPages: number;
-}) {
-  const [featured, setFeatured] = useState<PdfDocument[]>(initialFeatured);
-  const [pdfs, setPdfs] = useState<PdfDocument[]>(initialPdfs);
-  const [totalPages, setTotalPages] = useState(initialTotalPages);
-  const [total, setTotal] = useState(initialTotal);
+export function PdfLibraryBrowser() {
+  const [featured, setFeatured] = useState<PdfDocument[]>([]);
+  const [pdfs, setPdfs] = useState<PdfDocument[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -73,45 +63,18 @@ export function PdfLibraryBrowser({
     SubExamCategory[]
   >([]);
 
-  const skipNextFetch = useRef(initialPdfs.length > 0);
-
   const loadFeatured = useCallback(async () => {
     try {
       const data = await pdfService.getFeatured();
       setFeatured(data);
     } catch {
-      setFeatured(initialFeatured);
+      setFeatured([]);
     }
-  }, [initialFeatured]);
-
-  const loadPdfs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await pdfService.getAll({
-        page,
-        limit: PAGE_SIZE,
-        sort,
-        search: search || undefined,
-        docType: docType === "ALL" ? undefined : docType,
-        subExamCategoryId: subExam === "ALL" ? undefined : subExam,
-        freeOnly: freeOnly || undefined,
-      });
-      setPdfs(result.data);
-      setTotalPages(result.totalPages);
-      setTotal(result.total);
-    } catch {
-      setPdfs([]);
-      toast.error("পিডিএফ লোড করা যায়নি");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, sort, search, docType, subExam, freeOnly]);
+  }, []);
 
   useEffect(() => {
-    if (initialFeatured.length === 0) {
-      loadFeatured();
-    }
-  }, [initialFeatured.length, loadFeatured]);
+    loadFeatured();
+  }, [loadFeatured]);
 
   useEffect(() => {
     subExamCategoryService
@@ -121,12 +84,36 @@ export function PdfLibraryBrowser({
   }, []);
 
   useEffect(() => {
-    if (skipNextFetch.current) {
-      skipNextFetch.current = false;
-      return;
-    }
-    loadPdfs();
-  }, [loadPdfs]);
+    let cancelled = false;
+    setLoading(true);
+    pdfService
+      .getAll({
+        page,
+        limit: PAGE_SIZE,
+        sort,
+        search: search || undefined,
+        docType: docType === "ALL" ? undefined : docType,
+        subExamCategoryId: subExam === "ALL" ? undefined : subExam,
+        freeOnly: freeOnly || undefined,
+      })
+      .then((result) => {
+        if (cancelled) return;
+        setPdfs(result.data ?? []);
+        setTotalPages(result.totalPages ?? 1);
+        setTotal(result.total ?? 0);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setPdfs([]);
+        toast.error("পিডিএফ লোড করা যায়নি");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, sort, search, docType, subExam, freeOnly]);
 
   function applySearch(e?: React.FormEvent) {
     e?.preventDefault();
