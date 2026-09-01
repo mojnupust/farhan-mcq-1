@@ -14,7 +14,7 @@ export default function ExamPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
       <AnimateIn variant="fade-up" duration={400}>
         <div className="mt-8">
           <h2 className="text-lg font-semibold tracking-tight mb-4">

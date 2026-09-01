@@ -139,7 +139,7 @@ export function PdfLibraryBrowser() {
     freeOnly;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 pb-12 sm:px-6 lg:px-8 page-enter">
+    <div className="mx-auto max-w-5xl px-4 py-6 pb-12 sm:px-6 lg:px-8 page-enter">
       <div className="mb-8 rounded-2xl border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-8">
         <div className="flex items-start gap-4">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">

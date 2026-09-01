@@ -102,14 +102,14 @@ export default function ImagesPreviewPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <ContentSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter">
+    <div className="px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter">
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
           <Link href={ROUTES.images}>

@@ -1,3 +1,4 @@
+import { LandingHeader } from "@/components/landing-header";
 import { AuthProvider } from "@/features/auth";
 import { Toaster } from "sonner";
 
@@ -9,6 +10,7 @@ export default function PublicLayout({
   return (
     <AuthProvider>
       <Toaster richColors position="top-center" closeButton />
+      <LandingHeader />
       {children}
     </AuthProvider>
   );

@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import {
   categoryLabel,
   youtubeEmbedUrl,
@@ -163,7 +162,6 @@ export default async function VideoDetailPage({ params }: Props) {
   return (
     <>
       {video && <VideoJsonLd video={video} />}
-      <LandingHeader />
       {video ? <VideoDetailView video={video} /> : <VideoDetailClient id={id} />}
     </>
   );

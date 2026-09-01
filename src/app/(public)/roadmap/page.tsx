@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { JOB_CATEGORIES, JOB_ROLES } from "@/features/roadmap/roadmap-data";
@@ -15,11 +14,10 @@ export const metadata: Metadata = {
 export default function RoadmapPage() {
   return (
     <>
-      <LandingHeader />
       <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
         {/* Hero Section */}
         <section className="relative overflow-hidden px-4 py-12 sm:py-16">
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto max-w-5xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
               <MapPin className="size-4" />
               <span>ইন্টারেক্টিভ রোডম্যাপ</span>

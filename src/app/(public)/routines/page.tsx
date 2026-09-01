@@ -1,6 +1,5 @@
 "use client";
 
-import { LandingHeader } from "@/components/landing-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -73,8 +72,7 @@ export default function RoutinesPage() {
   if (loading) {
     return (
       <>
-        <LandingHeader />
-        <div className="mx-auto max-w-3xl px-4 py-6">
+        <div className="mx-auto max-w-5xl px-4 py-6">
           <ListSkeleton count={4} />
         </div>
       </>
@@ -83,8 +81,7 @@ export default function RoutinesPage() {
 
   return (
     <>
-      <LandingHeader />
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>

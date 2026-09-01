@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth";
-import { StudySection } from "@/features/dashboard/components/study-section";
 import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
@@ -83,16 +82,10 @@ export default function DashboardPage() {
     motivationalQuotes[new Date().getDate() % motivationalQuotes.length];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
       {/* Welcome Header */}
       <AnimateIn variant="fade-up" duration={400}>
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">হোম</h1>
-            <p className="text-sm text-muted-foreground">
-              স্বাগতম, {user?.name}
-            </p>
-          </div>
           {isAdmin && (
             <Button variant="outline" size="sm" asChild>
               <Link href="/admin">অ্যাডমিন প্যানেল</Link>
@@ -129,11 +122,11 @@ export default function DashboardPage() {
 
       {/* Daily Motivation */}
       <AnimateIn variant="fade-up" delay={100} duration={500}>
-        <div className="mt-5 rounded-xl bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border border-primary/10 p-4 flex items-start gap-3">
+        <div className="mt-5 flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
             <Sparkles className="size-4 text-primary" />
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm leading-normal text-muted-foreground">
             {dailyQuote}
           </p>
         </div>
@@ -150,16 +143,6 @@ export default function DashboardPage() {
           ) : (
             <CategoryGrid categories={categories} />
           )}
-        </div>
-      </AnimateIn>
-
-      {/* Study Section */}
-      <AnimateIn variant="fade-up" delay={300} duration={500}>
-        <div className="mt-10">
-          <h2 className="text-lg font-semibold tracking-tight mb-4">
-            প্র্যাক্টিস ও প্রস্তুতি
-          </h2>
-          <StudySection />
         </div>
       </AnimateIn>
     </div>

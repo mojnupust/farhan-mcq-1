@@ -275,7 +275,7 @@ export default function ExamSubjectTopicPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         {/* Page title */}
         <h1 className="text-xl font-semibold tracking-tight mb-5">
           বিষয়ভিত্তিক প্র্যাক্টিস

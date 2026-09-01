@@ -148,7 +148,7 @@ export default function AnswersPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className="px-4 py-6">
         <ContentSkeleton />
       </div>
     );
@@ -156,7 +156,7 @@ export default function AnswersPage({
 
   if (!filteredQuestions.length) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className="px-4 py-6">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
           <ArrowLeft className="size-4 mr-1" />
           ফিরে যান
@@ -170,7 +170,7 @@ export default function AnswersPage({
 
   return (
     <>
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+      <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="transition-transform duration-200 hover:scale-110 active:scale-95">

@@ -82,7 +82,7 @@ export default function ProfilePage() {
   console.log("Rendering profile page", { profile, activePackage });
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
       <h1 className="text-2xl font-semibold tracking-tight">প্রোফাইল</h1>
       <p className="text-sm text-muted-foreground">
         আপনার অ্যাকাউন্ট তথ্য দেখুন ও পরিবর্তন করুন

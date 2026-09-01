@@ -344,7 +344,7 @@ export default function ExamPage({
     <div className="min-h-screen bg-gray-50" ref={scrollContainerRef}>
       {/* Top Bar: Timer + Subject Filter + Submit */}
       <div className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-2">
+        <div className="flex items-center justify-between px-4 py-2">
           {/* Timer */}
           <div
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-lg font-bold transition-colors duration-300 ${
@@ -395,7 +395,7 @@ export default function ExamPage({
         {/* Subject Filter */}
         {subjects.length > 1 && (
           <div className="border-t bg-gray-50">
-            <div className="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-4 py-1.5">
+            <div className="flex gap-1 overflow-x-auto px-4 py-1.5">
               <Button
                 size="sm"
                 variant={subjectFilter === null ? "default" : "ghost"}
@@ -424,7 +424,7 @@ export default function ExamPage({
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-4xl px-4 py-4">
+      <div className="px-4 py-4">
         <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
           {/* All Questions - Scrollable */}
           <div className="space-y-4">

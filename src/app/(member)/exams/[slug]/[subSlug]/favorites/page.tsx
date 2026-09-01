@@ -103,7 +103,7 @@ export default function FavoritesPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className="px-4 py-6">
         <ContentSkeleton />
       </div>
     );
@@ -111,7 +111,7 @@ export default function FavoritesPage({
 
   if (!questions.length) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className="px-4 py-6">
         <div className="flex items-center gap-3 mb-6">
           <Button variant="ghost" size="icon" asChild>
             <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
@@ -132,7 +132,7 @@ export default function FavoritesPage({
 
   return (
     <>
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" asChild>

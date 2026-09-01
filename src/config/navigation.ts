@@ -11,7 +11,6 @@ import {
   FolderOpen,
   Home,
   LayoutDashboard,
-  LucideFileText,
   Megaphone,
   Package,
   Radio,
@@ -32,9 +31,6 @@ export interface NavItem {
 export const memberNav: NavItem[] = [
   { label: "হোম", href: ROUTES.dashboard, icon: Home },
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
-
-  { label: "ভিডিও লাইব্রেরি", href: ROUTES.videos, icon: Video },
-  { label: "পিডিএফ লাইব্রেরি", href: ROUTES.pdf, icon: LucideFileText },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
   { label: "সাবস্ক্রিপশন", href: ROUTES.subscriptions, icon: Receipt },

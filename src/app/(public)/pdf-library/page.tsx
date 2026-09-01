@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { PDF_SITE_ORIGIN } from "@/features/pdfs/server";
 import { PdfLibraryBrowser } from "./pdf-library-browser";
 
@@ -52,7 +51,6 @@ export default function PdfLibraryPage() {
   return (
     <>
       <LibraryJsonLd />
-      <LandingHeader />
       <PdfLibraryBrowser />
     </>
   );

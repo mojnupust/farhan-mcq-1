@@ -56,7 +56,7 @@ export default function ExamCategoryPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <ContentSkeleton />
       </div>
     );
@@ -64,7 +64,7 @@ export default function ExamCategoryPage({
 
   if (!category) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <p className="text-center text-muted-foreground py-12">
           ক্যাটাগরি পাওয়া যায়নি
         </p>
@@ -73,7 +73,7 @@ export default function ExamCategoryPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
       {/* Back + Header */}
       <AnimateIn variant="fade-up" duration={400}>
         <div className="flex items-center gap-3">

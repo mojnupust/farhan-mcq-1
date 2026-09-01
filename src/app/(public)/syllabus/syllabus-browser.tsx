@@ -69,7 +69,7 @@ export function SyllabusLibraryBrowser() {
   }, [filtered]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">সিলেবাস</h1>

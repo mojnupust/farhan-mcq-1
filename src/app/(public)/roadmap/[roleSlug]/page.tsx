@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { JOB_ROLES } from "@/features/roadmap/roadmap-data";
 import { RoadmapVisualizer } from "@/features/roadmap/roadmap-visualizer";
 import { ArrowLeft } from "lucide-react";
@@ -36,9 +35,8 @@ export default async function RoadmapRolePage({ params }: PageProps) {
 
   return (
     <>
-      <LandingHeader />
       <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           {/* Back navigation */}
           <Link
             href="/roadmap"

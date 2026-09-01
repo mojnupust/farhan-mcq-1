@@ -31,7 +31,7 @@ export function VideoDetailClient({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         <ContentSkeleton />
       </div>
     );
@@ -39,7 +39,7 @@ export function VideoDetailClient({ id }: { id: string }) {
 
   if (!video) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6">
         <Play className="mx-auto mb-3 size-10 text-muted-foreground/50" />
         <p className="text-muted-foreground">ভিডিও পাওয়া যায়নি</p>
       </div>

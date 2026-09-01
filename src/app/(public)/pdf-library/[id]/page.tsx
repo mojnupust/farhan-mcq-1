@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { docTypeLabel } from "@/features/pdfs/constants";
 import {
   fetchPublicPdfById,
@@ -177,7 +176,6 @@ export default async function PdfDetailPage({ params }: Props) {
   return (
     <>
       {pdf && <PdfJsonLd pdf={pdf} categoryName={categoryName} />}
-      <LandingHeader />
       {pdf ? (
         <PdfDetailView pdf={pdf} categoryName={categoryName} />
       ) : (

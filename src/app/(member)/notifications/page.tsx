@@ -49,7 +49,7 @@ export default function NotificationsPage() {
   };
 
   return (
-          <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">

@@ -1,6 +1,5 @@
 "use client";
 
-import { LandingHeader } from "@/components/landing-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -436,8 +435,7 @@ export default function JobCircularPage() {
 
   return (
     <>
-      <LandingHeader />
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Hero Header */}
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>

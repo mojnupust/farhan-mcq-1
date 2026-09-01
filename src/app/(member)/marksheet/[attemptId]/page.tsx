@@ -42,7 +42,7 @@ export default function MarksheetPage({
 
   if (loading) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="px-4 py-6 sm:px-6 lg:px-8">
           <ContentSkeleton />
         </div>
     );
@@ -50,7 +50,7 @@ export default function MarksheetPage({
 
   if (!marksheet) {
     return (
-              <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-muted-foreground py-12">
             মার্কশিট পাওয়া যায়নি
           </p>
@@ -59,7 +59,7 @@ export default function MarksheetPage({
   }
 
   return (
-          <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" asChild>
             <Link href={ROUTES.dashboard}>

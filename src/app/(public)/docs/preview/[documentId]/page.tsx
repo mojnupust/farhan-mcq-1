@@ -4,7 +4,7 @@ import { ROUTES } from "@/config/routes";
 import { DocxPreview } from "@/features/docs/components/docx-preview";
 import { use } from "react";
 
-export default function DocsPreviewPage({
+export default function PublicDocsPreviewPage({
   params,
 }: {
   params: Promise<{ documentId: string }>;
@@ -13,10 +13,11 @@ export default function DocsPreviewPage({
   return (
     <DocxPreview
       documentId={documentId}
-      backRoute={ROUTES.adminDocs}
-      newStyleRoute={ROUTES.adminDocs}
-      showDelete
+      backRoute={ROUTES.docs}
+      newStyleRoute={ROUTES.docs}
+      showDelete={false}
+      showDonationBanner
+      maxWidthClassName="max-w-5xl"
     />
   );
 }
-

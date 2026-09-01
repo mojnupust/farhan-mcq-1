@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { syllabusPlainText } from "@/features/syllabus/content";
 import {
   fetchPublicSyllabusBySlug,
@@ -166,7 +165,6 @@ export default async function SyllabusDetailPage({ params }: Props) {
   return (
     <>
       {syllabus && <SyllabusJsonLd syllabus={syllabus} />}
-      <LandingHeader />
       {syllabus ? (
         <SyllabusDetailView syllabus={syllabus} />
       ) : (

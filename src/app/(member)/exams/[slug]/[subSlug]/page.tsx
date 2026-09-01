@@ -101,7 +101,7 @@ export default function SubExamDashboardPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <ContentSkeleton />
       </div>
     );
@@ -109,7 +109,7 @@ export default function SubExamDashboardPage({
 
   if (!subCategory) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <p className="text-center text-muted-foreground py-12">
           সাব-ক্যাটাগরি পাওয়া যায়নি
         </p>
@@ -118,7 +118,7 @@ export default function SubExamDashboardPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 page-enter">
+    <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
       {/* Back + Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" asChild>

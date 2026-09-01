@@ -20,7 +20,7 @@ export function PdfDetailView({
   const tags = pdf.tags ?? [];
 
   return (
-    <article className="mx-auto max-w-4xl px-4 py-6 pb-12 sm:px-6 page-enter">
+    <article className="mx-auto max-w-5xl px-4 py-6 pb-12 sm:px-6 page-enter">
       <Button variant="ghost" size="sm" asChild className="mb-4">
         <Link href="/pdf-library">
           <ArrowLeft className="mr-2 size-4" />

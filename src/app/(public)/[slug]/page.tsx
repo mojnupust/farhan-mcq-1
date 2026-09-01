@@ -147,7 +147,7 @@ export default async function QuestionPage({ params }: Props) {
       ))}
 
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
           {/* ── Breadcrumb ── */}
           <nav
             aria-label="Breadcrumb"

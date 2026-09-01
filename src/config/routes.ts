@@ -51,6 +51,8 @@ export const ROUTES = {
   videoDetail: (id: string) => `/videos/${id}` as const,
   pdf: "/pdf-library",
   pdfDetail: (id: string) => `/pdf-library/${id}` as const,
+  docs: "/docs",
+  docsPreview: (documentId: string) => `/docs/preview/${documentId}` as const,
 
   // Admin
   admin: "/admin",

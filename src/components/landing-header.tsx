@@ -14,6 +14,7 @@ import { useAuth } from "@/features/auth";
 import {
   BookOpen,
   Briefcase,
+  FileEdit,
   Folder,
   LayoutDashboard,
   LogInIcon,
@@ -24,10 +25,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { href: "/pdf-library", label: "Popular PDF", icon: Folder },
-  { href: "/syllabus", label: "সিলেবাস", icon: BookOpen },
-  { href: "/job-circular", label: "জব", icon: Briefcase },
-  { href: "/videos", label: "ভিডিও", icon: Play },
+  { href: "/pdf-library", label: "PDF", icon: Folder },
+  { href: "/syllabus", label: "Syllabus", icon: BookOpen },
+  { href: "/job-circular", label: "Job", icon: Briefcase },
+  { href: "/videos", label: "Video", icon: Play },
+  { href: "/docs", label: "Docx", icon: FileEdit },
 ];
 
 export function LandingHeader() {

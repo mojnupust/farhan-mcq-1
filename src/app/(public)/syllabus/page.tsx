@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { SyllabusLibraryBrowser } from "./syllabus-browser";
 
 const SITE = "https://farhanmcq.com";
@@ -53,7 +52,6 @@ export default function SyllabusPage() {
   return (
     <>
       <LibraryJsonLd />
-      <LandingHeader />
       <SyllabusLibraryBrowser />
     </>
   );

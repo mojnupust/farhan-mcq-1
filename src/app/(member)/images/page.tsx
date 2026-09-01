@@ -273,14 +273,14 @@ export default function ImagesPage() {
 
   if (loadingExams) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-6 lg:px-8">
         <ContentSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter">
+    <div className="px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter">
       <AnimateIn variant="fade-up" duration={400}>
         <div className="mb-6 flex items-center gap-3">
           <ImageIcon className="size-7 text-primary" />

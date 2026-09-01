@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { VIDEO_SITE_ORIGIN } from "@/features/videos/server";
 import { VideoLibraryBrowser } from "./video-library-browser";
 
@@ -52,7 +51,6 @@ export default function VideosPage() {
   return (
     <>
       <LibraryJsonLd />
-      <LandingHeader />
       <VideoLibraryBrowser />
     </>
   );
