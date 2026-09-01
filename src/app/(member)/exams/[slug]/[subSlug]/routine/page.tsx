@@ -132,43 +132,43 @@ export default function RoutinePage({
   }, [subSlug]);
 
   return (
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              পরীক্ষার রুটিন
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              আসন্ন পরীক্ষার সময়সূচী
-            </p>
-          </div>
-        </div>
-
-        {/* Routine List */}
-        <div className="mt-6 space-y-3">
-          {loading ? (
-            <ListSkeleton count={3} />
-          ) : routines.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <Calendar className="mx-auto size-10 text-muted-foreground/50 mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  এখনো কোনো রুটিন যোগ হয়নি
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            routines.map((routine) => (
-              <RoutineCard key={routine.id} routine={routine} />
-            ))
-          )}
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            পরীক্ষার রুটিন
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            আসন্ন পরীক্ষার সময়সূচী
+          </p>
         </div>
       </div>
+
+      {/* Routine List */}
+      <div className="mt-6 space-y-3">
+        {loading ? (
+          <ListSkeleton count={3} />
+        ) : routines.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <Calendar className="mx-auto size-10 text-muted-foreground/50 mb-2" />
+              <p className="text-sm text-muted-foreground">
+                এখনো কোনো রুটিন যোগ হয়নি
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          routines.map((routine) => (
+            <RoutineCard key={routine.id} routine={routine} />
+          ))
+        )}
+      </div>
+    </div>
   );
 }

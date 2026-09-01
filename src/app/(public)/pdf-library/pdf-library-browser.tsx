@@ -59,9 +59,9 @@ export function PdfLibraryBrowser() {
   const [subExam, setSubExam] = useState<string>("ALL");
   const [sort, setSort] = useState<PdfSort>("newest");
   const [freeOnly, setFreeOnly] = useState(false);
-  const [subExamCategories, setSubExamCategories] = useState<
-    SubExamCategory[]
-  >([]);
+  const [subExamCategories, setSubExamCategories] = useState<SubExamCategory[]>(
+    [],
+  );
 
   const loadFeatured = useCallback(async () => {
     try {

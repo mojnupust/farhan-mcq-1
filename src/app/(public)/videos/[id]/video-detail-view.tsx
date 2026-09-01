@@ -49,11 +49,7 @@ export function VideoDetailView({ video }: { video: Video }) {
 
       <div className="mt-4">
         <Button variant="outline" size="sm" asChild>
-          <a
-            href={video.youtubeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="mr-2 size-4" />
             YouTube-এ দেখুন
           </a>

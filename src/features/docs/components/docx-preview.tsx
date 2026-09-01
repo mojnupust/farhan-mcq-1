@@ -6,7 +6,10 @@ import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { docxService, type DocxExportResult } from "@/features/docs";
 import { apiClient } from "@/lib/api-client";
 import { downloadBlob } from "@/lib/download-blob";
-import { toastErrorAfterCommit, toastSuccessAfterCommit } from "@/lib/safe-toast";
+import {
+  toastErrorAfterCommit,
+  toastSuccessAfterCommit,
+} from "@/lib/safe-toast";
 import {
   ArrowLeft,
   Download,
@@ -68,11 +71,13 @@ export function DocxPreview({
     setDownloading(true);
     let ok = false;
     try {
-      const blob = await apiClient.getBlob(docxService.downloadPath(documentId));
+      const blob = await apiClient.getBlob(
+        docxService.downloadPath(documentId),
+      );
       if (
         blob.type === "application/json" ||
         blob.size < 100 ||
-        !blob.type.includes("word") && !blob.type.includes("octet")
+        (!blob.type.includes("word") && !blob.type.includes("octet"))
       ) {
         const peek = await blob.slice(0, 4).arrayBuffer();
         const sig = new Uint8Array(peek);
@@ -135,7 +140,9 @@ export function DocxPreview({
   const { document: doc, styleConfig } = data;
 
   return (
-    <div className={`mx-auto px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}>
+    <div
+      className={`mx-auto px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}
+    >
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="icon" asChild>
           <Link href={backRoute}>
@@ -196,7 +203,9 @@ export function DocxPreview({
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div>
-            <p className="font-medium text-muted-foreground">প্রশ্নসেট সংখ্যা</p>
+            <p className="font-medium text-muted-foreground">
+              প্রশ্নসেট সংখ্যা
+            </p>
             <p>{doc.setCount}</p>
           </div>
           <div>
@@ -205,7 +214,9 @@ export function DocxPreview({
           </div>
           <div>
             <p className="font-medium text-muted-foreground">টেমপ্লেট</p>
-            <p>{styleConfig.templateStyle === "COLORFUL" ? "রঙিন" : "সাদা-কালো"}</p>
+            <p>
+              {styleConfig.templateStyle === "COLORFUL" ? "রঙিন" : "সাদা-কালো"}
+            </p>
           </div>
           <div>
             <p className="font-medium text-muted-foreground">কলাম</p>
@@ -228,7 +239,11 @@ export function DocxPreview({
       </Card>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur sm:hidden">
-        <Button onClick={downloadDocx} disabled={downloading} className="w-full">
+        <Button
+          onClick={downloadDocx}
+          disabled={downloading}
+          className="w-full"
+        >
           {downloading ? (
             <Loader2 className="mr-2 size-4 animate-spin" />
           ) : (

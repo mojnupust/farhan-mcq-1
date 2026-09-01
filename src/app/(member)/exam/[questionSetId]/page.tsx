@@ -425,7 +425,7 @@ export default function ExamPage({
 
       {/* Main Content */}
       <div className="px-4 py-4">
-        <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
+        <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
           {/* All Questions - Scrollable */}
           <div className="space-y-4">
             {filteredQuestions.map((question, qIdx) => {
@@ -453,7 +453,10 @@ export default function ExamPage({
                           </span>
                         )}
                         {optionAnswer && (
-                          <span className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce" aria-label="উত্তর দেওয়া হয়েছে">
+                          <span
+                            className="ml-auto rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 badge-bounce"
+                            aria-label="উত্তর দেওয়া হয়েছে"
+                          >
                             ✓ উত্তর দেওয়া হয়েছে
                           </span>
                         )}
@@ -487,7 +490,9 @@ export default function ExamPage({
                                     ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed scale-[0.99]"
                                     : "border-gray-200 hover:border-primary/50 hover:bg-primary/[0.02] hover:shadow-sm active:scale-[0.98] cursor-pointer"
                               }`}
-                              style={{ animationDelay: `${(qIdx * 60) + (i * 50) + 100}ms` }}
+                              style={{
+                                animationDelay: `${qIdx * 60 + i * 50 + 100}ms`,
+                              }}
                             >
                               <span
                                 className={`flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-bold transition-all duration-300 ${
@@ -519,21 +524,22 @@ export default function ExamPage({
           </div>
 
           {/* Question Palette (Sidebar) */}
-          <div className="lg:sticky lg:top-30 lg:self-start">
-            <Card className="overflow-hidden">
-              <div className="h-0.5 w-full bg-gradient-to-r from-primary/40 via-emerald-400/40 to-primary/40" />
-              <CardContent className="py-4">
-                <h3 className="mb-2 text-sm font-semibold text-center">
+          <div className="lg:sticky lg:top-30 lg:max-h-[calc(100dvh-8.5rem)] lg:self-start">
+            <Card className="overflow-hidden lg:max-h-[calc(100dvh-8.5rem)]">
+              <CardContent className="flex flex-1 flex-col overflow-hidden py-4">
+                <h3 className="mb-2 shrink-0 text-sm font-semibold text-center">
                   প্রশ্ন নম্বর
                 </h3>
                 {/* Mini progress */}
-                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                <div className="mb-3 h-1.5 w-full shrink-0 rounded-full bg-gray-100 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-500 ease-out progress-glow"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <div className="grid grid-cols-5 gap-x-3 gap-y-2">
+                {/* Scrolls internally when there are many questions, so the
+                    header/summary/legend below stay visible on screen. */}
+                <div className="-mr-1 grid grid-cols-5 gap-x-1 gap-y-2 overflow-y-auto p-2">
                   {filteredQuestions.map((q, i) => {
                     const isAnswered = answers[q.id] !== undefined;
                     const isCurrent = i === activeQuestionIndex;
@@ -556,7 +562,7 @@ export default function ExamPage({
                   })}
                 </div>
                 {/* Progress summary */}
-                <div className="mt-4 rounded-lg bg-gray-50 p-3">
+                <div className="mt-4 shrink-0 rounded-lg bg-gray-50 p-3">
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
                     <span>অগ্রগতি</span>
                     <span className="font-semibold text-foreground">
@@ -572,7 +578,7 @@ export default function ExamPage({
                     />
                   </div>
                 </div>
-                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                <div className="mt-3 shrink-0 space-y-1 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <span className="size-3 rounded bg-green-500 shadow-sm" />
                     উত্তর দেওয়া ({answeredCount})

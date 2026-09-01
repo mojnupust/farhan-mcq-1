@@ -82,9 +82,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function SyllabusJsonLd({
   syllabus,
 }: {
-  syllabus: NonNullable<
-    Awaited<ReturnType<typeof fetchPublicSyllabusBySlug>>
-  >;
+  syllabus: NonNullable<Awaited<ReturnType<typeof fetchPublicSyllabusBySlug>>>;
 }) {
   const canonicalUrl = syllabusCanonicalUrl(syllabus.slug);
   const description = syllabusSeoDescription(syllabus);

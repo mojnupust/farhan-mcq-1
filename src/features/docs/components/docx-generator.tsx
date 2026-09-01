@@ -8,21 +8,21 @@ import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { Progress } from "@/components/ui/progress";
 import {
-  examCategoryService,
-  type ExamCategory,
-} from "@/features/exam-categories";
-import {
   buildDefaultDocxStyleConfig,
   docxService,
   type DocxJobStatusResult,
   type DocxStyleConfigInput,
 } from "@/features/docs";
+import {
+  examCategoryService,
+  type ExamCategory,
+} from "@/features/exam-categories";
 import { questionSetService, type QuestionSet } from "@/features/question-sets";
 import {
   subExamCategoryService,
   type SubExamCategory,
 } from "@/features/sub-exam-categories";
-import { AlertTriangle, FileText, Loader2 } from "lucide-react";
+import { AlertTriangle, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -222,7 +222,9 @@ export function DocxGenerator({
   }
 
   return (
-    <div className={`mx-auto px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}>
+    <div
+      className={`mx-auto px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}
+    >
       <AnimateIn variant="fade-up" duration={400}>
         <div className="mb-6 flex items-center gap-3">
           <FileText className="size-7 text-primary" />

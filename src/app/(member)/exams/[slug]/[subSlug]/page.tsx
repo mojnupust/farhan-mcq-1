@@ -219,7 +219,12 @@ export default function SubExamDashboardPage({
       {/* 6 Icon Cards Grid */}
       <div className="mt-6 grid grid-cols-3 gap-3">
         {cards.map((card, index) => (
-          <AnimateIn key={card.label} variant="fade-up" delay={index * 60} duration={400}>
+          <AnimateIn
+            key={card.label}
+            variant="fade-up"
+            delay={index * 60}
+            duration={400}
+          >
             <Link href={card.href}>
               <Card className="group cursor-pointer card-hover-lift glow-on-hover transition-all duration-300 hover:border-primary/30">
                 <CardContent className="flex flex-col items-center justify-center py-6 gap-3">

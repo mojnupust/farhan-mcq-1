@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ফ্রি Docx তৈরি করুন | Farhan MCQ",
-    description: "নিজের ব্র্যান্ডে ফ্রিতে প্রশ্নের প্রিন্ট-রেডি Word ফাইল তৈরি করুন।",
+    description:
+      "নিজের ব্র্যান্ডে ফ্রিতে প্রশ্নের প্রিন্ট-রেডি Word ফাইল তৈরি করুন।",
     url: "https://farhanmcq.com/docs",
     type: "website",
     locale: "bn_BD",

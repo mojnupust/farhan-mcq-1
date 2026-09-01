@@ -11,12 +11,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { videoService } from "@/features/videos";
 import { VideoCard } from "@/features/videos/components/video-card";
 import {
   VIDEO_CATEGORIES,
   VIDEO_SORT_OPTIONS,
 } from "@/features/videos/constants";
-import { videoService } from "@/features/videos";
 import type {
   Video,
   VideoCategory,

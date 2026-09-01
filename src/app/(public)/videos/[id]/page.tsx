@@ -36,8 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${video.title} — ${typeLabel} ভিডিও`;
   const description = videoSeoDescription(video);
   const canonicalUrl = videoCanonicalUrl(video.id);
-  const thumb =
-    video.thumbnailUrl ?? youtubeThumbnail(video.youtubeVideoId);
+  const thumb = video.thumbnailUrl ?? youtubeThumbnail(video.youtubeVideoId);
   const keywords = [
     video.title,
     `${video.title} ভিডিও`,
@@ -92,11 +91,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function VideoJsonLd({ video }: { video: NonNullable<Awaited<ReturnType<typeof fetchPublicVideoById>>> }) {
+function VideoJsonLd({
+  video,
+}: {
+  video: NonNullable<Awaited<ReturnType<typeof fetchPublicVideoById>>>;
+}) {
   const canonicalUrl = videoCanonicalUrl(video.id);
   const description = videoSeoDescription(video);
-  const thumb =
-    video.thumbnailUrl ?? youtubeThumbnail(video.youtubeVideoId);
+  const thumb = video.thumbnailUrl ?? youtubeThumbnail(video.youtubeVideoId);
   const duration = isoDuration(video.durationSec);
 
   const jsonLd = {
@@ -162,7 +164,11 @@ export default async function VideoDetailPage({ params }: Props) {
   return (
     <>
       {video && <VideoJsonLd video={video} />}
-      {video ? <VideoDetailView video={video} /> : <VideoDetailClient id={id} />}
+      {video ? (
+        <VideoDetailView video={video} />
+      ) : (
+        <VideoDetailClient id={id} />
+      )}
     </>
   );
 }

@@ -15,21 +15,21 @@ export default function ResultsPage({
   const { slug, subSlug } = use(params);
 
   return (
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-semibold tracking-tight">রেজাল্ট</h1>
-        </div>
-        <Card className="mt-6">
-          <CardContent className="py-12 text-center">
-            <Trophy className="mx-auto size-12 text-muted-foreground/50 mb-3" />
-            <p className="text-muted-foreground">পরীক্ষার ফলাফল শীঘ্রই আসছে</p>
-          </CardContent>
-        </Card>
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-semibold tracking-tight">রেজাল্ট</h1>
       </div>
+      <Card className="mt-6">
+        <CardContent className="py-12 text-center">
+          <Trophy className="mx-auto size-12 text-muted-foreground/50 mb-3" />
+          <p className="text-muted-foreground">পরীক্ষার ফলাফল শীঘ্রই আসছে</p>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

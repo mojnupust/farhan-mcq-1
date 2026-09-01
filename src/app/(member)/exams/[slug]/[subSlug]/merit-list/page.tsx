@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import {
   Table,
   TableBody,
@@ -11,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TableSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import type { MeritListEntry } from "@/features/sub-exam-categories";
 import { subExamCategoryService } from "@/features/sub-exam-categories";
@@ -50,81 +50,79 @@ export default function MeritListPage({
   }, [subSlug]);
 
   return (
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
-              <ArrowLeft className="size-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              মেরিট লিস্ট
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              সকল পরীক্ষার্থীদের ফলাফল
-            </p>
-          </div>
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={ROUTES.subExamDashboard(slug, subSlug)}>
+            <ArrowLeft className="size-5" />
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">মেরিট লিস্ট</h1>
+          <p className="text-sm text-muted-foreground">
+            সকল পরীক্ষার্থীদের ফলাফল
+          </p>
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Trophy className="size-5 text-amber-500" />
-              লিডারবোর্ড
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <TableSkeleton rows={5} />
-            ) : entries.length === 0 ? (
-              <div className="py-8 text-center">
-                <Medal className="mx-auto size-10 text-muted-foreground/50 mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  এখনো কোনো পরীক্ষার ফলাফল নেই
-                </p>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-16">র‍্যাংক</TableHead>
-                    <TableHead>নাম</TableHead>
-                    <TableHead className="text-right">মোট নম্বর</TableHead>
-                    <TableHead className="text-right">সঠিক</TableHead>
-                    <TableHead className="text-right">ভুল</TableHead>
-                    <TableHead className="text-right">পরীক্ষা</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {entries.map((entry) => (
-                    <TableRow key={entry.userId}>
-                      <TableCell>
-                        <RankBadge rank={entry.rank} />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {entry.userName}
-                      </TableCell>
-                      <TableCell className="text-right font-bold">
-                        {entry.totalMarks}
-                      </TableCell>
-                      <TableCell className="text-right text-emerald-600">
-                        {entry.totalCorrect}
-                      </TableCell>
-                      <TableCell className="text-right text-destructive">
-                        {entry.totalWrong}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {entry.examsTaken}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Trophy className="size-5 text-amber-500" />
+            লিডারবোর্ড
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <TableSkeleton rows={5} />
+          ) : entries.length === 0 ? (
+            <div className="py-8 text-center">
+              <Medal className="mx-auto size-10 text-muted-foreground/50 mb-2" />
+              <p className="text-sm text-muted-foreground">
+                এখনো কোনো পরীক্ষার ফলাফল নেই
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-16">র‍্যাংক</TableHead>
+                  <TableHead>নাম</TableHead>
+                  <TableHead className="text-right">মোট নম্বর</TableHead>
+                  <TableHead className="text-right">সঠিক</TableHead>
+                  <TableHead className="text-right">ভুল</TableHead>
+                  <TableHead className="text-right">পরীক্ষা</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {entries.map((entry) => (
+                  <TableRow key={entry.userId}>
+                    <TableCell>
+                      <RankBadge rank={entry.rank} />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {entry.userName}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {entry.totalMarks}
+                    </TableCell>
+                    <TableCell className="text-right text-emerald-600">
+                      {entry.totalCorrect}
+                    </TableCell>
+                    <TableCell className="text-right text-destructive">
+                      {entry.totalWrong}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {entry.examsTaken}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

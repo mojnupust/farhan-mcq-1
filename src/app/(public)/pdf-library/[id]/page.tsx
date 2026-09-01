@@ -1,13 +1,10 @@
-import { docTypeLabel } from "@/features/pdfs/constants";
+import { docTypeLabel, subExamCategoryLabel } from "@/features/pdfs/constants";
 import {
   fetchPublicPdfById,
   PDF_SITE_ORIGIN,
   pdfCanonicalUrl,
   pdfSeoDescription,
 } from "@/features/pdfs/server";
-import {
-  subExamCategoryLabel,
-} from "@/features/pdfs/constants";
 import {
   subExamCategoryService,
   type SubExamCategory,

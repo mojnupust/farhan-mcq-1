@@ -84,7 +84,9 @@ export default function ExamCategoryPage({
           </Button>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-              <span className="text-3xl animate-float">{category.icon || "📝"}</span>
+              <span className="text-3xl animate-float">
+                {category.icon || "📝"}
+              </span>
               {category.name}
             </h1>
           </div>
@@ -145,7 +147,12 @@ export default function ExamCategoryPage({
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {subCategories.map((sub, index) => (
-                <AnimateIn key={sub.id} variant="fade-up" delay={index * 50} duration={400}>
+                <AnimateIn
+                  key={sub.id}
+                  variant="fade-up"
+                  delay={index * 50}
+                  duration={400}
+                >
                   <Link href={`/exams/${slug}/${sub.slug}`}>
                     <Card className="group card-hover-lift glow-on-hover cursor-pointer transition-all duration-300 hover:border-primary/30">
                       <CardHeader className="py-4">

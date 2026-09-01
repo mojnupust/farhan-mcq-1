@@ -24,7 +24,10 @@ export function AppLayout({
         user={user}
         unreadNotifications={unreadMessages}
       />
-      <main className="flex-1 overflow-x-hidden">{children}</main>
+      {/* min-w-0 (not overflow-x-hidden) prevents horizontal overflow without
+          turning main into a scroll container, which would break position:sticky
+          for children like the exam page's sticky top bar. */}
+      <main className="min-w-0 flex-1">{children}</main>
     </div>
   );
 }

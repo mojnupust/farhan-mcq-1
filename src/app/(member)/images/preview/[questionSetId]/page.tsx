@@ -4,12 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/features/auth/components/auth-provider";
+import {
+  slideService,
+  type QuestionSetSlidesResult,
+  type Slide,
+} from "@/features/slides";
 import { SlidePreviewCard } from "@/features/slides/components/slide-preview-card";
-import { slideService, type QuestionSetSlidesResult, type Slide } from "@/features/slides";
 import { slideImageVersionKey } from "@/features/slides/utils/slide-text";
 import { apiClient } from "@/lib/api-client";
 import { downloadBlob } from "@/lib/download-blob";
-import { toastSuccessAfterCommit, toastErrorAfterCommit } from "@/lib/safe-toast";
+import {
+  toastErrorAfterCommit,
+  toastSuccessAfterCommit,
+} from "@/lib/safe-toast";
 import { ArrowLeft, Download, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
@@ -26,7 +33,9 @@ export default function ImagesPreviewPage({
   const [loading, setLoading] = useState(true);
   const [downloadingZip, setDownloadingZip] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [imageVersions, setImageVersions] = useState<Record<string, number>>({});
+  const [imageVersions, setImageVersions] = useState<Record<string, number>>(
+    {},
+  );
 
   const loadSlides = useCallback(async () => {
     setLoading(true);
@@ -72,7 +81,9 @@ export default function ImagesPreviewPage({
       const result = await slideService.deleteByQuestionSetId(questionSetId);
       setData(null);
       setImageVersions({});
-      toastSuccessAfterCommit(`${result.deletedCount}টি স্লাইড মুছে ফেলা হয়েছে`);
+      toastSuccessAfterCommit(
+        `${result.deletedCount}টি স্লাইড মুছে ফেলা হয়েছে`,
+      );
     } catch {
       toastErrorAfterCommit("স্লাইড মুছে ফেলা যায়নি");
     } finally {
@@ -117,7 +128,9 @@ export default function ImagesPreviewPage({
           </Link>
         </Button>
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold tracking-tight">তৈরি হওয়া স্লাইড</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            তৈরি হওয়া স্লাইড
+          </h1>
           <p className="text-sm text-muted-foreground">
             {data?.slides.length ?? 0}টি স্লাইড — এডিট, ডাউনলোড ও শেয়ার
           </p>
@@ -148,7 +161,11 @@ export default function ImagesPreviewPage({
             </Button>
           )}
           {data && data.slides.length > 0 && (
-            <Button onClick={downloadZip} disabled={downloadingZip} className="flex-1 sm:flex-none">
+            <Button
+              onClick={downloadZip}
+              disabled={downloadingZip}
+              className="flex-1 sm:flex-none"
+            >
               {downloadingZip ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
@@ -192,7 +209,11 @@ export default function ImagesPreviewPage({
       {/* Mobile sticky zip download */}
       {data && data.slides.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 p-3 backdrop-blur sm:hidden">
-          <Button onClick={downloadZip} disabled={downloadingZip} className="w-full">
+          <Button
+            onClick={downloadZip}
+            disabled={downloadingZip}
+            className="w-full"
+          >
             {downloadingZip ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />

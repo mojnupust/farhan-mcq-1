@@ -21,8 +21,9 @@ export function DocxDonationBanner() {
         <div className="flex items-start gap-2">
           <Gift className="mt-0.5 size-5 shrink-0 text-primary" />
           <p>
-            আপনার জব প্রস্তুতি প্ল্যাটফর্মের জন্য <strong>সম্পূর্ণ ফ্রিতে</strong> প্রশ্নের
-            Docx ফাইল বানিয়ে নিন। ব্র্যান্ড নেম রিনেম করে আপনার নিজের ব্র্যান্ডের নাম দিন,
+            আপনার জব প্রস্তুতি প্ল্যাটফর্মের জন্য{" "}
+            <strong>সম্পূর্ণ ফ্রিতে</strong> প্রশ্নের Docx ফাইল বানিয়ে নিন।
+            ব্র্যান্ড নেম রিনেম করে আপনার নিজের ব্র্যান্ডের নাম দিন,
             কালার/টেমপ্লেট ও কলাম কাস্টমাইজ করুন — সব ফ্রি।
           </p>
         </div>
@@ -30,7 +31,8 @@ export function DocxDonationBanner() {
           <HandHeart className="size-5 shrink-0 text-primary" />
           <p className="flex-1">
             যেহেতু এটি ফ্রি, আপনি এটি দ্বারা উপকৃত হলে সাধ্যমতো{" "}
-            <strong>২০ / ৩০ / ৪০ টাকা</strong> নিচের বিকাশ/নগদ নাম্বারে পাঠিয়ে দিন 🙏
+            <strong>২০ / ৩০ / ৪০ টাকা</strong> নিচের বিকাশ/নগদ নাম্বারে পাঠিয়ে
+            দিন 🙏
           </p>
           <Button
             type="button"
