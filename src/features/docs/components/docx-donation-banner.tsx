@@ -31,7 +31,7 @@ export function DocxDonationBanner() {
           <HandHeart className="size-5 shrink-0 text-primary" />
           <p className="flex-1">
             যেহেতু এটি ফ্রি, আপনি এটি দ্বারা উপকৃত হলে সাধ্যমতো{" "}
-            <strong>২০ / ৩০ / ৪০ টাকা</strong> নিচের বিকাশ/নগদ নাম্বারে পাঠিয়ে
+            <strong>৭০ / ৮০ / ৯০ টাকা</strong> নিচের বিকাশ/নগদ নাম্বারে পাঠিয়ে
             দিন 🙏
           </p>
           <Button
