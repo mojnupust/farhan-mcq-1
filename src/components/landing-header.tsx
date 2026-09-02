@@ -27,9 +27,9 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/pdf-library", label: "PDF", icon: Folder },
   { href: "/syllabus", label: "Syllabus", icon: BookOpen },
+  { href: "/docs", label: "Docx", icon: FileEdit, isNew: true },
   { href: "/job-circular", label: "Job", icon: Briefcase },
   { href: "/videos", label: "Video", icon: Play },
-  { href: "/docs", label: "Docx", icon: FileEdit },
 ];
 
 export function LandingHeader() {
@@ -51,14 +51,14 @@ export function LandingHeader() {
 
             {/* Desktop nav links */}
             <nav className="hidden sm:flex items-center gap-1">
-              {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+              {NAV_LINKS.map(({ href, label, icon: Icon, isNew }) => {
                 const active =
                   pathname === href || pathname.startsWith(href + "/");
                 return (
                   <Link
                     key={href}
                     href={href}
-                    className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                    className={`relative flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                       active
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -66,6 +66,12 @@ export function LandingHeader() {
                   >
                     <Icon className="size-3.5" />
                     {label}
+                    {isNew && (
+                      <span className="absolute -top-0.5 -right-0.5 flex size-2">
+                        <span className="badge-ping absolute inline-flex h-full w-full rounded-full bg-red-500" />
+                        <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -135,7 +141,7 @@ export function LandingHeader() {
         aria-label="Primary"
         className="fixed inset-x-0 bottom-0 z-50 flex sm:hidden items-stretch border-t bg-background/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]"
       >
-        {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+        {NAV_LINKS.map(({ href, label, icon: Icon, isNew }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
@@ -146,11 +152,19 @@ export function LandingHeader() {
               {active && (
                 <span className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-primary" />
               )}
-              <Icon
-                className={`size-5 ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-              />
+              <span className="relative">
+                <Icon
+                  className={`size-5 ${
+                    active ? "text-primary" : "text-muted-foreground"
+                  }`}
+                />
+                {isNew && (
+                  <span className="absolute -top-0.5 -right-0.5 flex size-1.5">
+                    <span className="badge-ping absolute inline-flex h-full w-full rounded-full bg-red-500" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
+                  </span>
+                )}
+              </span>
               <span
                 className={active ? "text-primary" : "text-muted-foreground"}
               >

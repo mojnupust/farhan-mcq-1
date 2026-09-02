@@ -21,10 +21,9 @@ export function DocxDonationBanner() {
         <div className="flex items-start gap-2">
           <Gift className="mt-0.5 size-5 shrink-0 text-primary" />
           <p>
-            আপনার জব প্রস্তুতি প্ল্যাটফর্মের জন্য{" "}
-            <strong>সম্পূর্ণ ফ্রিতে</strong> প্রশ্নের Docx ফাইল বানিয়ে নিন।
-            ব্র্যান্ড নেম রিনেম করে আপনার নিজের ব্র্যান্ডের নাম দিন,
-            কালার/টেমপ্লেট ও কলাম কাস্টমাইজ করুন — সব ফ্রি।
+            <strong>সম্পূর্ণ ফ্রিতে</strong> সকল জব সলুশ্যন Docx ফাইল বানিয়ে
+            নিন। আপনার নিজের ব্র্যান্ডের নাম দিন, কালার/টেমপ্লেট ও কলাম
+            কাস্টমাইজ করুন — সব ফ্রি। ব্যবসা শুরু করুন।
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 rounded-md border border-dashed border-primary/40 bg-background p-3">
@@ -33,6 +32,7 @@ export function DocxDonationBanner() {
             যেহেতু এটি ফ্রি, আপনি এটি দ্বারা উপকৃত হলে সাধ্যমতো{" "}
             <strong>৭০ / ৮০ / ৯০ টাকা</strong> নিচের বিকাশ/নগদ নাম্বারে পাঠিয়ে
             দিন 🙏
+            <br /> সাইট চালু রাখতে খরচা হয়।
           </p>
           <Button
             type="button"

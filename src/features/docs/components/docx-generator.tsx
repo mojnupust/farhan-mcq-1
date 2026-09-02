@@ -233,8 +233,8 @@ export function DocxGenerator({
               Docx তৈরি করুন
             </h1>
             <p className="text-sm text-muted-foreground">
-              এক বা একাধিক প্রশ্নসেট নির্বাচন করে প্রিন্ট-রেডি Word ফাইল তৈরি
-              করুন
+              সকল বিসিএস, প্রাইমারি, NTRCA এর বিগত সালের প্রশ্ন Word ফাইল
+              ডাউনলোড করে নিন।
             </p>
           </div>
         </div>
