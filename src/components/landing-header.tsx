@@ -26,7 +26,7 @@ import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/pdf-library", label: "PDF", icon: Folder },
-  { href: "/syllabus", label: "Syllabus", icon: BookOpen },
+  { href: "/routines", label: "Routines", icon: BookOpen },
   { href: "/docs", label: "Docx", icon: FileEdit, isNew: true },
   { href: "/job-circular", label: "Job", icon: Briefcase },
   { href: "/videos", label: "Video", icon: Play },
