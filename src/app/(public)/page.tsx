@@ -223,7 +223,7 @@ export default function LandingPage() {
                     সরকারি চাকরিতে
                     <span className="text-primary"> সফল হওয়ার</span>
                     <br />
-                    সবচেয়ে স্মার্ট উপায়
+                    উপায়: সঠিক প্রস্তুতি 
                   </h1>
                 </AnimateIn>
                 <AnimateIn variant="fade-up" delay={200} duration={600}>

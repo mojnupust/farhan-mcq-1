@@ -28,7 +28,7 @@ export function HeroCTA() {
           </Link>
         </Button>
         <p className="text-sm text-muted-foreground">
-          ✅ আপনি ইতোমধ্যে সদস্য। স্বাগতম!
+          ✅ স্বাগতম! আপনি ইতোমধ্যে সদস্য।
         </p>
       </div>
     );
@@ -39,12 +39,9 @@ export function HeroCTA() {
       <Button size="lg" className="text-base shadow-lg" asChild>
         <Link href="/dashboard">
           <LogInIcon />
-          এখনই জয়েন করুন — মাত্র ৳৩৯/মাস
+          এখনই জয়েন করুন — একদম ফ্রি তে
         </Link>
       </Button>
-      <p className="text-sm text-muted-foreground">
-        ✅ কোনো চুক্তি নেই। যেকোনো সময় বাতিল করুন।
-      </p>
     </div>
   );
 }
