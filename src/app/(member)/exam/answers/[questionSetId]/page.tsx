@@ -176,7 +176,7 @@ export default function AnswersPage({
     <>
       <div className="page-enter">
         {/* Header */}
-        <div className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm">
+        <div className="sticky top-14 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm lg:top-0">
           <div className="flex items-center gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <Button
               variant="ghost"
