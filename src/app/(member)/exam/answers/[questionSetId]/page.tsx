@@ -174,10 +174,10 @@ export default function AnswersPage({
 
   return (
     <>
-      <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
+      <div className="page-enter">
         {/* Header */}
         <div className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <Button
               variant="ghost"
               size="icon"
@@ -186,7 +186,7 @@ export default function AnswersPage({
             >
               <ArrowLeft className="size-5" />
             </Button>
-            <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
+            <h1 className="text-lg font-semibold tracking-tight">উত্তরপত্র</h1>
             <Badge variant="secondary" className="ml-1">
               {filteredQuestions.length} প্রশ্ন
             </Badge>
@@ -211,46 +211,48 @@ export default function AnswersPage({
               </Button>
             </div>
           </div>
-        </div>
 
-        {/* Subject Filter */}
-        {subjects.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Button
-              size="sm"
-              variant={subjectFilter === null ? "default" : "outline"}
-              onClick={() => setSubjectFilter(null)}
-              className="transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              সকল ({questions.length})
-            </Button>
-            {subjects.map((s) => {
-              const count = questions.filter((q) => q.subject === s).length;
-              return (
-                <Button
-                  key={s}
-                  size="sm"
-                  variant={subjectFilter === s ? "default" : "outline"}
-                  onClick={() => setSubjectFilter(s)}
-                  className="transition-all duration-200 hover:scale-105 active:scale-95"
-                >
-                  {s} ({count})
-                </Button>
-              );
-            })}
+          {/* Scroll Progress */}
+          <div className="h-0.5 w-full bg-gray-100">
+            <div
+              className="h-full scroll-progress-bar transition-all duration-300"
+              style={{ width: `${scrollProgress}%` }}
+            />
           </div>
-        )}
 
-        {/* Scroll Progress */}
-        <div className="mb-4 h-1 w-full rounded-full bg-gray-100 overflow-hidden">
-          <div
-            className="h-full scroll-progress-bar rounded-full transition-all duration-300"
-            style={{ width: `${scrollProgress}%` }}
-          />
+          {/* Subject Filter */}
+          {subjects.length > 1 && (
+            <div className="border-t bg-gray-50">
+              <div className="flex gap-1 overflow-x-auto px-4 py-1.5 sm:px-6 lg:px-8">
+                <Button
+                  size="sm"
+                  variant={subjectFilter === null ? "default" : "ghost"}
+                  className="h-7 text-xs shrink-0"
+                  onClick={() => setSubjectFilter(null)}
+                >
+                  সকল ({questions.length})
+                </Button>
+                {subjects.map((s) => {
+                  const count = questions.filter((q) => q.subject === s).length;
+                  return (
+                    <Button
+                      key={s}
+                      size="sm"
+                      variant={subjectFilter === s ? "default" : "ghost"}
+                      className="h-7 text-xs shrink-0"
+                      onClick={() => setSubjectFilter(s)}
+                    >
+                      {s} ({count})
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Questions - Flat View */}
-        <div className="space-y-6">
+        <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {filteredQuestions.map((question, qIdx) => (
             <div
               key={question.id}
