@@ -176,38 +176,40 @@ export default function AnswersPage({
     <>
       <div className="px-4 py-6 sm:px-6 lg:px-8 page-enter">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="transition-transform duration-200 hover:scale-110 active:scale-95"
-          >
-            <ArrowLeft className="size-5" />
-          </Button>
-          <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
-          <Badge variant="secondary" className="ml-1">
-            {filteredQuestions.length} প্রশ্ন
-          </Badge>
-          <div className="ml-auto">
+        <div className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
             <Button
-              size="sm"
-              variant={globalShowAnswers ? "outline" : "default"}
-              onClick={handleGlobalToggle}
-              className="gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="transition-transform duration-200 hover:scale-110 active:scale-95"
             >
-              {globalShowAnswers ? (
-                <>
-                  <EyeOff className="size-4" />
-                  উত্তর লুকান
-                </>
-              ) : (
-                <>
-                  <Eye className="size-4" />
-                  উত্তর দেখুন
-                </>
-              )}
+              <ArrowLeft className="size-5" />
             </Button>
+            <h1 className="text-xl font-semibold tracking-tight">উত্তরপত্র</h1>
+            <Badge variant="secondary" className="ml-1">
+              {filteredQuestions.length} প্রশ্ন
+            </Badge>
+            <div className="ml-auto">
+              <Button
+                size="sm"
+                variant={globalShowAnswers ? "outline" : "default"}
+                onClick={handleGlobalToggle}
+                className="gap-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
+              >
+                {globalShowAnswers ? (
+                  <>
+                    <EyeOff className="size-4" />
+                    উত্তর লুকান
+                  </>
+                ) : (
+                  <>
+                    <Eye className="size-4" />
+                    উত্তর দেখুন
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
 
