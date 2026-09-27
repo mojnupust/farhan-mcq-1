@@ -139,7 +139,7 @@ export function DocxStylePanel({ value, onChange, className }: DocxStylePanelPro
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="site-url">সাইট URL (ব্যাখ্যা লিংক)</Label>
+        <Label htmlFor="site-url">সাইট URL (ব্যাখ্যা লিংক → /mcq/slug)</Label>
         <Input
           id="site-url"
           value={value.siteBaseUrl}

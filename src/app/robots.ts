@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/"],
     },
-    sitemap: "https://farhanmcq.com/sitemap.xml",
+    sitemap: "https://www.farhanmcq.com/sitemap.xml",
   };
 }

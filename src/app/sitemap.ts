@@ -24,16 +24,10 @@
 import type { MetadataRoute } from "next";
 import { fetchPdfSitemapEntries } from "@/features/pdfs/server";
 import { fetchVideoSitemapEntries } from "@/features/videos/server";
+import { getServerApiBase } from "@/lib/server-api-base";
 
-// ── Config ────────────────────────────────────────────────────────────────────
-
-const BASE_URL = "https://farhanmcq.com";
-
-// NEXT_PUBLIC_API_URL = "https://api.farhanmcq.com/api" (ends with /api)
-// We need the root (without /api) so we can call /api/v1/...
-const API_ROOT = (
-  process.env.NEXT_PUBLIC_API_URL ?? "https://api.farhanmcq.com/api"
-).replace(/\/api$/, "");
+const BASE_URL = "https://www.farhanmcq.com";
+const API_BASE = getServerApiBase();
 
 // ISR: rebuild the sitemap every 6 hours.
 // Matches the cache TTL we'll use on the two new endpoints.
@@ -121,19 +115,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ] = await Promise.all([
       // Existing endpoint ✅
       safeFetch<ExamCategoryItem>(
-        `${API_ROOT}/api/v1/exam-categories`,
+        `${API_BASE}/v1/exam-categories`,
         "exam-categories",
       ),
-      // NEW endpoint (Step 1 below) ✅
       safeFetch<SubExamSitemapItem>(
-        `${API_ROOT}/api/v1/sub-exam-categories/sitemap`,
+        `${API_BASE}/v1/sub-exam-categories/sitemap`,
         "sub-exam-sitemap",
       ),
-      // Existing endpoint ✅  — returns all syllabuses (active=true)
-      safeFetch<SyllabusItem>(`${API_ROOT}/api/v1/syllabuses`, "syllabuses"),
-      // NEW endpoint (Step 2 below) ✅
+      safeFetch<SyllabusItem>(`${API_BASE}/v1/syllabuses`, "syllabuses"),
       safeFetch<QuestionSlugItem>(
-        `${API_ROOT}/api/v1/question-sets/public/slugs`,
+        `${API_BASE}/v1/question-sets/public/slugs`,
         "question-slugs",
       ),
       fetchPdfSitemapEntries(),
@@ -181,6 +172,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${BASE_URL}/videos`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/mcq`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
@@ -296,7 +293,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   //  Data comes from: GET /api/v1/question-sets/public/question/:slug
 
   const questionRoutes: MetadataRoute.Sitemap = questionSlugs.map((q) => ({
-    url: `${BASE_URL}/${q.slug}`,
+    url: `${BASE_URL}/mcq/${q.slug}`,
     lastModified: q.updatedAt ? new Date(q.updatedAt) : now,
     changeFrequency: "monthly" as const,
     priority: 0.55,

@@ -43,7 +43,7 @@ export const ROUTES = {
   jobCircular: "/job-circular",
   jobAlerts: "#",
   blogPosts: "#",
-  question: (slug: string) => `/${slug}` as const,
+  question: (slug: string) => `/mcq/${slug}` as const,
   images: "/images",
   imagesPreview: (questionSetId: string) =>
     `/images/preview/${questionSetId}` as const,
