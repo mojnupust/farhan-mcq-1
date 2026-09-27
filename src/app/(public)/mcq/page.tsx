@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PUBLIC_PAGE_WIDTH } from "@/components/public-page";
 import { ROUTES } from "@/config/routes";
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function McqIndexPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div className={`${PUBLIC_PAGE_WIDTH} py-12`}>
       <h1 className="text-2xl font-semibold">MCQ প্রশ্নব্যাংক</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         পরীক্ষা নির্বাচন করে অনুশীলন শুরু করুন। প্রতিটি প্রশ্নের আলাদা পাতা

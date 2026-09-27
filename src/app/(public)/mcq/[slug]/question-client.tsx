@@ -1,5 +1,6 @@
 "use client";
 
+import { PUBLIC_PAGE_WIDTH } from "@/components/public-page";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import type { PublicQuestionDto } from "@/features/questions";
 import { apiClient } from "@/lib/api-client";
@@ -33,7 +34,7 @@ export function PublicQuestionClient({ slug }: { slug: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className={`${PUBLIC_PAGE_WIDTH} py-8`}>
         <ContentSkeleton />
       </div>
     );
@@ -41,7 +42,7 @@ export function PublicQuestionClient({ slug }: { slug: string }) {
 
   if (!question) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6">
+      <div className={`${PUBLIC_PAGE_WIDTH} py-16 text-center`}>
         <BookOpen className="mx-auto mb-3 size-10 text-muted-foreground/50" />
         <p className="text-muted-foreground">প্রশ্ন পাওয়া যায়নি</p>
       </div>

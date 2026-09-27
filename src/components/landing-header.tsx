@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { PUBLIC_PAGE_WIDTH } from "@/components/public-page";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +40,7 @@ export function LandingHeader() {
   return (
     <>
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+        <div className={`flex h-16 items-center justify-between ${PUBLIC_PAGE_WIDTH}`}>
           {/* Logo */}
           <div className="flex items-center gap-4 lg:gap-6">
             <Link href="/" className="shrink-0">

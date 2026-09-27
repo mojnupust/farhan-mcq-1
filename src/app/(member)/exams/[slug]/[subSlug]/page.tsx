@@ -209,7 +209,7 @@ export default function SubExamDashboardPage({
                 আজ লাইভ পরীক্ষা নেই
               </p>
               <p className="text-xs text-slate-400 leading-relaxed">
-                পরবর্তী পরীক্ষার জন্য অপেক্ষা করুন
+                আর্কাইভে ক্লিক করে পূর্ববর্তী প্রশ্নসেট প্রাকটিস করুন।
               </p>
             </div>
           </div>
