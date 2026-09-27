@@ -1,4 +1,3 @@
-import { LandingHeader } from "@/components/landing-header";
 import { ROUTES } from "@/config/routes";
 import type { PublicQuestionDto } from "@/features/questions";
 import { publicMcqUrl } from "@/features/questions/server";
@@ -27,10 +26,8 @@ export function PublicQuestionView({
   const canonicalUrl = publicMcqUrl(question.slug);
 
   return (
-    <>
-      <LandingHeader />
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
           <nav
             aria-label="Breadcrumb"
             className="mb-6 text-sm text-muted-foreground"
@@ -230,6 +227,6 @@ export function PublicQuestionView({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
