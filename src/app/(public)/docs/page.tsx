@@ -1,4 +1,5 @@
-import { DOCX_FAQ_ITEMS, DocxFaq } from "@/features/docs/components/docx-faq";
+import { DOCX_FAQ_ITEMS } from "@/features/docs/components/docx-faq-items";
+import { DocxFaq } from "@/features/docs/components/docx-faq";
 import { DocxGenerator } from "@/features/docs/components/docx-generator";
 import { Download, PenLine, Printer } from "lucide-react";
 

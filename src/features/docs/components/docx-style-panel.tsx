@@ -152,6 +152,14 @@ export function DocxStylePanel({ value, onChange, className }: DocxStylePanelPro
   const togglesSection = (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
+        <Label htmlFor="show-answer">সঠিক উত্তর দেখান</Label>
+        <Switch
+          id="show-answer"
+          checked={value.showAnswer}
+          onCheckedChange={(checked) => patch({ showAnswer: checked })}
+        />
+      </div>
+      <div className="flex items-center justify-between gap-4">
         <Label htmlFor="show-explanation">ব্যাখ্যা দেখান</Label>
         <Switch
           id="show-explanation"
@@ -187,7 +195,7 @@ export function DocxStylePanel({ value, onChange, className }: DocxStylePanelPro
           {brandingSection}
         </section>
         <section className="space-y-3">
-          <h3 className="text-sm font-semibold">ব্যাখ্যা</h3>
+          <h3 className="text-sm font-semibold">উত্তর ও ব্যাখ্যা</h3>
           {togglesSection}
         </section>
       </div>
@@ -202,7 +210,7 @@ export function DocxStylePanel({ value, onChange, className }: DocxStylePanelPro
           <AccordionContent>{brandingSection}</AccordionContent>
         </AccordionItem>
         <AccordionItem value="toggles">
-          <AccordionTrigger>ব্যাখ্যা</AccordionTrigger>
+          <AccordionTrigger>উত্তর ও ব্যাখ্যা</AccordionTrigger>
           <AccordionContent>{togglesSection}</AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -8,6 +8,7 @@ export interface DocxStyleConfigInput {
   brandName: string;
   brandSubtitle: string;
   footerText: string;
+  showAnswer: boolean;
   showExplanation: boolean;
   explanationMaxChars: number;
   siteBaseUrl: string;

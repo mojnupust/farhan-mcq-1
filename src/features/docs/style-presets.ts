@@ -9,6 +9,7 @@ export function buildDefaultDocxStyleConfig(): DocxStyleConfigInput {
     brandName: "Farhan MCQ",
     brandSubtitle: "farhanmcq.com",
     footerText: "নিয়মিত অনুশীলন করতে ফলো করুন — Farhan MCQ",
+    showAnswer: true,
     showExplanation: false,
     explanationMaxChars: 400,
     siteBaseUrl: "https://www.farhanmcq.com",
