@@ -35,8 +35,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { DocxDonationBanner } from "./docx-donation-banner";
-
 interface DocxPreviewProps {
   documentId: string;
   /** Route to go back to the generator. */
@@ -233,8 +231,6 @@ export function DocxPreview({
         </CardContent>
       </Card>
 
-      {showDonationBanner && <DocxDonationBanner />}
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
@@ -247,7 +243,9 @@ export function DocxPreview({
             <div className="flex items-start gap-2">
               <Layers className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
               <div>
-                <dt className="text-xs text-muted-foreground">প্রশ্নসেট সংখ্যা</dt>
+                <dt className="text-xs text-muted-foreground">
+                  প্রশ্নসেট সংখ্যা
+                </dt>
                 <dd className="font-medium">{doc.setCount}</dd>
               </div>
             </div>

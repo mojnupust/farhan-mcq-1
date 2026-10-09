@@ -37,7 +37,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { DocxDonationBanner } from "./docx-donation-banner";
 import { DocxStylePanel } from "./docx-style-panel";
 
 const POLL_INTERVAL_MS = 2000;
@@ -59,7 +58,6 @@ function formatQuestionSetLabel(set: QuestionSet): string {
   });
   return `${set.title} — ${date}`;
 }
-
 
 interface DocxGeneratorProps {
   /** Base path the preview page lives under (admin vs public), e.g. "/docs/preview". */
@@ -268,9 +266,9 @@ export function DocxGenerator({
               Docx তৈরি করুন
             </h2>
             <p className="text-sm text-muted-foreground">
-              সকল বিসিএস, প্রাইমারি, NTRCA এর বিগত সালের প্রশ্ন বেছে নিয়ে
-              নিজের ব্র্যান্ডে প্রিন্ট-রেডি Word ফাইল তৈরি করুন — প্রিন্ট করুন
-              অথবা বিক্রি করুন, সম্পূর্ণ ফ্রি।
+              সকল বিসিএস, প্রাইমারি, NTRCA এর বিগত সালের প্রশ্ন বেছে নিয়ে নিজের
+              ব্র্যান্ডে প্রিন্ট-রেডি Word ফাইল তৈরি করুন — প্রিন্ট করুন অথবা
+              বিক্রি করুন, সম্পূর্ণ ফ্রি।
             </p>
           </div>
         </div>
@@ -305,8 +303,6 @@ export function DocxGenerator({
             );
           })}
         </ol>
-
-        {showDonationBanner && <DocxDonationBanner />}
 
         <Card>
           <CardHeader>
@@ -417,7 +413,10 @@ export function DocxGenerator({
                             </span>
                             <div className="flex flex-wrap gap-1.5">
                               {set.subject && (
-                                <Badge variant="outline" className="font-normal">
+                                <Badge
+                                  variant="outline"
+                                  className="font-normal"
+                                >
                                   {set.subject}
                                 </Badge>
                               )}
