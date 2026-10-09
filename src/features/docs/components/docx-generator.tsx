@@ -2,6 +2,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AnimateIn } from "@/components/ui/animate-in";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
@@ -22,7 +23,17 @@ import {
   subExamCategoryService,
   type SubExamCategory,
 } from "@/features/sub-exam-categories";
-import { AlertTriangle, FileText } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Circle,
+  FileText,
+  FolderOpen,
+  PenLine,
+  Printer,
+  ShoppingBag,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -33,6 +44,13 @@ const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_ATTEMPTS = 90;
 const STUCK_QUEUED_MS = 45_000;
 
+const STEPS = [
+  "পরীক্ষার ক্যাটাগরি",
+  "সাব-ক্যাটাগরি",
+  "প্রশ্নসেট",
+  "ডিজাইন ও ডাউনলোড",
+] as const;
+
 function formatQuestionSetLabel(set: QuestionSet): string {
   const date = new Date(set.date).toLocaleDateString("bn-BD", {
     year: "numeric",
@@ -41,6 +59,7 @@ function formatQuestionSetLabel(set: QuestionSet): string {
   });
   return `${set.title} — ${date}`;
 }
+
 
 interface DocxGeneratorProps {
   /** Base path the preview page lives under (admin vs public), e.g. "/docs/preview". */
@@ -121,6 +140,14 @@ export function DocxGenerator({
   function toggleQuestionSet(id: string) {
     setSelectedSetIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
+  function selectAllQuestionSets() {
+    setSelectedSetIds(
+      selectedSetIds.length === questionSets.length
+        ? []
+        : questionSets.map((s) => s.id),
     );
   }
 
@@ -213,6 +240,14 @@ export function DocxGenerator({
         ? "কিউতে আছে — ওয়ার্কার শুরু করছে..."
         : "শুরু হচ্ছে...";
 
+  const currentStep = !examSlug
+    ? 0
+    : !subExamSlug
+      ? 1
+      : selectedSetIds.length === 0
+        ? 2
+        : 3;
+
   if (loadingExams) {
     return (
       <div className={`mx-auto px-4 py-6 sm:px-6 lg:px-8 ${maxWidthClassName}`}>
@@ -226,18 +261,50 @@ export function DocxGenerator({
       className={`mx-auto px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}
     >
       <AnimateIn variant="fade-up" duration={400}>
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mb-5 flex items-center gap-3">
           <FileText className="size-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h2 className="text-2xl font-semibold tracking-tight">
               Docx তৈরি করুন
-            </h1>
+            </h2>
             <p className="text-sm text-muted-foreground">
-              সকল বিসিএস, প্রাইমারি, NTRCA এর বিগত সালের প্রশ্ন Word ফাইল
-              ডাউনলোড করে নিন।
+              সকল বিসিএস, প্রাইমারি, NTRCA এর বিগত সালের প্রশ্ন বেছে নিয়ে
+              নিজের ব্র্যান্ডে প্রিন্ট-রেডি Word ফাইল তৈরি করুন — প্রিন্ট করুন
+              অথবা বিক্রি করুন, সম্পূর্ণ ফ্রি।
             </p>
           </div>
         </div>
+
+        {/* Step tracker — gives users a clear sense of progress through the form */}
+        <ol className="mb-6 flex items-center gap-1 overflow-x-auto rounded-lg border bg-muted/30 p-2 text-xs sm:text-sm">
+          {STEPS.map((label, idx) => {
+            const done = idx < currentStep;
+            const active = idx === currentStep;
+            return (
+              <li key={label} className="flex shrink-0 items-center gap-1">
+                <span
+                  className={`flex items-center gap-1.5 rounded-md px-2 py-1 font-medium ${
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : done
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                  }`}
+                >
+                  {done ? (
+                    <CheckCircle2 className="size-3.5 shrink-0" />
+                  ) : (
+                    <Circle className="size-3.5 shrink-0" />
+                  )}
+                  {idx + 1}. {label}
+                </span>
+                {idx < STEPS.length - 1 && (
+                  <span className="h-px w-3 shrink-0 bg-border sm:w-6" />
+                )}
+              </li>
+            );
+          })}
+        </ol>
 
         {showDonationBanner && <DocxDonationBanner />}
 
@@ -246,24 +313,33 @@ export function DocxGenerator({
             <CardTitle className="text-base">১. পরীক্ষার ক্যাটাগরি</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <Combobox
-              options={examOptions}
-              value={examSlug}
-              onChange={(value) => {
-                setExamSlug(value);
-                setSubExamSlug(null);
-                setSubExamCategories([]);
-                setSelectedSetIds([]);
-                setQuestionSets([]);
-                setLoadingSubExams(true);
-              }}
-              placeholder="পরীক্ষার ক্যাটাগরি নির্বাচন করুন"
-              searchPlaceholder="ক্যাটাগরি খুঁজুন..."
-            />
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                প্রথমে আপনার পরীক্ষার নাম বেছে নিন (যেমন: বিসিএস, প্রাইমারি,
+                ব্যাংক, NTRCA)
+              </p>
+              <Combobox
+                options={examOptions}
+                value={examSlug}
+                onChange={(value) => {
+                  setExamSlug(value);
+                  setSubExamSlug(null);
+                  setSubExamCategories([]);
+                  setSelectedSetIds([]);
+                  setQuestionSets([]);
+                  setLoadingSubExams(true);
+                }}
+                placeholder="পরীক্ষার ক্যাটাগরি নির্বাচন করুন"
+                searchPlaceholder="ক্যাটাগরি খুঁজুন..."
+              />
+            </div>
 
             {examSlug && (
-              <div className="space-y-2">
+              <div className="space-y-2 border-t pt-4">
                 <label className="text-sm font-medium">২. সাব-ক্যাটাগরি</label>
+                <p className="text-xs text-muted-foreground">
+                  এরপর নির্দিষ্ট পরীক্ষার সার্কুলার বা বিভাগ বেছে নিন
+                </p>
                 <Combobox
                   options={subExamOptions}
                   value={subExamSlug}
@@ -284,31 +360,50 @@ export function DocxGenerator({
             )}
 
             {subExamSlug && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">
-                    ৩. প্রশ্নসেট (এক বা একাধিক)
-                  </label>
-                  {selectedSetIds.length > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      {selectedSetIds.length}টি নির্বাচিত
-                    </span>
+              <div className="space-y-2 border-t pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <label className="text-sm font-medium">
+                      ৩. প্রশ্নসেট বেছে নিন (এক বা একাধিক)
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      যে সেটগুলো Docx ফাইলে থাকবে সেগুলোতে টিক দিন
+                    </p>
+                  </div>
+                  {questionSets.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={selectAllQuestionSets}
+                    >
+                      {selectedSetIds.length === questionSets.length
+                        ? "সব বাতিল করুন"
+                        : "সব নির্বাচন করুন"}
+                    </Button>
                   )}
                 </div>
                 {loadingQuestionSets ? (
                   <p className="text-sm text-muted-foreground">লোড হচ্ছে...</p>
                 ) : questionSets.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    এই সাব-ক্যাটাগরিতে কোনো প্রশ্নসেট পাওয়া যায়নি
-                  </p>
+                  <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center">
+                    <FolderOpen className="size-6 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      এই সাব-ক্যাটাগরিতে কোনো প্রশ্নসেট পাওয়া যায়নি
+                    </p>
+                  </div>
                 ) : (
-                  <div className="max-h-64 space-y-2 overflow-y-auto rounded-lg border p-3">
+                  <div className="max-h-72 space-y-2 overflow-y-auto rounded-lg border p-3">
                     {questionSets.map((set) => {
                       const checked = selectedSetIds.includes(set.id);
                       return (
                         <label
                           key={set.id}
-                          className="flex cursor-pointer items-start gap-3 rounded-md p-2 hover:bg-muted/50"
+                          className={`flex cursor-pointer items-start gap-3 rounded-md border p-2.5 transition-colors ${
+                            checked
+                              ? "border-primary/40 bg-primary/5"
+                              : "border-transparent hover:bg-muted/50"
+                          }`}
                         >
                           <input
                             type="checkbox"
@@ -316,12 +411,54 @@ export function DocxGenerator({
                             onChange={() => toggleQuestionSet(set.id)}
                             className="mt-1 size-4 accent-primary"
                           />
-                          <span className="text-sm leading-snug">
-                            {formatQuestionSetLabel(set)}
-                          </span>
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <span className="block text-sm leading-snug font-medium">
+                              {formatQuestionSetLabel(set)}
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {set.subject && (
+                                <Badge variant="outline" className="font-normal">
+                                  {set.subject}
+                                </Badge>
+                              )}
+                              <Badge variant="outline" className="font-normal">
+                                {set.totalMarks} নম্বর
+                              </Badge>
+                              <Badge
+                                variant={set.isLive ? "default" : "secondary"}
+                                className="font-normal"
+                              >
+                                {set.isLive ? "লাইভ" : "আর্কাইভ"}
+                              </Badge>
+                            </div>
+                          </div>
                         </label>
                       );
                     })}
+                  </div>
+                )}
+
+                {selectedSetIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 rounded-lg bg-muted/40 p-2.5">
+                    {questionSets
+                      .filter((s) => selectedSetIds.includes(s.id))
+                      .map((s) => (
+                        <Badge
+                          key={s.id}
+                          variant="secondary"
+                          className="max-w-full gap-1 pr-1 font-normal"
+                        >
+                          <span className="truncate">{s.title}</span>
+                          <button
+                            type="button"
+                            onClick={() => toggleQuestionSet(s.id)}
+                            className="rounded-full p-0.5 hover:bg-background/60"
+                            aria-label={`${s.title} বাদ দিন`}
+                          >
+                            <X className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
                   </div>
                 )}
               </div>
@@ -333,9 +470,24 @@ export function DocxGenerator({
           <Card className="mt-6">
             <CardHeader>
               <CardTitle className="text-base">৪. লেআউট ও ডিজাইন</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                আপনার পছন্দমতো টেমপ্লেট, ব্র্যান্ড নাম ও কলাম সাজিয়ে নিন
+              </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <DocxStylePanel value={styleConfig} onChange={setStyleConfig} />
+
+              <div className="flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground sm:text-sm">
+                <ShoppingBag className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p>
+                  তৈরি Docx ফাইলটি নিজের ব্র্যান্ডে{" "}
+                  <strong className="text-foreground">প্রিন্ট করে বিতরণ</strong>{" "}
+                  করতে পারবেন অথবা{" "}
+                  <strong className="text-foreground">বিক্রি</strong> করতে
+                  পারবেন — সম্পূর্ণ ফ্রি, কোনো লুকানো শর্ত নেই।
+                </p>
+                <Printer className="mt-0.5 size-4 shrink-0 text-primary" />
+              </div>
 
               {generateError && (
                 <Alert variant="destructive">
@@ -355,8 +507,10 @@ export function DocxGenerator({
               ) : (
                 <Button
                   onClick={handleGenerate}
-                  className="hidden w-full md:flex"
+                  size="lg"
+                  className="hidden w-full gap-2 md:flex"
                 >
+                  <PenLine className="size-4" />
                   Docx তৈরি করুন ({selectedSetIds.length} প্রশ্নসেট)
                 </Button>
               )}

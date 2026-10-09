@@ -1,7 +1,14 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ContentSkeleton } from "@/components/ui/loading-skeleton";
 import { docxService, type DocxExportResult } from "@/features/docs";
 import { apiClient } from "@/lib/api-client";
@@ -12,14 +19,20 @@ import {
 } from "@/lib/safe-toast";
 import {
   ArrowLeft,
+  CheckCircle2,
+  Columns,
   Download,
   FileText,
+  Layers,
+  ListChecks,
   Loader2,
+  MoreVertical,
+  PenLine,
   RefreshCw,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { DocxDonationBanner } from "./docx-donation-banner";
@@ -67,6 +80,13 @@ export function DocxPreview({
     loadExport();
   }, [loadExport]);
 
+  const filename = useMemo(() => {
+    if (!data) return "";
+    return data.document.setCount === 1
+      ? `${data.document.questionSetIds[0]}-questions.docx`
+      : `farhan-mcq-${data.document.setCount}-sets.docx`;
+  }, [data]);
+
   async function downloadDocx() {
     setDownloading(true);
     let ok = false;
@@ -84,10 +104,6 @@ export function DocxPreview({
         const isZip = sig[0] === 0x50 && sig[1] === 0x4b;
         if (!isZip) throw new Error("Invalid docx response");
       }
-      const filename =
-        data!.document.setCount === 1
-          ? `${data!.document.questionSetIds[0]}-questions.docx`
-          : `farhan-mcq-${data!.document.setCount}-sets.docx`;
       downloadBlob(blob, filename);
       ok = true;
     } catch {
@@ -141,10 +157,10 @@ export function DocxPreview({
 
   return (
     <div
-      className={`mx-auto px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}
+      className={`mx-auto px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-8 page-enter ${maxWidthClassName}`}
     >
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
+      <div className="mb-5 flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild className="shrink-0">
           <Link href={backRoute}>
             <ArrowLeft className="size-5" />
           </Link>
@@ -155,86 +171,131 @@ export function DocxPreview({
             {doc.setCount}টি প্রশ্নসেট · {doc.questionCount}টি প্রশ্ন
           </p>
         </div>
-        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-          <Button variant="outline" size="sm" onClick={loadExport}>
-            <RefreshCw className="mr-2 size-4" />
-            রিফ্রেশ
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={newStyleRoute}>
-              <RefreshCw className="mr-2 size-4" />
-              নতুন স্টাইলে তৈরি
-            </Link>
-          </Button>
-          {showDelete && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={deleteExport}
-              disabled={deleting || downloading}
-            >
-              {deleting ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <Trash2 className="mr-2 size-4" />
-              )}
-              মুছুন
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="shrink-0">
+              <MoreVertical className="size-4" />
+              <span className="sr-only">আরও অপশন</span>
             </Button>
-          )}
-          <Button onClick={downloadDocx} disabled={downloading}>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={loadExport}>
+              <RefreshCw className="mr-2 size-4" />
+              রিফ্রেশ
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={newStyleRoute}>
+                <PenLine className="mr-2 size-4" />
+                নতুন স্টাইলে তৈরি
+              </Link>
+            </DropdownMenuItem>
+            {showDelete && (
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={deleteExport}
+                disabled={deleting || downloading}
+              >
+                <Trash2 className="mr-2 size-4" />
+                মুছুন
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Primary CTA — made large and visually distinct so the download link is impossible to miss */}
+      <Card className="mb-6 border-primary/40 bg-primary/4 shadow-sm">
+        <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <FileText className="size-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{filename}</p>
+              <p className="text-xs text-muted-foreground">
+                Microsoft Word (.docx) · {doc.setCount}টি প্রশ্নসেট
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={downloadDocx}
+            disabled={downloading}
+            size="lg"
+            className="w-full gap-2 sm:w-auto"
+          >
             {downloading ? (
-              <Loader2 className="mr-2 size-4 animate-spin" />
+              <Loader2 className="size-5 animate-spin" />
             ) : (
-              <Download className="mr-2 size-4" />
+              <Download className="size-5" />
             )}
             ডাউনলোড (.docx)
           </Button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {showDonationBanner && <DocxDonationBanner />}
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <FileText className="size-5" />
+            <ListChecks className="size-5" />
             ফাইল বিবরণ
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <div>
-            <p className="font-medium text-muted-foreground">
-              প্রশ্নসেট সংখ্যা
-            </p>
-            <p>{doc.setCount}</p>
-          </div>
-          <div>
-            <p className="font-medium text-muted-foreground">মোট প্রশ্ন</p>
-            <p>{doc.questionCount}</p>
-          </div>
-          <div>
-            <p className="font-medium text-muted-foreground">টেমপ্লেট</p>
-            <p>
-              {styleConfig.templateStyle === "COLORFUL" ? "রঙিন" : "সাদা-কালো"}
-            </p>
-          </div>
-          <div>
-            <p className="font-medium text-muted-foreground">কলাম</p>
-            <p>{styleConfig.columnCount}</p>
-          </div>
-          <div>
-            <p className="font-medium text-muted-foreground">ব্যাখ্যা</p>
-            <p>{styleConfig.showExplanation ? "চালু" : "বন্ধ"}</p>
-          </div>
-          <div>
-            <p className="font-medium text-muted-foreground">তৈরির সময়</p>
-            <p>
-              {new Date(doc.createdAt).toLocaleString("bn-BD", {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </p>
-          </div>
+        <CardContent>
+          <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
+            <div className="flex items-start gap-2">
+              <Layers className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <dt className="text-xs text-muted-foreground">প্রশ্নসেট সংখ্যা</dt>
+                <dd className="font-medium">{doc.setCount}</dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <FileText className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <dt className="text-xs text-muted-foreground">মোট প্রশ্ন</dt>
+                <dd className="font-medium">{doc.questionCount}</dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <Columns className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <dt className="text-xs text-muted-foreground">কলাম</dt>
+                <dd className="font-medium">{styleConfig.columnCount}</dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 col-span-2 sm:col-span-1">
+              <div className="mt-0.5 shrink-0">
+                <Badge variant="secondary" className="font-normal">
+                  {styleConfig.templateStyle === "COLORFUL"
+                    ? "রঙিন টেমপ্লেট"
+                    : "সাদা-কালো টেমপ্লেট"}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <dt className="text-xs text-muted-foreground">ব্যাখ্যা</dt>
+                <dd className="font-medium">
+                  {styleConfig.showExplanation ? "চালু" : "বন্ধ"}
+                </dd>
+              </div>
+            </div>
+            <div className="col-span-2 flex items-start gap-2 sm:col-span-3">
+              <RefreshCw className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <div>
+                <dt className="text-xs text-muted-foreground">তৈরির সময়</dt>
+                <dd className="font-medium">
+                  {new Date(doc.createdAt).toLocaleString("bn-BD", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </dd>
+              </div>
+            </div>
+          </dl>
         </CardContent>
       </Card>
 
@@ -242,12 +303,13 @@ export function DocxPreview({
         <Button
           onClick={downloadDocx}
           disabled={downloading}
-          className="w-full"
+          size="lg"
+          className="w-full gap-2"
         >
           {downloading ? (
-            <Loader2 className="mr-2 size-4 animate-spin" />
+            <Loader2 className="size-5 animate-spin" />
           ) : (
-            <Download className="mr-2 size-4" />
+            <Download className="size-5" />
           )}
           ডাউনলোড (.docx)
         </Button>
