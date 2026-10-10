@@ -19,6 +19,9 @@ import {
   Star,
   User,
   Video,
+  Flame,
+  Coins,
+  Banknote,
 } from "lucide-react";
 
 export interface NavItem {
@@ -30,6 +33,7 @@ export interface NavItem {
 
 export const memberNav: NavItem[] = [
   { label: "হোম", href: ROUTES.dashboard, icon: Home },
+  { label: "আয় করুন", href: ROUTES.earn, icon: Flame },
   { label: "পরীক্ষা", href: ROUTES.exams, icon: BookOpen },
   { label: "নোটিফিকেশন", href: ROUTES.notifications, icon: Bell },
   { label: "ফেভারিট", href: ROUTES.favorites, icon: Star },
@@ -67,5 +71,7 @@ export const adminNav: NavItem[] = [
 
   { label: "প্যাকেজ", href: ROUTES.adminPackages, icon: Package },
   { label: "ট্রানজাকশন", href: ROUTES.adminTransactions, icon: CreditCard },
+  { label: "উইথড্রয়াল", href: ROUTES.adminWithdrawals, icon: Banknote },
   { label: "সেটিংস", href: ROUTES.adminSettings, icon: Settings },
+  { label: "রিওয়ার্ড কনফিগ", href: ROUTES.adminRewardConfig, icon: Coins },
 ];

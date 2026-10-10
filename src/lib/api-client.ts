@@ -4,7 +4,7 @@ const API_BASE_URL =
 /** Default request timeout in milliseconds */
 const REQUEST_TIMEOUT = 15_000;
 
-class ApiError extends Error {
+export class ApiError extends Error {
   public details?: { field: string; message: string }[];
 
   constructor(

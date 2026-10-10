@@ -36,6 +36,7 @@ export const ROUTES = {
   profile: "/profile",
   subscriptions: "/subscriptions",
   favorites: "/favorites",
+  earn: "/earn",
   routine: "/routines",
   syllabus: "/syllabus",
   syllabusDetail: (syllabusSlug: string) =>
@@ -74,6 +75,8 @@ export const ROUTES = {
   adminPackages: "/admin/packages",
   adminTransactions: "/admin/transactions",
   adminSettings: "/admin/settings",
+  adminRewardConfig: "/admin/reward-config",
+  adminWithdrawals: "/admin/withdrawals",
   adminBroadcastCenter: "/admin/broadcast-center",
   adminBroadcastIntegrations: "/admin/broadcast-center/integrations",
   adminBroadcastHistory: "/admin/broadcast-center/history",

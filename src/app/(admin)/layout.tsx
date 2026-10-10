@@ -3,6 +3,7 @@
 import { AppLayout } from "@/components/layout/app-layout";
 import { PageLoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { AuthProvider, useAuth } from "@/features/auth";
+import { Toaster } from "sonner";
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -32,6 +33,7 @@ export default function AdminLayout({
 }) {
   return (
     <AuthProvider>
+      <Toaster richColors position="top-center" closeButton />
       <AdminLayoutInner>{children}</AdminLayoutInner>
     </AuthProvider>
   );

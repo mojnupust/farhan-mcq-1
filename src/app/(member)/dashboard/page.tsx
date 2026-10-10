@@ -4,12 +4,13 @@ import { AnimateIn } from "@/components/ui/animate-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/features/auth";
 import type { ExamCategory } from "@/features/exam-categories";
 import { examCategoryService } from "@/features/exam-categories";
 import { CategoryGrid } from "@/features/exam-categories/components/category-grid";
 import { useSubscription } from "@/features/subscriptions";
-import { Send, Sparkles } from "lucide-react";
+import { Flame, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -119,6 +120,23 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : null}
+
+      <Card className="mt-4 border-orange-200 bg-orange-50/50 dark:border-orange-900 dark:bg-orange-950/20">
+        <CardContent className="flex items-center justify-between gap-3 py-3">
+          <div className="flex items-center gap-2.5">
+            <Flame className="size-5 text-orange-500" />
+            <div>
+              <p className="text-sm font-medium">দৈনিক স্ট্রিক</p>
+              <p className="text-xs text-muted-foreground">
+                চেক-ইন করে পয়সা জমান
+              </p>
+            </div>
+          </div>
+          <Button size="sm" asChild>
+            <Link href={ROUTES.earn}>আয় করুন</Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Daily Motivation */}
       <AnimateIn variant="fade-up" delay={100} duration={500}>

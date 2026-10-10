@@ -15,6 +15,7 @@ const MEMBER_ROUTES = [
   "/profile",
   "/notifications",
   "/videos",
+  "/earn",
 ];
 
 function MemberLayoutInner({ children }: { children: React.ReactNode }) {
