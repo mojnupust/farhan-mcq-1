@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProfileSkeleton } from "@/components/ui/loading-skeleton";
+import { useAuth } from "@/features/auth";
 import { subscriptionService, useSubscription } from "@/features/subscriptions";
 import type { UserProfileDto } from "@/features/subscriptions/types";
 import { Send, User } from "lucide-react";
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
+  const { updateUser } = useAuth();
   const { activePackage, isLoading: subLoading } = useSubscription();
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function ProfilePage() {
     try {
       const updated = await subscriptionService.updateProfile({ name });
       setProfile(updated);
+      updateUser({ name: updated.name, photo: updated.photo });
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "আপডেট ব্যর্থ");
@@ -78,8 +81,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
-  console.log("Rendering profile page", { profile, activePackage });
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8">

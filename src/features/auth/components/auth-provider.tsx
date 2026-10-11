@@ -20,6 +20,7 @@ interface AuthContextType {
   register: (
     data: import("../types").RegisterInput,
   ) => Promise<import("../types").AuthResponse>;
+  updateUser: (patch: Partial<AuthUser>) => void;
   logout: () => void;
 }
 
@@ -54,6 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (patch: Partial<AuthUser>) => {
+    setUser((current) => (current ? { ...current, ...patch } : current));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -62,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: user?.role === "ADMIN",
         login,
         register,
+        updateUser,
         logout,
       }}
     >
