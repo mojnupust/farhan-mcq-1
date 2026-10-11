@@ -17,6 +17,9 @@ interface AuthContextType {
   login: (
     data: import("../types").LoginInput,
   ) => Promise<import("../types").AuthResponse>;
+  register: (
+    data: import("../types").RegisterInput,
+  ) => Promise<import("../types").AuthResponse>;
   logout: () => void;
 }
 
@@ -40,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return response;
   };
 
+  const register = async (data: import("../types").RegisterInput) => {
+    const response = await authService.register(data);
+    setUser(response.user);
+    return response;
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -52,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAdmin: user?.role === "ADMIN",
         login,
+        register,
         logout,
       }}
     >

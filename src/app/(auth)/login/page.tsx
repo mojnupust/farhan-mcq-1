@@ -11,11 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  PasswordResetDialog,
-  RegistrationClosedDialog,
-  useAuth,
-} from "@/features/auth";
+import { PasswordResetDialog, useAuth } from "@/features/auth";
 import { normalizeBdMobile } from "@/features/auth/lib/mobile";
 import { loginSchema } from "@/features/auth/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +30,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
-  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [resetMobile, setResetMobile] = useState("");
 
   const {
@@ -196,13 +191,9 @@ export default function LoginPage() {
 
           <div className="mt-6 flex items-center justify-center gap-1.5 text-sm">
             <span className="text-muted-foreground">অ্যাকাউন্ট নেই?</span>
-            <button
-              type="button"
-              onClick={() => setShowRegisterDialog(true)}
-              className="font-medium text-primary hover:underline"
-            >
+            <Link href="/register" className="font-medium text-primary hover:underline">
               নতুন একাউন্ট খুলুন
-            </button>
+            </Link>
           </div>
         </Card>
         <div className="w-full flex justify-center px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
@@ -215,11 +206,6 @@ export default function LoginPage() {
           </Link>
         </div>
       </div>
-
-      <RegistrationClosedDialog
-        open={showRegisterDialog}
-        onOpenChange={setShowRegisterDialog}
-      />
 
       <PasswordResetDialog
         open={showResetModal}
