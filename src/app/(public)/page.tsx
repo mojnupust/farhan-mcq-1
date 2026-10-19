@@ -55,27 +55,13 @@ const stats = [
 ];
 
 const categories = [
-  { id: 1, name: "জব সলিউশন", slug: "job-solution", icon: "💼", count: "১৫০+" },
+  { id: 1, name: "সেন্ট্রাল জব সল্যুশন", slug: " central-job-solution", icon: "📖", count: "৫০০০+" },
   {
     id: 2,
-    name: "শিক্ষক নিয়োগ ও নিবন্ধন",
-    slug: "teacher-recruitment",
-    icon: "📚",
-    count: "২০০+",
-  },
-  {
-    id: 3,
-    name: "বিসিএস প্রস্তুতি",
-    slug: "bcs-preparation",
-    icon: "🎯",
-    count: "১০০+",
-  },
-  {
-    id: 4,
-    name: "ব্যাংক নিয়োগ ও প্রস্তুতি",
-    slug: "bank-recruitment",
-    icon: "🏦",
-    count: "৮০+",
+    name: "সমাজসেবা অধিদপ্তর নিয়োগ প্রস্ততি",
+    slug: "somaj-seba-niyog-prostuti",
+    icon: "👩🏻‍💼",
+    count: "১৫০০+",
   },
 ];
 
