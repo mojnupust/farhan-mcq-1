@@ -92,7 +92,13 @@ export default function Pricing() {
                               aria-hidden="true"
                             />
                             <span className="inline-flex items-center gap-1">
-                              লাইভ পরীক্ষা: {pkg.liveQuota ?? <InfinityIcon className="size-4" aria-label="সীমাহীন" />}
+                              লাইভ পরীক্ষা:{" "}
+                              {pkg.liveQuota ?? (
+                                <InfinityIcon
+                                  className="size-4"
+                                  aria-label="সীমাহীন"
+                                />
+                              )}
                             </span>
                           </li>
                           <li className="flex items-start gap-2">
@@ -101,7 +107,13 @@ export default function Pricing() {
                               aria-hidden="true"
                             />
                             <span className="inline-flex items-center gap-1">
-                              আর্কাইভ পরীক্ষা: {pkg.archiveQuota ?? <InfinityIcon className="size-4" aria-label="সীমাহীন" />}
+                              আর্কাইভ পরীক্ষা:{" "}
+                              {pkg.archiveQuota ?? (
+                                <InfinityIcon
+                                  className="size-4"
+                                  aria-label="সীমাহীন"
+                                />
+                              )}
                             </span>
                           </li>
                         </>
@@ -123,8 +135,8 @@ export default function Pricing() {
         </div>
 
         <p className="mx-auto mt-8 max-w-xl text-center text-sm text-muted-foreground">
-          bKash বা Nagad-এ পেমেন্ট করা যায়। Mobile দিয়ে সাইন ইন করে শুরু করুন,
-          তারপর অ্যাডমিনের সাথে যোগাযোগ করলেই অ্যাক্সেস চালু হবে।
+          bKash বা Nagad-এ পেমেন্ট করা যায়। Phone Number দিয়ে সাইন ইন করে শুরু
+          করুন, তারপর অ্যাডমিনের সাথে যোগাযোগ করলেই অ্যাক্সেস চালু হবে।
         </p>
       </div>
     </section>

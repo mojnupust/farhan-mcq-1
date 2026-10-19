@@ -9,12 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AnimateIn } from "@/components/ui/animate-in";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpen,
   Clock,
@@ -152,7 +147,7 @@ const faqs = [
   {
     question: "কীভাবে পেমেন্ট করতে হবে?",
     answer:
-      "bKash বা Nagad এর মাধ্যমে পেমেন্ট করা যায়। Google দিয়ে সাইন ইন করার পর অ্যাডমিনের সাথে যোগাযোগ করলেই হবে — সম্পূর্ণ সহজ প্রক্রিয়া।",
+      "bKash বা Nagad এর মাধ্যমে পেমেন্ট করা যায়। Phone Number দিয়ে সাইন ইন করার পর অ্যাডমিনের সাথে যোগাযোগ করলেই হবে — সম্পূর্ণ সহজ প্রক্রিয়া।",
   },
   {
     question: "লাইভ সেশন মিস হলে কী হবে?",
@@ -174,18 +169,20 @@ const faqs = [
 const steps = [
   {
     icon: UserPlus,
-    title: "Google দিয়ে সাইন ইন করুন",
-    description: "পাসওয়ার্ড মনে রাখার ঝামেলা নেই। এক ক্লিকেই আপনার অ্যাকাউন্ট তৈরি হবে।",
+    title: "Phone Number দিয়ে সাইন ইন করুন",
+    description: "02 ধাপে আপনার অ্যাকাউন্ট তৈরি হবে।",
   },
   {
     icon: ListChecks,
     title: "আপনার পরীক্ষা বেছে নিন",
-    description: "BCS, ব্যাংক, শিক্ষক নিয়োগ বা জব সলিউশন — যেটির প্রস্তুতি নিচ্ছেন সেটি নির্বাচন করুন।",
+    description:
+      "BCS, ব্যাংক, শিক্ষক নিয়োগ বা জব সলিউশন — যেটির প্রস্তুতি নিচ্ছেন সেটি নির্বাচন করুন।",
   },
   {
     icon: Trophy,
     title: "পরীক্ষা দিন, ফলাফল দেখুন",
-    description: "লাইভ পরীক্ষা ও মডেল টেস্টে অংশ নিন এবং সাথে সাথে ব্যাখ্যাসহ উত্তর জানুন।",
+    description:
+      "লাইভ পরীক্ষা ও মডেল টেস্টে অংশ নিন এবং সাথে সাথে ব্যাখ্যাসহ উত্তর জানুন।",
   },
 ];
 
@@ -223,7 +220,10 @@ export default function LandingPage() {
           aria-labelledby="hero-heading"
           className="relative overflow-hidden border-b bg-linear-to-br from-primary/10 via-background to-background"
         >
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            aria-hidden="true"
+          >
             <div className="absolute -top-40 -right-40 size-96 rounded-full bg-primary/10 blur-3xl animate-float" />
             <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float-delayed" />
           </div>
@@ -233,7 +233,10 @@ export default function LandingPage() {
               <div className="max-w-2xl">
                 <AnimateIn variant="fade-up" delay={50} duration={500}>
                   <p className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1.5 text-sm font-medium text-foreground/80 shadow-sm">
-                    <span className="relative size-2 rounded-full bg-green-500" aria-hidden="true">
+                    <span
+                      className="relative size-2 rounded-full bg-green-500"
+                      aria-hidden="true"
+                    >
                       <span className="absolute inset-0 animate-ping rounded-full bg-green-500 opacity-75" />
                     </span>
                     ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
@@ -260,7 +263,7 @@ export default function LandingPage() {
                 <AnimateIn variant="fade-up" delay={300} duration={600}>
                   <HeroCTA />
                   <p className="mt-4 text-sm text-muted-foreground">
-                    Google দিয়ে সাইন ইন করে এখনই শুরু করুন ·{" "}
+                    Phone Number দিয়ে সাইন ইন করে এখনই শুরু করুন ·{" "}
                     <a
                       href="#pricing"
                       className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
@@ -317,12 +320,17 @@ export default function LandingPage() {
                             {["ক", "খ", "গ"][i]}
                           </span>
                           {o.t}
-                          {o.ok ? <span className="sr-only"> (সঠিক উত্তর)</span> : null}
+                          {o.ok ? (
+                            <span className="sr-only"> (সঠিক উত্তর)</span>
+                          ) : null}
                         </li>
                       ))}
                     </ol>
                     <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Zap className="size-3.5 text-primary" aria-hidden="true" />
+                      <Zap
+                        className="size-3.5 text-primary"
+                        aria-hidden="true"
+                      />
                       উত্তর দিলেই সাথে সাথে ব্যাখ্যা পাবেন
                     </p>
                   </figure>
@@ -333,12 +341,17 @@ export default function LandingPage() {
         </section>
 
         {/* ── Stats ── */}
-        <section aria-label="Farhan MCQ এক নজরে" className="border-b bg-primary text-primary-foreground">
+        <section
+          aria-label="Farhan MCQ এক নজরে"
+          className="border-b bg-primary text-primary-foreground"
+        >
           <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
             <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <dd className="order-first text-2xl font-bold sm:text-3xl">{stat.value}</dd>
+                  <dd className="order-first text-2xl font-bold sm:text-3xl">
+                    {stat.value}
+                  </dd>
                   <dt className="mt-1 text-sm opacity-80">{stat.label}</dt>
                 </div>
               ))}
@@ -351,7 +364,10 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
               <div className="mx-auto max-w-xl text-center">
-                <h2 id="steps-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h2
+                  id="steps-heading"
+                  className="text-2xl font-semibold tracking-tight sm:text-3xl"
+                >
                   শুরু করতে লাগে মাত্র তিনটি ধাপ
                 </h2>
                 <p className="mt-2 text-muted-foreground">
@@ -362,12 +378,21 @@ export default function LandingPage() {
 
             <ol className="mt-10 grid gap-6 md:grid-cols-3">
               {steps.map((step, index) => (
-                <li key={step.title} className="relative rounded-2xl border bg-card p-6">
+                <li
+                  key={step.title}
+                  className="relative rounded-2xl border bg-card p-6"
+                >
                   <div className="flex items-center gap-3">
-                    <span className="flex size-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground" aria-hidden="true">
+                    <span
+                      className="flex size-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+                      aria-hidden="true"
+                    >
                       {["১", "২", "৩"][index]}
                     </span>
-                    <step.icon className="size-5 text-primary" aria-hidden="true" />
+                    <step.icon
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
                   </div>
                   <h3 className="mt-4 text-base font-semibold">{step.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
@@ -380,19 +405,28 @@ export default function LandingPage() {
         </section>
 
         {/* ── MCQ Library ── */}
-        <section aria-labelledby="library-heading" className="border-b bg-muted/40">
+        <section
+          aria-labelledby="library-heading"
+          className="border-b bg-muted/40"
+        >
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <h2 id="library-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  <h2
+                    id="library-heading"
+                    className="text-2xl font-semibold tracking-tight sm:text-3xl"
+                  >
                     আপনার পরীক্ষার MCQ লাইব্রেরি
                   </h2>
                   <p className="mt-1 text-muted-foreground">
                     ক্যাটাগরি বেছে নিন, সাইন ইন করুন এবং প্র্যাকটিস শুরু করুন।
                   </p>
                 </div>
-                <BookOpen className="hidden size-8 text-muted-foreground sm:block" aria-hidden="true" />
+                <BookOpen
+                  className="hidden size-8 text-muted-foreground sm:block"
+                  aria-hidden="true"
+                />
               </div>
             </AnimateIn>
 
@@ -405,10 +439,15 @@ export default function LandingPage() {
                   >
                     <Card className="h-full transition-colors group-hover:border-primary/50">
                       <CardHeader className="pb-3">
-                        <span className="inline-block text-3xl transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
+                        <span
+                          className="inline-block text-3xl transition-transform duration-300 group-hover:scale-110"
+                          aria-hidden="true"
+                        >
                           {category.icon}
                         </span>
-                        <CardTitle className="mt-2 text-base">{category.name}</CardTitle>
+                        <CardTitle className="mt-2 text-base">
+                          {category.name}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -435,7 +474,10 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
               <div className="mx-auto max-w-xl text-center">
-                <h2 id="benefits-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h2
+                  id="benefits-heading"
+                  className="text-2xl font-semibold tracking-tight sm:text-3xl"
+                >
                   সদস্য হলে যা যা পাবেন
                 </h2>
                 <p className="mt-2 text-muted-foreground">
@@ -448,7 +490,10 @@ export default function LandingPage() {
               {benefits.map((benefit) => (
                 <li key={benefit.title} className="flex gap-4">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                    <benefit.icon className="size-5 text-primary" aria-hidden="true" />
+                    <benefit.icon
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
                   </span>
                   <div>
                     <h3 className="font-semibold">{benefit.title}</h3>
@@ -463,10 +508,16 @@ export default function LandingPage() {
         </section>
 
         {/* ── Testimonials ── */}
-        <section aria-labelledby="testimonials-heading" className="border-b bg-muted/40">
+        <section
+          aria-labelledby="testimonials-heading"
+          className="border-b bg-muted/40"
+        >
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <h2 id="testimonials-heading" className="text-center text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h2
+                id="testimonials-heading"
+                className="text-center text-2xl font-semibold tracking-tight sm:text-3xl"
+              >
                 শিক্ষার্থীরা কী বলছেন
               </h2>
             </AnimateIn>
@@ -475,9 +526,17 @@ export default function LandingPage() {
               {testimonials.map((t) => (
                 <li key={t.name}>
                   <figure className="flex h-full flex-col rounded-2xl border bg-card p-6">
-                    <div className="flex gap-0.5" role="img" aria-label={`${t.stars} স্টার রেটিং`}>
+                    <div
+                      className="flex gap-0.5"
+                      role="img"
+                      aria-label={`${t.stars} স্টার রেটিং`}
+                    >
                       {Array.from({ length: t.stars }).map((_, i) => (
-                        <Star key={i} className="size-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+                        <Star
+                          key={i}
+                          className="size-4 fill-yellow-400 text-yellow-400"
+                          aria-hidden="true"
+                        />
                       ))}
                     </div>
                     <blockquote className="mt-3 flex-1 leading-relaxed text-foreground/90">
@@ -501,7 +560,10 @@ export default function LandingPage() {
         <section aria-labelledby="about-heading" className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <h2 id="about-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h2
+                id="about-heading"
+                className="text-2xl font-semibold tracking-tight sm:text-3xl"
+              >
                 আমাদের সম্পর্কে
               </h2>
               <div className="mt-6 max-w-2xl">
@@ -539,7 +601,10 @@ export default function LandingPage() {
         {/* ── FAQ ── */}
         <section aria-labelledby="faq-heading" className="bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <h2 id="faq-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2
+              id="faq-heading"
+              className="text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
               সাধারণ প্রশ্নের উত্তর
             </h2>
             <p className="mt-2 text-muted-foreground">
@@ -561,14 +626,23 @@ export default function LandingPage() {
         </section>
 
         {/* ── Final CTA ── */}
-        <section aria-labelledby="cta-heading" className="relative overflow-hidden border-y bg-primary text-primary-foreground">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <section
+          aria-labelledby="cta-heading"
+          className="relative overflow-hidden border-y bg-primary text-primary-foreground"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            aria-hidden="true"
+          >
             <div className="absolute -top-20 -right-20 size-60 rounded-full bg-white/5 blur-2xl animate-float" />
             <div className="absolute -bottom-20 -left-20 size-60 rounded-full bg-white/5 blur-2xl animate-float-delayed" />
           </div>
           <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
             <AnimateIn variant="scale-up" duration={600}>
-              <Clock className="mx-auto mb-4 size-10 opacity-80" aria-hidden="true" />
+              <Clock
+                className="mx-auto mb-4 size-10 opacity-80"
+                aria-hidden="true"
+              />
               <h2 id="cta-heading" className="text-2xl font-bold sm:text-3xl">
                 আজই অ্যাকাউন্ট খুলুন, আজই প্রথম পরীক্ষা দিন
               </h2>
