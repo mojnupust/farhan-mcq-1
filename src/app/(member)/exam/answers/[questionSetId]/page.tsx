@@ -13,6 +13,8 @@ import {
   ContentSkeleton,
   ListSkeleton,
 } from "@/components/ui/loading-skeleton";
+import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/features/auth";
 import type { QuestionStats, ReviewQuestion } from "@/features/question-sets";
 import { questionSetService } from "@/features/question-sets";
 import {
@@ -23,7 +25,9 @@ import {
   Eye,
   EyeOff,
   Heart,
+  LogIn,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import "./hide-scrollbar.css";
@@ -38,6 +42,7 @@ export default function AnswersPage({
 }) {
   const { questionSetId } = use(params);
   const router = useRouter();
+  const { user } = useAuth();
 
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,15 +164,77 @@ export default function AnswersPage({
   }
 
   if (!filteredQuestions.length) {
+    const loginHref = `${ROUTES.login}?next=${encodeURIComponent(`/exam/answers/${questionSetId}`)}`;
+    const registerHref = `${ROUTES.register}?next=${encodeURIComponent(`/exam/answers/${questionSetId}`)}`;
+    const needsLogin = !user && questions.length === 0;
+    const emptyFilter = questions.length > 0 && Boolean(subjectFilter);
+
     return (
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 sm:px-6">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
           <ArrowLeft className="size-4 mr-1" />
           ফিরে যান
         </Button>
-        <p className="text-center text-muted-foreground py-12">
-          কোনো প্রশ্ন পাওয়া যায়নি
-        </p>
+
+        <Card className="mx-auto mt-8 max-w-md border-primary/20 bg-gradient-to-b from-primary/5 to-background">
+          <CardContent className="flex flex-col items-center px-6 py-10 text-center">
+            <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              {needsLogin ? (
+                <LogIn className="size-7" />
+              ) : (
+                <BookOpen className="size-7" />
+              )}
+            </div>
+
+            {needsLogin ? (
+              <>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  উত্তর দেখতে লগইন করুন
+                </h1>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  সঠিক উত্তর, ব্যাখ্যা ও ফেভারিট সেভ করতে ফ্রি অ্যাকাউন্ট দিন —
+                  একবার লগইন করলেই পুরো সেট খুলে যাবে।
+                </p>
+                <div className="mt-6 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+                  <Button asChild className="w-full sm:w-auto">
+                    <Link href={loginHref}>লগইন করুন</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full sm:w-auto">
+                    <Link href={registerHref}>নতুন একাউন্ট খুলুন</Link>
+                  </Button>
+                </div>
+              </>
+            ) : emptyFilter ? (
+              <>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  এই বিষয়ে প্রশ্ন নেই
+                </h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  অন্য বিষয় বেছে নিন, অথবা সব প্রশ্ন দেখুন।
+                </p>
+                <Button
+                  className="mt-6"
+                  variant="outline"
+                  onClick={() => setSubjectFilter(null)}
+                >
+                  সব প্রশ্ন দেখুন
+                </Button>
+              </>
+            ) : (
+              <>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  এই সেটে প্রশ্ন নেই
+                </h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  অন্য প্রশ্নসেট বেছে নিয়ে অনুশীলন চালিয়ে যান।
+                </p>
+                <Button className="mt-6" asChild>
+                  <Link href={ROUTES.exams}>প্রশ্নসেটে যান</Link>
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }
