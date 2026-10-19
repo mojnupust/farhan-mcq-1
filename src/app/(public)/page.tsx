@@ -55,7 +55,7 @@ const stats = [
 ];
 
 const categories = [
-  { id: 1, name: "সেন্ট্রাল জব সল্যুশন", slug: " central-job-solution", icon: "📖", count: "৫০০০+" },
+  { id: 1, name: "সেন্ট্রাল জব সল্যুশন", slug: "central-job-solution", icon: "📖", count: "৫০০০+" },
   {
     id: 2,
     name: "সমাজসেবা অধিদপ্তর নিয়োগ প্রস্ততি",
