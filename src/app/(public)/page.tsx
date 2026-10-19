@@ -12,19 +12,21 @@ import { AnimateIn } from "@/components/ui/animate-in";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
   BookOpen,
   Clock,
+  ListChecks,
   Lock,
   MessageCircle,
   PlayCircle,
   Radio,
   Star,
   TrendingUp,
+  Trophy,
+  UserPlus,
   Users,
   Video,
   Zap,
@@ -169,6 +171,24 @@ const faqs = [
   },
 ];
 
+const steps = [
+  {
+    icon: UserPlus,
+    title: "Google দিয়ে সাইন ইন করুন",
+    description: "পাসওয়ার্ড মনে রাখার ঝামেলা নেই। এক ক্লিকেই আপনার অ্যাকাউন্ট তৈরি হবে।",
+  },
+  {
+    icon: ListChecks,
+    title: "আপনার পরীক্ষা বেছে নিন",
+    description: "BCS, ব্যাংক, শিক্ষক নিয়োগ বা জব সলিউশন — যেটির প্রস্তুতি নিচ্ছেন সেটি নির্বাচন করুন।",
+  },
+  {
+    icon: Trophy,
+    title: "পরীক্ষা দিন, ফলাফল দেখুন",
+    description: "লাইভ পরীক্ষা ও মডেল টেস্টে অংশ নিন এবং সাথে সাথে ব্যাখ্যাসহ উত্তর জানুন।",
+  },
+];
+
 export default function LandingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -197,52 +217,63 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main>
+      <main id="main-content">
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden border-b bg-linear-to-br from-primary/5 via-background to-background">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-40 -right-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float" />
-            <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/3 blur-3xl animate-float-delayed" />
+        <section
+          aria-labelledby="hero-heading"
+          className="relative overflow-hidden border-b bg-linear-to-br from-primary/10 via-background to-background"
+        >
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div className="absolute -top-40 -right-40 size-96 rounded-full bg-primary/10 blur-3xl animate-float" />
+            <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-primary/5 blur-3xl animate-float-delayed" />
           </div>
-          <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 relative">
+
+          <div className="relative mx-auto max-w-5xl px-4 pt-12 pb-16 sm:px-6 sm:pt-16 sm:pb-20">
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              {/* ── Text content ── */}
               <div className="max-w-2xl">
-                {/* Badge */}
                 <AnimateIn variant="fade-up" delay={50} duration={500}>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-                    <span className="relative size-2 rounded-full bg-green-500">
-                      <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
+                  <p className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1.5 text-sm font-medium text-foreground/80 shadow-sm">
+                    <span className="relative size-2 rounded-full bg-green-500" aria-hidden="true">
+                      <span className="absolute inset-0 animate-ping rounded-full bg-green-500 opacity-75" />
                     </span>
                     ৪৫+ শিক্ষার্থী এখন প্রস্তুতি নিচ্ছেন
-                  </div>
+                  </p>
                 </AnimateIn>
 
                 <AnimateIn variant="fade-up" delay={100} duration={600}>
-                  <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                    সরকারি চাকরিতে
-                    <span className="text-primary"> সফল হওয়ার</span>
-                    <br />
-                    উপায়: সঠিক প্রস্তুতি 
+                  <h1
+                    id="hero-heading"
+                    className="text-balance text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-[3.25rem]"
+                  >
+                    পরীক্ষার হলের মতো করেই প্রস্তুতি নিন
                   </h1>
                 </AnimateIn>
+
                 <AnimateIn variant="fade-up" delay={200} duration={600}>
-                  <p className="mt-5 text-lg text-muted-foreground sm:text-xl leading-relaxed">
+                  <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
                     BCS, ব্যাংক, প্রাইমারি শিক্ষক নিয়োগ ও NTRCA — সব পরীক্ষার
-                    জন্য পূর্ণাঙ্গ MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং
-                    অভিজ্ঞ মেন্টরের গাইডলাইন — একটিমাত্র প্ল্যাটফর্মে।
+                    জন্য MCQ প্র্যাকটিস, লাইভ পরীক্ষা, মডেল টেস্ট এবং অভিজ্ঞ
+                    মেন্টরের গাইডলাইন, একটিমাত্র প্ল্যাটফর্মে।
                   </p>
                 </AnimateIn>
 
                 <AnimateIn variant="fade-up" delay={300} duration={600}>
                   <HeroCTA />
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Google দিয়ে সাইন ইন করে এখনই শুরু করুন ·{" "}
+                    <a
+                      href="#pricing"
+                      className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+                    >
+                      প্যাকেজ দেখুন
+                    </a>
+                  </p>
                 </AnimateIn>
               </div>
 
-              {/* ── Hero image ── */}
+              {/* Image + sample question */}
               <AnimateIn variant="fade-up" delay={350} duration={700}>
-                <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-                  <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/5 blur-2xl" />
+                <div className="relative mx-auto w-full max-w-md pb-2 lg:max-w-none sm:pb-10">
                   <div className="relative overflow-hidden rounded-2xl border bg-background shadow-xl">
                     <Image
                       src="/images/hero-illustration.png"
@@ -253,6 +284,48 @@ export default function LandingPage() {
                       className="h-auto w-full object-cover"
                     />
                   </div>
+
+                  <figure className="relative -mt-12 mx-3 rounded-xl border bg-card p-4 shadow-lg sm:absolute sm:-bottom-2 sm:-left-6 sm:mx-0 sm:mt-0 sm:w-80">
+                    <figcaption className="text-xs font-medium text-muted-foreground">
+                      নমুনা প্রশ্ন
+                    </figcaption>
+                    <p className="mt-1 text-sm font-semibold leading-snug">
+                      জাতীয় সংসদ ভবনের স্থপতি কে?
+                    </p>
+                    <ol className="mt-3 space-y-1.5 text-sm" type="A">
+                      {[
+                        { t: "মাজহারুল ইসলাম", ok: false },
+                        { t: "লুই আই. কান", ok: true },
+                        { t: "রবার্ট বয়েড", ok: false },
+                      ].map((o, i) => (
+                        <li
+                          key={o.t}
+                          className={
+                            o.ok
+                              ? "flex items-center gap-2 rounded-md border border-green-600/40 bg-green-500/10 px-2.5 py-1.5 font-medium"
+                              : "flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-muted-foreground"
+                          }
+                        >
+                          <span
+                            className={
+                              o.ok
+                                ? "flex size-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[11px] text-white"
+                                : "flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px]"
+                            }
+                            aria-hidden="true"
+                          >
+                            {["ক", "খ", "গ"][i]}
+                          </span>
+                          {o.t}
+                          {o.ok ? <span className="sr-only"> (সঠিক উত্তর)</span> : null}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Zap className="size-3.5 text-primary" aria-hidden="true" />
+                      উত্তর দিলেই সাথে সাথে ব্যাখ্যা পাবেন
+                    </p>
+                  </figure>
                 </div>
               </AnimateIn>
             </div>
@@ -260,158 +333,164 @@ export default function LandingPage() {
         </section>
 
         {/* ── Stats ── */}
-        <section className="border-b bg-primary text-primary-foreground">
+        <section aria-label="Farhan MCQ এক নজরে" className="border-b bg-primary text-primary-foreground">
           <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {stats.map((stat, index) => (
-                <AnimateIn
-                  key={stat.label}
-                  variant="fade-up"
-                  delay={index * 100}
-                  duration={500}
-                >
-                  <div className="text-center">
-                    <p className="text-2xl font-bold sm:text-3xl">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-sm opacity-80">{stat.label}</p>
-                  </div>
-                </AnimateIn>
+            <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <dd className="order-first text-2xl font-bold sm:text-3xl">{stat.value}</dd>
+                  <dt className="mt-1 text-sm opacity-80">{stat.label}</dt>
+                </div>
               ))}
-            </div>
+            </dl>
           </div>
         </section>
 
-        {/* ── Benefits ── */}
-        <section className="border-b">
+        {/* ── How it works ── */}
+        <section aria-labelledby="steps-heading" className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <div className="text-center">
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  আমাদের সদস্যরা যা পাবেন
+              <div className="mx-auto max-w-xl text-center">
+                <h2 id="steps-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  শুরু করতে লাগে মাত্র তিনটি ধাপ
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  সরকারি চাকরিতে সফলতার <strong>complete solution</strong> —
-                  সবকিছু এক জায়গায়
+                  অ্যাকাউন্ট খুলে আজই আপনার প্রথম পরীক্ষা দিন।
                 </p>
               </div>
             </AnimateIn>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {benefits.map((benefit, index) => (
-                <AnimateIn
-                  key={benefit.title}
-                  variant="fade-up"
-                  delay={index * 80}
-                  duration={500}
-                >
-                  <Card className="border bg-card card-hover-lift glow-on-hover h-full">
-                    <CardHeader>
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 transition-transform duration-300 hover:scale-110">
-                        <benefit.icon className="size-5 text-primary" />
-                      </div>
-                      <CardTitle className="text-base mt-2">
-                        {benefit.title}
-                      </CardTitle>
-                      <CardDescription>{benefit.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </AnimateIn>
+
+            <ol className="mt-10 grid gap-6 md:grid-cols-3">
+              {steps.map((step, index) => (
+                <li key={step.title} className="relative rounded-2xl border bg-card p-6">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground" aria-hidden="true">
+                      {["১", "২", "৩"][index]}
+                    </span>
+                    <step.icon className="size-5 text-primary" aria-hidden="true" />
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold">{step.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
         {/* ── MCQ Library ── */}
-        <section className="border-b bg-muted/40">
+        <section aria-labelledby="library-heading" className="border-b bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <div className="flex items-center justify-between">
+              <div className="flex items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                    MCQ লাইব্রেরি
+                  <h2 id="library-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                    আপনার পরীক্ষার MCQ লাইব্রেরি
                   </h2>
                   <p className="mt-1 text-muted-foreground">
-                    সাইন ইন করুন এবং প্র্যাকটিস শুরু করুন।
+                    ক্যাটাগরি বেছে নিন, সাইন ইন করুন এবং প্র্যাকটিস শুরু করুন।
                   </p>
                 </div>
-                <BookOpen className="size-8 text-muted-foreground hidden sm:block animate-float" />
+                <BookOpen className="hidden size-8 text-muted-foreground sm:block" aria-hidden="true" />
               </div>
             </AnimateIn>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {categories.map((category, index) => (
-                <AnimateIn
-                  key={category.id}
-                  variant="fade-up"
-                  delay={index * 100}
-                  duration={500}
-                >
-                  <Link href={`/exams/${category.slug}`} className="group">
-                    <Card className="h-full card-hover-lift glow-on-hover group-hover:border-primary/40">
+
+            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/exams/${category.slug}`}
+                    className="group block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <Card className="h-full transition-colors group-hover:border-primary/50">
                       <CardHeader className="pb-3">
-                        <span className="text-2xl transition-transform duration-300 inline-block group-hover:scale-110">
+                        <span className="inline-block text-3xl transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
                           {category.icon}
                         </span>
-                        <CardTitle className="text-sm mt-2">
-                          {category.name}
-                        </CardTitle>
+                        <CardTitle className="mt-2 text-base">{category.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <PlayCircle className="size-3" />
-                            <span>{category.count} MCQ</span>
-                          </div>
-                          <Lock className="size-3" />
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <PlayCircle className="size-4" aria-hidden="true" />
+                            {category.count} MCQ
+                          </span>
+                          <span className="flex items-center gap-1 text-xs">
+                            <Lock className="size-3.5" aria-hidden="true" />
+                            সাইন ইন প্রয়োজন
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
                   </Link>
-                </AnimateIn>
+                </li>
               ))}
-            </div>
+            </ul>
+          </div>
+        </section>
+
+        {/* ── Benefits ── */}
+        <section aria-labelledby="benefits-heading" className="border-b">
+          <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+            <AnimateIn variant="fade-up" duration={500}>
+              <div className="mx-auto max-w-xl text-center">
+                <h2 id="benefits-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  সদস্য হলে যা যা পাবেন
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  সরকারি চাকরির প্রস্তুতির সবকিছু এক জায়গায়।
+                </p>
+              </div>
+            </AnimateIn>
+
+            <ul className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+              {benefits.map((benefit) => (
+                <li key={benefit.title} className="flex gap-4">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                    <benefit.icon className="size-5 text-primary" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold">{benefit.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
         {/* ── Testimonials ── */}
-        <section className="border-b">
+        <section aria-labelledby="testimonials-heading" className="border-b bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <div className="text-center">
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  শিক্ষার্থীরা কী বলছেন
-                </h2>
-              </div>
+              <h2 id="testimonials-heading" className="text-center text-2xl font-semibold tracking-tight sm:text-3xl">
+                শিক্ষার্থীরা কী বলছেন
+              </h2>
             </AnimateIn>
-            <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              {testimonials.map((t, index) => (
-                <AnimateIn
-                  key={t.name}
-                  variant="fade-up"
-                  delay={index * 120}
-                  duration={500}
-                >
-                  <Card className="border card-hover-lift h-full">
-                    <CardHeader>
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: t.stars }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className="size-4 fill-yellow-400 text-yellow-400"
-                          />
-                        ))}
-                      </div>
-                      <CardDescription className="text-foreground/80 italic">
-                        &quot;{t.text}&quot;
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm font-medium">{t.name}</p>
+
+            <ul className="mt-10 grid gap-6 sm:grid-cols-3">
+              {testimonials.map((t) => (
+                <li key={t.name}>
+                  <figure className="flex h-full flex-col rounded-2xl border bg-card p-6">
+                    <div className="flex gap-0.5" role="img" aria-label={`${t.stars} স্টার রেটিং`}>
+                      {Array.from({ length: t.stars }).map((_, i) => (
+                        <Star key={i} className="size-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+                      ))}
+                    </div>
+                    <blockquote className="mt-3 flex-1 leading-relaxed text-foreground/90">
+                      &quot;{t.text}&quot;
+                    </blockquote>
+                    <figcaption className="mt-5 border-t pt-4">
+                      <p className="text-sm font-semibold">{t.name}</p>
                       <p className="text-xs text-muted-foreground">{t.role}</p>
-                    </CardContent>
-                  </Card>
-                </AnimateIn>
+                    </figcaption>
+                  </figure>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
 
@@ -419,10 +498,10 @@ export default function LandingPage() {
         <Pricing />
 
         {/* ── About ── */}
-        <section className="border-b">
+        <section aria-labelledby="about-heading" className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
             <AnimateIn variant="fade-up" duration={500}>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h2 id="about-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
                 আমাদের সম্পর্কে
               </h2>
               <div className="mt-6 max-w-2xl">
@@ -436,32 +515,36 @@ export default function LandingPage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   Farhan Software | প্রতিষ্ঠাতা: Mojnu Miah
                 </p>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
+                <p className="mt-4 leading-relaxed text-muted-foreground">
                   প্রস্তুতির শুরুতেই সঠিক দিকনির্দেশনা পেলে সময় অনেকটাই বাঁচানো
                   সম্ভব। Farhan MCQ আপনাকে শুরু থেকেই একটি পরিষ্কার roadmap
                   দেয়। আমাদের লক্ষ্য — প্রতিটি শিক্ষার্থীকে এমনভাবে প্রস্তুত
                   করা যেন তারা আত্মবিশ্বাসের সাথে যেকোনো পরীক্ষায় অংশ নিতে
                   পারে।
                 </p>
-                <p className="mt-4 text-sm italic text-muted-foreground">
-                  কবি সুকান্ত ভট্টাচার্য আমাদের অনুপ্রেরণা —
-                  <br />
-                  <em>
+                <blockquote className="mt-5 border-l-2 border-primary/40 pl-4 text-sm italic text-muted-foreground">
+                  <p>
                     &quot;ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমার চাঁদ যেন
                     ঝলসানো রুটি&quot;
-                  </em>
-                </p>
+                  </p>
+                  <footer className="mt-1 not-italic">
+                    — কবি সুকান্ত ভট্টাচার্য, আমাদের অনুপ্রেরণা
+                  </footer>
+                </blockquote>
               </div>
             </AnimateIn>
           </div>
         </section>
 
         {/* ── FAQ ── */}
-        <section className="border-t bg-muted/40">
+        <section aria-labelledby="faq-heading" className="bg-muted/40">
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Frequently asked questions
+            <h2 id="faq-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              সাধারণ প্রশ্নের উত্তর
             </h2>
+            <p className="mt-2 text-muted-foreground">
+              সাইন আপ করার আগে যা জানতে চাইতে পারেন।
+            </p>
             <div className="mt-8 max-w-2xl">
               <Accordion type="single" collapsible className="w-full">
                 {faqs.map((faq, index) => (
@@ -478,20 +561,19 @@ export default function LandingPage() {
         </section>
 
         {/* ── Final CTA ── */}
-        <section className="border-b bg-primary text-primary-foreground relative overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <section aria-labelledby="cta-heading" className="relative overflow-hidden border-y bg-primary text-primary-foreground">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <div className="absolute -top-20 -right-20 size-60 rounded-full bg-white/5 blur-2xl animate-float" />
             <div className="absolute -bottom-20 -left-20 size-60 rounded-full bg-white/5 blur-2xl animate-float-delayed" />
           </div>
-          <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20 relative">
+          <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20">
             <AnimateIn variant="scale-up" duration={600}>
-              <Clock className="mx-auto size-10 mb-4 opacity-80" />
-              <h2 className="text-2xl font-bold sm:text-3xl">
-                আজই শুরু করুন — দেরি না করাই ভালো!
+              <Clock className="mx-auto mb-4 size-10 opacity-80" aria-hidden="true" />
+              <h2 id="cta-heading" className="text-2xl font-bold sm:text-3xl">
+                আজই অ্যাকাউন্ট খুলুন, আজই প্রথম পরীক্ষা দিন
               </h2>
-              <p className="mt-3 text-primary-foreground/80 max-w-md mx-auto">
-                প্রতিদিন হাজার হাজার প্রার্থী প্রস্তুতি নিচ্ছে। আপনি কি পিছিয়ে
-                থাকবেন?
+              <p className="mx-auto mt-3 max-w-md text-primary-foreground/80">
+                প্রতিটি দিনের প্রস্তুতি আপনাকে চাকরির এক ধাপ কাছে নিয়ে যায়।
               </p>
               <FinalCTAButton />
             </AnimateIn>
