@@ -65,7 +65,7 @@ export default function Pricing() {
 
                     <p className="mt-4 flex items-baseline gap-1.5">
                       <span className="text-4xl font-bold tracking-tight">
-                        ৳{pkg.price}
+                        ৳{pkg.price - pkg.discount}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         / {pkg.durationDays} দিন
