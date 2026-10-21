@@ -442,7 +442,7 @@ export default function JobCircularPage() {
             <div className="flex items-center gap-2 mb-1">
               <Briefcase className="size-5 text-primary" />
               <h1 className="text-2xl font-semibold tracking-tight">
-                সরকারি চাকরির বিজ্ঞপ্তি
+                চাকরির বিজ্ঞপ্তি
               </h1>
             </div>
             <p className="text-sm text-muted-foreground">
