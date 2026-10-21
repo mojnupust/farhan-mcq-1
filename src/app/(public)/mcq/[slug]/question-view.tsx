@@ -4,6 +4,7 @@ import type { PublicQuestionDto } from "@/features/questions";
 import { publicMcqUrl } from "@/features/questions/server";
 import { sanitizeHtml } from "@/lib/sanitize";
 import Link from "next/link";
+import { McqSignupCard } from "./mcq-signup-card";
 
 const OPTION_LETTERS: Record<string, string> = {
   A: "ক",
@@ -223,6 +224,7 @@ export function PublicQuestionView({
               {question.subExamCategoryName} →
             </Link>
           </div>
+          <McqSignupCard />
         </aside>
       </div>
     </div>
