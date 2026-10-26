@@ -6,6 +6,8 @@ export interface SubExamCategory {
   description: string | null;
   sortOrder: number;
   isActive: boolean;
+  /** true হলে শুধু admin দেখতে পায় (public list/sitemap/Google থেকে লুকানো) */
+  isAdminOnly?: boolean;
   createdAt: string;
 }
 
@@ -23,6 +25,7 @@ export interface UpdateSubExamCategoryInput {
   description?: string;
   sortOrder?: number;
   isActive?: boolean;
+  isAdminOnly?: boolean;
 }
 
 export interface BulkUpsertSubExamCategoryItem {

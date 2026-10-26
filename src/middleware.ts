@@ -15,6 +15,12 @@ const PROTECTED_PREFIXES = [
 
 const ADMIN_PREFIXES = ["/admin"];
 
+// Search engine-এ যে path কখনো যাবে না
+const NOINDEX_PREFIXES = [
+  "/exams/topic-wise-preparation/random-exams",
+  "/admin",
+];
+
 // ─── Security Headers ──────────────────────────────────────────────────────
 const securityHeaders = {
   // Prevent MIME-type sniffing
@@ -65,6 +71,12 @@ export function middleware(request: NextRequest) {
   // Apply all security headers
   for (const [key, value] of Object.entries(securityHeaders)) {
     response.headers.set(key, value);
+  }
+
+  // Admin-only exam category: Google যেন কোনোভাবেই index না করে
+  // (backend সবসময় 404 দেয়, এটা বাড়তি নিরাপত্তা)
+  if (NOINDEX_PREFIXES.some((p) => pathname.startsWith(p))) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
 
   // In mock mode, allow all routes

@@ -138,6 +138,25 @@ export default function AdminSubCategoriesPage() {
     }
   };
 
+  // Public <-> শুধু Admin বদলান (backend cache আলাদা key-তে, তাই সঙ্গে সঙ্গে কাজ করে)
+  const handleToggleAdminOnly = async (sub: SubExamCategory) => {
+    const next = !sub.isAdminOnly;
+    const ok = window.confirm(
+      next
+        ? `"${sub.name}" শুধু Admin-এর জন্য লুকানো হবে। নিশ্চিত?`
+        : `"${sub.name}" সবার জন্য Public হয়ে যাবে। নিশ্চিত?`,
+    );
+    if (!ok) return;
+    try {
+      await subExamCategoryService.update(sub.id, { isAdminOnly: next });
+      setSubCategories((prev) =>
+        prev.map((s) => (s.id === sub.id ? { ...s, isAdminOnly: next } : s)),
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleEdit = (sub: SubExamCategory) => {
     setForm({
       examCategoryId: sub.examCategoryId,
@@ -317,9 +336,18 @@ export default function AdminSubCategoriesPage() {
                     </TableCell>
                     <TableCell>{sub.sortOrder}</TableCell>
                     <TableCell>
-                      <Badge variant={sub.isActive ? "default" : "secondary"}>
-                        {sub.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                      </Badge>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant={sub.isActive ? "default" : "secondary"}>
+                          {sub.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                        </Badge>
+                        <Button
+                          variant={sub.isAdminOnly ? "destructive" : "outline"}
+                          size="sm"
+                          onClick={() => handleToggleAdminOnly(sub)}
+                        >
+                          {sub.isAdminOnly ? "🔒 শুধু Admin" : "🌐 Public"}
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
